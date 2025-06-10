@@ -1,0 +1,5 @@
+Turn the following input into a casual podcast monologue.
+Make it fun, engaging and conversational.
+
+Input:
+{input_text}

@@ -1,0 +1,5 @@
+Rewrite the following input in the style of an educational science podcast.
+Keep the tone informative and precise.
+
+Input:
+{input_text}
