@@ -16,7 +16,7 @@ llm = AzureChatOpenAI(
 )
 
 PROMPT_PATHS = {
-    "scientific": Path("src/prompts/scientific_style.txt"),
+    "scientific": Path("prompts/scientific_style.txt"),
     "casual": Path("src/prompts/casual_style.txt"),
 }
 
@@ -31,5 +31,8 @@ def generate_podcast_text(style: str, input_text: str) -> str:
     return response.content
 
 if __name__ == "__main__":
-    output = generate_podcast_text("scientific", "climate change and its impact on our oceans")
+    output = generate_podcast_text("scientific", "Podcast o słoniu po polsku")
     print(output)
+    # print(os.getenv("API_VERSION"))
+    # print(os.getenv("AZURE_OPENAI_DEPLOYMENT"))
+    # print(os.getenv("AZURE_OPENAI_ENDPOINT"))
