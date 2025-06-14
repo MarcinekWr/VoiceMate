@@ -17,7 +17,7 @@ if st.button("🎧 Generuj podcast"):
                 output = generate_podcast_text(style, input_text)
                 audio_path = "output.mp3"
                 text_to_speech(output, filename=audio_path)
-                
+
                 st.success("🎧 Gotowe! Posłuchaj nagrania:")
                 st.audio(audio_path, format="audio/mp3")
                 st.text_area("📝 Wygenerowany tekst:", output, height=250)
