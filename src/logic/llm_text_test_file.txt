@@ -1,0 +1,707 @@
+Spis treści
+Przedmowa . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+1. Wprowadzenie . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+1.1. Sztuczna inteligencja, uczenie maszynowe i uczenie głębokie . . . . . . . . . . . . . . . . . . . . . . . 9
+1.2. Klasyczne programowanie a uczenie maszynowe . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+2. Etapy uczenia maszynowego . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+3. Reprezentacja danych . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+3.1. Oznaczenia i nomenklatura . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+3.2. Uczenie nadzorowane i nienadzorowane . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15
+3.3. Zbiór treningowy i testowy . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+4. Regresja, klasyfikacja i klasteryzacja . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18
+5. Miary sukcesu . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+5.1. Regresja . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+5.2. Klasyfikacja . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+5.3. Klasteryzacja . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+6. Konfiguracja środowiska programistycznego . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 24
+7. Parametryzacja sygnału i ekstrakcja cech . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+7.1. Parametry czasowe . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+7.2. Parametry widmowe . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28
+7.3. Parametry formantowe . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+7.4. Parametry czasowo-częstotliwościowe . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31
+8. Algorytm k-najbliższych sąsiadów (ang. k-nearest neighbours, k-NN) . . . . . . . . . . . . . . . . . . 40
+9. Przekleństwo wymiarowości . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 48
+9.1. Analiza składowych głównych (ang. Principal Component Analysis, PCA) . . . . . . . . . . . . 49
+9.2. Analiza składowych niezależnych (ang. Independent Component Analysis, ICA) . . . . . . . 55
+10. Algorytm k-średnich . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 62
+11. Algorytmy hierarchiczne . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 68
+11.1. Miara odległości między skupieniami . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 68
+11.2. Metody aglomeracyjne . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 69
+11.3. Metody deaglomeracyjne . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 69
+12. Regresja liniowa . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 72
+12.1. Metoda analityczna . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 74
+12.2. Regularyzacja Tichonowa . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 75
+12.3. Metoda gradientu prostego . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 76
+13. Uogólnione modele liniowe (ang. Generalized Linear Models, GML) . . . . . . . . . . . . . . . . . . . 85
+13.1. Regresja liniowa jako uogólniony model liniowy . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 85
+6 Podstawy uczenia maszynowego
+14. Regresja logistyczna . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 87
+14.1. Ocena jakości modelu regresji logistycznej . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 89
+15. Metody wektorów nośnych . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 96
+15.1. Margines . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 97
+15.2. Klasyfikator maksymalizujący margines (ang. Maximal Margin Classifier, MMC) . . . . 97
+15.3. Klasyfikator wektorów nośnych (ang. Support Vector Classifier, SVC) . . . . . . . . . . . . . . . 99
+15.4. Maszyna wektorów nośnych (ang. Support Vector Machine, SVM) . . . . . . . . . . . . . . . . . . 100
+15.5. Maszyna wektorów nośnych w klasyfikacji wieloklasowej . . . . . . . . . . . . . . . . . . . . . . . . . 102
+16. Drzewa klasyfikacyjne i lasy losowe . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 109
+16.1. Drzewa klasyfikacyjne . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 109
+16.1.1. Współczynnik Giniego . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 112
+16.1.2. Entropia i zysk informacyjny . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 113
+16.1.3. Przycinanie drzew klasyfikacyjnych . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 113
+16.2. Lasy losowe . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 114
+17. Wprowadzenie do sieci neuronowych . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 132
+17.1. Perceptron . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 132
+17.2. Wielowarstwowe sieci neuronowe . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 134
+Dodatek . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 145
+Rozwiązania zadań . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 149
+Bibliografia . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 189
+7
+Przedmowa
+Niniejsza praca przeznaczona jest przede wszystkim dla studentów inżynierii akustycznej, jako pomoc
+naukowa w  realizacji treści przedmiotu podstawy uczenia maszynowego w  technologiach akustycznych. Jest to kompendium wykładanych treści w postaci zestawienia podstawowych algorytmów uczenia maszynowego wraz z wprowadzeniem do implementacji tych metod przy użyciu języka Python, na
+przykładzie wybranych zadań z rozwiązaniami.
+Celem niniejszej monografii nie było szczegółowe przedstawienie każdej z metod uczenia maszynowego. Autorki chciały uniknąć stworzenia kolejnego bardzo fachowego podręcznika, którego lektura wymagałaby długiego czasu i dużego zaangażowania czytelnika, a tym samym ryzyka, że studenci
+chętniej sięgną po coraz liczniejsze, ogólnodostępne w  Internecie teksty popularnonaukowe. Dlatego
+też zamierzeniem autorek było możliwie zwięzłe przedstawienie podstawowych metod uczenia maszynowego z odniesieniami do literatury fachowej, pozwalającymi zainteresowanym czytelnikom znaleźć
+bardziej szczegółowy opis poszczególnych zagadnień. Ponadto zadaniem publikacji jest uwypuklenie
+podstawowych treści, które na wykładzie z podstaw uczenia maszynowego w technologiach akustycznych są przedstawione w dużo szerszym zakresie. Praca ta ma być zatem bazą podstawowej wiedzy dla
+osób, które dopiero rozpoczynają naukę uczenia maszynowego. Dlatego też w większości przypadków,
+gdzie zrozumienie sposobu działania danego algorytmu tego nie wymagało, zrezygnowano z formalizmów matematycznych. Jednak w  uzasadnionych przypadkach, pod warunkiem, że było to możliwe
+bez wykraczania poza podstawy matematyki wyższej, w celu wytłumaczenia powiązania pewnych algorytmów, zamieszczono wyprowadzenia matematyczne tych metod. Powinno to zaspokoić co bardziej
+dociekliwych czytelników.
+W monografii zestawiono najbardziej podstawowe algorytmy, które pozwalają w przystępny sposób
+przedstawić istotę rozwiązywania problemów metodami uczenia maszynowego. Poznanie idei działania
+wybranych metod pozwoli studentom w przyszłości zrozumieć również bardziej zaawansowane algorytmy uczenia maszynowego i świadomie ich używać . Wybór opisanych metod podyktowany był też próbą
+przedstawienia szerokiego wachlarza technik stosowanych w uczeniu maszynowym.
+Pomimo ścisłego powiązania niniejszej publikacji z konkretnym programem studiów zadbano, aby
+prezentowane zadania i przykłady zastosowań poszczególnych algorytmów nie ograniczały się wyłącznie
+do technologii akustycznych. W monografii można znaleźć proste przykłady z bardzo różnych dziedzin.
+Z jednej strony ma to na celu pokazanie szerokich możliwości zastosowania przedstawionych metod,
+natomiast z drugiej powoduje, że praca ta może być wartościową pozycją nie tylko dla studentów inżynierii akustycznej.
+Pierwsze pięć rozdziałów ma na celu wprowadzenie czytelnika w ogólne nazewnictwo i ideę uczenia
+maszynowego. Rozdział 1 tłumaczy, czym jest uczenie maszynowe w kontekście sztucznej inteligencji.
+W drugim rozdziale przedstawiono ogólne kroki postępowania w rozwiązywaniu problemów metodami uczenia maszynowego. W rozdziale 3 ustalono oznaczenia obowiązujące w całej publikacji, a także
+podzielono metody uczenia maszynowego – zgodnie z przyjętą nomenklaturą – na uczenie nadzorowane
+i nienadzorowane. Omówiono także zagadnienie podziału zbioru danych na zbiór treningowy i testowy.
+W rozdziale 4 rozróżniono trzy podstawowe problemy rozwiązywane metodami uczenia maszynowego,
+czyli regresję, klasyfikację i klasteryzację. Rozdział 5 posłużył wprowadzeniu miar sukcesu w zależności
+od tego, czy mamy do czynienia z regresją, klasyfikacją, czy klasteryzacją. W rozdziale tym przedstawiono jedynie najbardziej uniwersalne miary sukcesu, natomiast te bardziej specyficzne, jak np. strata logarytmiczna czy metryka ROC AUC, zostały opisane w późniejszych rozdziałach wraz z odpowiednimi
+algorytmami.
+8 Podstawy uczenia maszynowego
+Celem kolejnych dwóch rozdziałów jest wprowadzenie do implementacji metod uczenia maszynowego. Najpierw przedstawiono konfigurację środowiska programistycznego, a  następnie sposoby
+parametryzacji sygnału. W rozdziałach 8–17 przedstawiono konkretne algorytmy stosowane w uczeniu
+maszynowym. Większość z  tych rozdziałów składa się z  trzech części. Pierwsza część to syntetyczne
+wprowadzenie do metody, ogólna idea jej działania oraz kroki algorytmu, druga to implementacja konkretnych przykładów, natomiast trzecia to zadania do samodzielnego opracowania, przy czym ich rozwiązania można znaleźć w ostatnim rozdziale.
+Kolejność przedstawionych metod została ustalona tak, aby stopniować trudność w zrozumieniu
+działania przedstawianych metod, ale też sukcesywnie wprowadzać kolejne funkcje w języku Python.
+Tym samym, w rozdziale 8 opisano najprostszą z metod uczenia maszynowego, czyli klasyfikację algorytmem k-najbliższych sąsiadów. W następnym rozdziale omówiono problem przekleństwa wymiarowości oraz przedstawiono dwie metody redukcji wymiarowości. Kolejne dwa rozdziały przedstawiają
+metody klasteryzacji – algorytm k-średnich oraz algorytmy hierarchiczne. Rozdziały 12–14 stanowią
+pewną integralną całość i dotyczą uogólnionych modeli liniowych. W rozdziale 12 przedstawiono model
+regresji liniowej. Rozdział 13 jest teoretycznym wprowadzeniem pojęcia uogólnionych modeli liniowych. Wykazano też, że opisana we wcześniejszym rozdziale regresja liniowa jest szczególnym przypadkiem uogólnionego modelu liniowego. Natomiast w rozdziale 14 wprowadzono regresję logistyczną jako
+uogólniony model liniowy, pokazując tym samym sposób, w  jaki należy konstruować model liniowy
+adekwatnie do rozwiązywanego problemu. W rozdziale 15 omówiono trudniejszą metodę klasyfikacji,
+jaką jest maszyna wektorów nośnych. Rozdział 16 to opis drzew klasyfikacyjnych z przykładem agregacji
+klasyfikatorów metodą lasów losowych. Rozdział 17 stanowi wprowadzenie do sieci neuronowych. Aby
+nie zdominować publikacji zagadnieniami z  tej tematyki, ograniczono się do przedstawienia jedynie
+ogólnej idei i najprostszych realizacji. Jeżeli w którymś z rozdziałów potrzebna była znajomość pewnych
+definicji, twierdzeń czy własności z zakresu podstawowego kursu matematyki na studiach, ich przypomnienie podano w dodatku.
+9
+1 Wprowadzenie
+Sztuczna inteligencja jest dziś bardzo popularnym kierunkiem. Można o  niej przeczytać zarówno
+w bardzo fachowych czasopismach, jak i – coraz częściej – w źródłach popularnonaukowych. Wraz
+ze wzrostem popularności rośnie grupa entuzjastów prezentujących nieraz wręcz utopijne wizje tego
+jak sztuczna inteligencja już niebawem zmieni nasz świat. Nie brakuje jednak także sceptyków. Do
+tej grupy należą często osoby, które śledzą historię dokonań w dziedzinie sztucznej inteligencji i wiedzą, że wiele z nierealnych wizji zweryfikowała już rzeczywistość. Wydaje się zatem, że w środowisku
+naukowym minęły już czasy wyolbrzymiania możliwości, jakie daje wykorzystanie narzędzi sztucznej inteligencji. W czasie rozwoju tej dziedziny w ostatnich dekadach obserwowano zarówno wzloty,
+jak i upadki. Odkrycie niektórych metod sztucznej inteligencji rzeczywiście zrewolucjonizowało wiele
+różnych dziedzin, ale zwykle po tym przychodziły momenty stagnacji i zapomnienia, aż do kolejnych
+przełomów. Dzisiaj w niemal każdym obszarze naszego życia można doszukać się mniej lub bardziej
+znaczących zastosowań sztucznej inteligencji, także w obszarze akustyki i inżynierii dźwięku. Dlatego zdecydowanie warto poznać przynajmniej podstawowe narzędzia sztucznej inteligencji, a uczenie
+maszynowe w szczególności. Należy jednak pamiętać, że metody sztucznej inteligencji wspierają pracę
+ludzi, ale wciąż jeszcze to wiedza i doświadczenie człowieka są niezastąpione.
+1.1. Sztuczna inteligencja, uczenie maszynowe i uczenie głębokie
+Na początku należy wyjaśnić pojęcia, które kojarzą się z tematem uczenia maszynowego, ale dość często
+są mylnie używane. Najszerszym pojęciem jest tutaj sztuczna inteligencja (ang. Artificial Intelligence, AI)
+i jest to dział, do którego należą nie tylko metody uczenia maszynowego (ang. Machine Learning, ML),
+ale też wiele innych. Szczególnym przypadkiem uczenia maszynowego jest uczenie głębokie (ang. Deep
+Learning, DL). Natomiast najlepszym przykładem metod sztucznej inteligencji, które wyraźnie odróżniają się od metod uczenia maszynowego, jest symboliczna sztuczna inteligencja. Zależność pomiędzy
+tymi pojęciami przedstawia rysunek 1.1.
+Rysunek 1.1. Podział metod z zakresu sztucznej inteligencji
+10 Podstawy uczenia maszynowego
+Aby zrozumieć podstawową różnicę pomiędzy uczeniem maszynowym a  symboliczną sztuczną
+inteligencją, wyjaśnijmy najpierw, czym jest symboliczna sztuczna inteligencja. Najlepszym jej przykładem są wczesne symulatory gry w szachy. W takich symulatorach to programista musiał wcześniej opracować reguły. Natomiast w uczeniu maszynowym dostarczane są dane, ale to algorytm ma za zadanie
+znalezienie reguł. Oczywiście nie oznacza to, że maszyna zastąpi człowieka. Sukces uczenia maszynowego wiąże się z wiedzą i doświadczeniem osoby, która go używa. Dotyczy to przede wszystkim wyboru
+adekwatnego algorytmu, odpowiadającego charakterowi problemu, z którym się mierzymy. Ważne jest
+także odpowiednie przygotowanie danych. Niemniej jednak ostatecznie to algorytm uczenia maszynowego ma dostarczyć zestawu reguł, które będą odpowiedzialne za udzielanie odpowiedzi w zadanym
+przez nas problemie, przy czym reguły te często nie są określane jako jawny wzór.
+1.2. Klasyczne programowanie a uczenie maszynowe
+Porównanie wspomnianego we wcześniejszym podrozdziale przykładu algorytmu sztucznej inteligencji z uczeniem maszynowym prowadzi do ogólnego rozróżnienia klasycznego programowania i metod
+uczenia maszynowego. Schemat rozwiązywania problemu za pomocą programowania klasycznego
+przedstawia rysunek 1.2.
+Dane
+Reguły
+Odpowiedzi Programowanie
+klasyczne
+Rysunek 1.2. Schemat rozwiązywania problemu za pomocą programowania klasycznego
+Aby zwizualizować proces rozwiązywania problemów za pomocą uczenia maszynowego, trzeba
+wyszczególnić dwa etapy: etap trenowania systemu w celu określenia reguł, które będą podstawą modelu,
+oraz etap docelowego użycia otrzymanego modelu, co przedstawiają kolejne schematy (rys. 1.3 oraz rys. 1.4).
+Dane treningowe
+Oczekiwane odpowiedzi
+opcjonalnie
+Reguły Uczenie
+maszynowe
+Rysunek 1.3. Schemat trenowania modelu za pomocą uczenia maszynowego
+Zauważmy, że w przypadku uczenia maszynowego na wejściu możemy dysponować jedynie danymi
+treningowymi. Oczekiwane odpowiedzi podajemy opcjonalnie (w zależności od tego, czy mamy do czynienia z uczeniem nadzorowanym, czy nienadzorowanym, przyjrzymy się temu tematowi dokładniej w podrozdziale 3.2). Następnie na podstawie danych wejściowych wytrenowany model przewiduje dane wyjściowe.
+Dane wejściowe Dane wyjściowe Wytrenowany model
+czyli zestaw reguł
+opracowany przez algorytm
+Rysunek 1.4. Schemat rozwiązywania problemu za pomocą modelu wytrenowanego
+za pomocą metod uczenia maszynowego
+11
+2 Etapy uczenia maszynowego
+Uczenie maszynowe obejmuje szeroki wachlarz bardzo zróżnicowanych metod mających jednak pewne
+wspólne cechy możliwe do uogólnienia. W ten sposób można przybliżyć zestaw kroków, które niezależnie od metody należy wykonać, aby za pomocą uczenia maszynowego rozwiązać dany problem. W rozdziale tym zostaną omówione poszczególne etapy uczenia maszynowego.
+1. Zdefiniowanie problemu
+Im precyzyjniej zostanie określony problem, którego rozwiązanie jest poszukiwane, tym lepiej będzie
+można dobrać najefektywniejszy algorytm uczenia maszynowego. Problem należy docelowo zdefiniować
+w języku metod uczenia maszynowego, czyli dopasować go do dostępnych metod uczenia maszynowego.
+Wybranie właściwej metody ułatwia uprzednie zaklasyfikowanie rozwiązywanego problemu do odpowiedniej grupy. Najczęściej wyszczególnia się trzy typy problemów, które można rozwiązać za pomocą
+algorytmów: regresji, klasyfikacji albo klasteryzacji. Języki, którymi posługują się wyszczególnione grupy algorytmów uczenia maszynowego, zostały opisane w rozdziale 4. Należy także nadmienić, że wiele
+problemów tylko pozornie nie spełnia wymagań metod uczenia maszynowego i często wystarczy problem przedefiniować, aby móc skutecznie użyć jednego z algorytmów. Dlatego też jest to bardzo ważny
+etap, od którego w dużym stopniu zależy ewentualny sukces zastosowania metod uczenia maszynowego.
+2. Zebranie danych wejściowych i – jeżeli to możliwe – danych wyjściowych
+Od jakości i ilości danych zależy jakość modelu. Szczegółowe informacje dotyczące zbioru danych opisano w rozdziale 3. Ważnym pojęciem związanym z wymaganą ilością danych jest przekleństwo wymiarowości.
+3. Uporządkowanie danych
+Etap ten dotyczy standardowych działań wykonywanych w celu przygotowania danych do analizy, takich
+jak: czyszczenie, imputacja, standaryzowanie, formatowanie, ewentualnie wstępne grupowanie czy
+selekcja. Zwykle na tym etapie dokonuje się również przygotowanie danych zgodnie z wymaganiami
+algorytmu, który będziemy chcieli zastosować.
+4. Jeśli to możliwe, podział na zbiory: treningowy i testowy
+Każdy model musi być trenowany na pewnym zbiorze danych, ale potrzebny jest również oddzielny zbiór
+obiektów do weryfikacji, czy wytrenowany model działa w sposób zadowalający. W tym celu, zanim rozpoczęty zostanie etap trenowania modelu, należy zbiór danych podzielić. Więcej informacji na ten temat
+można znaleźć w podrozdziale 3.3.
+5. Wybór algorytmu
+W pierwszym kroku, w wyniku zdefiniowania problemu w języku technik uczenia maszynowego, wybór
+został zawężony do konkretnej grupy algorytmów, np. regresji, klasyfikacji czy klasteryzacji. Wybór grupy algorytmów determinuje zwykle, czy powinno to być uczenie z nadzorem, czy bez nadzoru. Jednak
+w obrębie każdej grupy mamy wiele algorytmów, które w różny sposób będą prowadzić do tego samego
+12 Podstawy uczenia maszynowego
+celu, ale ich np. sprawność czy efektywność będzie inna w zależności od danych. I w tym miejscu należy
+zaznaczyć, że uczenie maszynowe nie jest nauką teoretyczną, ale empiryczną. Oczywiście dysponujemy pewnym zasobem wiedzy o poszczególnych algorytmach, ale ostatecznie liczą się rezultaty. Jeżeli
+dany algorytm daje w naszym przypadku zadowalające efekty, to znaczy, że jest odpowiedni. Natomiast
+określenie, który algorytm będzie dla nas najlepszy, często następuje w wyniku prób i błędów. Dlatego
+zachęca się do próbowania i nie poddawania się, jeżeli pierwszy zastosowany algorytm zawiedzie. Uczenie maszynowe jest dla wytrwałych. W kolejnych rozdziałach zostaną scharakteryzowane i szczegółowo
+opisane wybrane algorytmy uczenia maszynowego.
+UWAGA
+Wybór algorytmu powinno się zaczynać od najprostszych algorytmów. Nie jest prawdą, że im
+bardziej złożony algorytm, tym lepiej sobie poradzi i będzie bardziej uniwersalny. Ponadto warto zawsze skorzystać z wiedzy i doświadczenia osób, które z podobnym problemem mierzyły się już
+wcześniej. Polecane źródła takiej wiedzy to: Papers with Code, Kaggle, Arxiv, DeepLearn.org, Github,
+publikacje naukowe.
+6. Ustalenie wartości hiperparametrów dla wybranego algorytmu
+Większość algorytmów uczenia maszynowego wymaga określenia wartości pewnych zmiennych konfiguracyjnych zwanych hiperparametrami. W zależności od algorytmu może to być np.:
+– liczba k w algorytmie k-najbliższych sąsiadów,
+– maksymalna głębokość drzewa decyzyjnego,
+– liczba drzew w lesie losowym,
+– liczba warstw w sieci neuronowej.
+Hiperparametry muszą zostać podane a priori, nie uzyskuje się ich w wyniku trenowania modelu
+ani nie są modyfikowane w trakcie wykonywania algorytmu, chyba że są zadane w postaci funkcji zależnej od np. numeru iteracji. Wybór wartości hiperparametrów danego algorytmu wpływa na jego pracę
+i przekłada się na uzyskane wyniki
+7. Określenie miary sukcesu
+Miary sukcesu, najczęściej wyrażone jako miary błędu, są potrzebne, aby ocenić, czy wytrenowany
+model pozwala uzyskać zadowalające efekty. Wybór algorytmu determinuje zwykle dostępną grupę
+miar sukcesu, ale nie oznacza to, że nie możemy zdefiniować swojej miary, która będzie weryfikować
+to, na czym nam najbardziej zależy. Opis najczęściej stosowanych miar sukcesu można znaleźć w rozdziale 5.
+8. Trening
+Jest to etap bezpośredniego powstawania modelu. Dane treningowe są przedstawiane w wybranym algorytmie, a algorytm na ich podstawie buduje reguły. Celowo została tutaj użyta forma wskazująca na to, że
+algorytm wykonuje tę pracę samodzielnie. Tak jak zostało to opisane w podrozdziale 1.1, w odróżnieniu
+od programowania klasycznego, algorytmy uczenia maszynowego służą opracowaniu reguł. Należy jednak zaznaczyć, że zwykle finalnie opracowane reguły nie mają postaci jawnej. Wytrenowany model jest
+uogólnieniem zależności, które można zaobserwować w prezentowanych danych.
+9. Ewaluacja otrzymanego modelu
+W tym celu wykorzystuje się ustaloną wcześniej miarę sukcesu. Jeżeli wynik jest zadowalający, uczenie
+maszynowe dobiega końca i możemy korzystać z uzyskanego modelu. W przeciwny wypadku przechodzimy do kolejnego etapu.
+2. Etapy uczenia maszynowego 13
+10. Optymalizacja hiperparametrów
+Jeżeli ewaluacja wskazała, że wytrenowany model nie jest zadowalający, zanim zdecydujemy się wykorzystać inny algorytm, warto dokonać zmian w obrębie ustalonych wartości hiperparametrów wybranego algorytmu. Po wyborze innej wartości hiperparametru należy wrócić do kroku numer 7, czyli
+na nowo wytrenować model i ponownie go ocenić. Jeżeli sterowanie hiperparametrami nie przyniesie
+rezultatów, trzeba wrócić do etapu wyboru algorytmu. Jeżeli kolejne algorytmy nie będą działać zgodnie
+z oczekiwaniami, warto przeanalizować możliwość zmian w punktach 1–4.
+14
+3 Reprezentacja danych
+Oprócz znajomości algorytmów uczenia maszynowego ważnym kluczem do sukcesu jest również dysponowanie odpowiednimi danymi. Można nawet powiedzieć, że na osiągnięty sukces w dziedzinie uczenia
+maszynowego ma wpływ nie tylko umiejętnie użyty algorytm, ale w dużej mierze również to, jakie dane
+zostały użyte. Ważna jest świadomość tego, jak potrzebny jest ten etap, ponieważ od niego może zależeć
+powodzenie całej pracy. Przy czym konieczna jest tutaj nie tylko odpowiednia ilość, ale też jakość danych
+i adekwatna do rozpatrywanego problemu ich reprezentacja.
+Aspekty, na które należy zwrócić uwagę przy przygotowywaniu danych, podano poniżej.
+Reprezentatywność
+Nie możemy oczekiwać od systemu, że nauczy się dobrze np. klasyfikować dowolne przykłady muzyczne,
+jeżeli w zbiorze treningowym znajdą się tylko przykłady wybranych gatunków muzycznych z biblioteki ulubionych utworów autora pracy. Aby zapewnić reprezentatywność danych, wystarczy zadbać, aby
+dobór przykładów treningowych był próbą losową prostą, tj. ciągiem niezależnych zmiennych losowych
+o jednakowych rozkładach, takich samych jak zmienna losowa w całej populacji. Zatem próbę losową
+pobieramy z populacji wszystkich możliwych przykładów dla danego problemu.
+Jakość
+Dane powinny być usystematyzowane, a wszelkie ich braki powinny zostać rozpatrzone pod kątem
+zysków i strat. Zatem jeżeli mamy odpowiednio dużo danych, odrzucamy te niekompletne, w przeciwnym wypadku dokonujemy imputacji brakujących wartości w obrębie wybrakowanych atrybutów.
+Ilość
+W tym punkcie należy wspomnieć o znamiennym przekleństwie wymiarowości, czyli wykładniczym wzroście wymaganej liczby danych wraz ze wzrostem liczby zmiennych w modelu (opisanym w rozdziale 9).
+Ujednolicony zapis
+Analizę bardzo upraszcza konsekwencja i jednolity zapis danych. Dlatego poniżej wprowadzony zostanie
+dość intuicyjny zapis wektorowy, który dobrze oddaje wielowymiarowy charakter obiektów w zbiorach
+treningowym i testowym.
+3.1. Oznaczenia i nomenklatura
+Najczęściej stosowaną reprezentacją danych w uczeniu maszynowym jest reprezentacja atrybut-wartość.
+W uczeniu maszynowym każdy obiekt jest opisany przez ustalony zestaw wartości zadanych atrybutów
+warunkowych. Zatem jeżeli rozważamy d atrybutów (d ∈ ℕ), to dla każdego obiektu w zbiorze danych
+musi zostać podanych d wartości, przy czym każda z nich pochodzi ze zbioru wartości tego atrybutu.
+Ustalone wartości atrybutów dla kolejnych obiektów w zbiorze danych przestawia tzw. tablica informacyjna (tab. 3.1).
+3. Reprezentacja danych 15
+Zatem w N-licznym zbiorze d-wymiarowych danych możemy przyjąć następujące oznaczenia:
+X – d-wymiarowa przestrzeń, z której pochodzą dane wejściowe, d ∈ N,
+x(j)
+ = (x1
+(j)
+, x2
+(j)
+, ..., xd
+(j)
+), j = 1, ..., N – j-ta dana wejściowa,
+xi
+(j)
+, i = 1, 2, ..., d – wartość i-tego atrybutu warunkowego dla j-tego przykładu.
+Tabela 3.1. Tablica informacyjna
+A1 A2 ... Ad
+x(1) x1
+(1) x2
+(1)... xd
+(1)
+x(2) x1
+(2) x2
+(2)... xd
+(2)
+...............
+x(N) x1
+(N) x2
+(N)... xd
+(N)
+Atrybuty warunkowe są też zamiennie nazywane cechami lub po prostu zmiennymi niezależnymi.
+Tak określonych danych używa się w  celu nienadzorowanego trenowania modelu. W  przypadku gdy
+algorytm realizuje uczenie z nadzorem, należy jeszcze dla każdego obiektu określić wartość tzw. atrybutu
+decyzyjnego. Wtedy:
+Y – jednowymiarowa przestrzeń, z której pochodzą wartości atrybutu decyzyjnego,
+y(j)
+ – wartość atrybutu decyzyjnego dla j-tego obiektu.
+Atrybut decyzyjny jest też zamiennie nazywany zmienną zależną albo daną wyjściową. Tablica informacyjna uwzględniająca atrybut decyzyjny nazywana jest rozszerzoną tablicą informacyjną (tab. 3.2).
+Tabela 3.2. Rozszerzona tablica informacyjna
+A1 A2 ... Ad D
+x(1) x1
+(1) x2
+(1)... xd
+(1) y(1)
+x(2) x1
+(2) x2
+(2)... xd
+(2) y(2)
+............... …
+x(N) x1
+(N) x2
+(N)... xd
+(N) y(N)
+Obiekty i zbiór danych są wtedy postaci:
+(x(j)
+, y(j)
+) = (x1
+(j)
+, x2
+(j)
+, ..., xd
+(j)
+, y(j)
+) – pojedynczy obiekt, para danej wejściowej i odpowiadającej jej danej
+wyjściowej,
+X = {(x(j)
+, y(j)
+), j = 1, ..., N} – zbiór danych.
+Mówiąc o zbiorze wartości poszczególnych atrybutów, należy wspomnieć, że każdy z nich może być
+określony innym typem zmiennej. Wyszczególnić należy trzy typy atrybutów:
+1) nominalne (dziedziny są zbiorami nieuporządkowanymi, możliwe jest określenie tylko relacji równości i braku równości, np. płeć);
+2) porządkowe (dziedziny są zbiorami uporządkowanymi, możliwe jest określenie relacji porządku
+liniowego, np. wysokość określona wartościami {bardzo niski, niski, średni, wysoki, bardzo wysoki}),
+uwaga: znajomość porządku nie oznacza znajomości odległości między obiektami);
+3) liczbowe/numeryczne/ciągłe (dziedziny zdefiniowane na liczbowych skalach pomiarowych, przedziałowych lub ilorazowych, możliwe są obliczenia algebraiczne na wartościach).
+3.2. Uczenie nadzorowane i nienadzorowane
+Podczas wprowadzania oznaczeń wspomniane zostały atrybuty warunkowe i opcjonalny atrybut decyzyjny, który determinuje, czy przeprowadzane trenowanie modelu odbywa się z nadzorem, czy bez niego.
+16 Podstawy uczenia maszynowego
+Uczenie nadzorowane (inaczej uczenie z nadzorem, uczenie z nauczycielem):
+– x(j) = (x1
+(j)
+, x2
+(j)
+, ..., xd
+(j)
+, y(j)
+) przykład uczący,
+– dane treningowe składają się z  danych wejściowych i  odpowiadających im danych wyjściowych
+(oczekiwane odpowiedzi systemu),
+– na podstawie zbioru danych treningowych system uczy się zależności danych wyjściowych od
+danych wejściowych, przy czym powinien tę zależność uogólnić, czyli opracować funkcję f odwzorowującą X → Y.
+Uczenie nienadzorowane (inaczej uczenie bez nadzoru, uczenie bez nauczyciela):
+– x(j) = (x1
+(j)
+, x2
+(j)
+, ..., xd
+(j)
+) przykład uczący,
+– brak podania oczekiwanych odpowiedzi,
+– system ma sam odkryć regularności w zbiorze danych, np. grupowanie przykładów w klasy.
+Należy zaznaczyć, że to, czy będziemy przeprowadzać uczenie z nadzorem, czy bez nadzoru, często
+nie zależy od nas, ale od charakteru naszego problemu i tego, jakimi danymi dysponujemy.
+3.3. Zbiór treningowy i testowy
+Dane, którymi dysponujemy, są konieczne, aby model mógł nauczyć się wykonywać zadania (np. regresji
+czy klasyfikacji). Dane odzwierciedlają specyfikę danego problemu i pozwalają ją zamodelować. Należy
+jednak sprawdzić działanie wytrenowanego modelu, w szczególności upewnić się, czy system poradzi sobie
+z nowym przykładem spoza danych treningowych. W przypadku uczenia nadzorowanego jest to bardzo
+proste. Wystarczy zostawić pewną liczbę obiektów „na później”, to znaczy nie pokazywać ich systemowi na
+etapie trenowania, tylko użyć do sprawdzenia wytrenowanego modelu. Sprawdzenie polega na porównaniu wyniku generowanego przez model z wartością atrybutu decyzyjnego dla tej samej danej wejściowej.
+Dlatego też już na samym początku, zanim zaczniemy trenować model, dane, którymi dysponujemy,
+dzielimy na zbiór danych treningowych (inaczej zwany zbiorem danych uczących) i testowych. Należy
+w tym miejscu zaznaczyć, że podział na zbiór treningowy i testowy musi być losowy. Dla dużych zbiorów
+danych, do których należy co najmniej kilka tysięcy przykładów, stosuje się jednokrotny podział losowy
+(ang. hold-out). Najczęściej przyjmowane wtedy proporcje zbiorów treningowego i testowego to odpowiednio 2:1 lub 9:1.
+Problem pojawia się wtedy, gdy dysponujemy małym zbiorem danych. W takim przypadku może okazać
+się, że odłożenie pewnej części danych na etap testowania spowoduje, że dane pozostałe w zbiorze treningowym będą niewystarczające do wytrenowania dostatecznie dobrego modelu. Dlatego dla mniejszych zbiorów
+danych przeprowadza się trening modelu na wszystkich dostępnych danych, a w celu oceny otrzymanego
+klasyfikatora estymuje się błąd klasyfikatora przy zastosowaniu jednej z metod podziału wielokrotnego:
+– random sub-sampling,
+– k-krotna ocena krzyżowa (ang. k-fold cross validation),
+– leaving-one-out,
+– bootstrap (dla najmniejszych zbiorów danych).
+Nazwy ‘random sub-sampling’, ‘leaving-one-out’ oraz ‘bootstrap’ zostały przytoczone bez polskiego
+tłumaczenia, ponieważ właśnie w takiej postaci są one powszechnie używane w środowisku inżynierów
+uczenia maszynowego.
+Metoda random sub-sampling
+W  metodzie random sub-sampling powtarzane są jednokrotne podziały losowe. W  wyniku każdego
+podziału otrzymujemy pary zbiorów treningowych i odpowiadających im zbiorów testowych. Następnie przeprowadzane jest trenowanie modelu i jego testowanie na podstawie wyznaczonych par zbiorów
+treningowych i testowych oraz obliczane są miary sukcesu (opisane w rozdziale 5) dla kolejnych modeli.
+Estymowaną oceną klasyfikatora wytrenowanego na całym zbiorze dostępnych danych będzie średnia
+arytmetyczna z ocen poszczególnych modeli wytrenowanych i ocenionych w kolejnych podziałach.
+3. Reprezentacja danych 17
+Metoda k-krotnej walidacji krzyżowej i leaving-one-out
+Metoda k-krotnej walidacji krzyżowej przebiega dokładnie według takiego samego schematu jak w metodzie random sub-sampling z tą różnicą, że poszczególne podziały nie są jednokrotne, ale N-elementowy
+zbiór danych dzielony jest na k podzbiorów X = Z1 ∪ Z2 ∪ ... ∪ Zk
+. Następnie w i-tej iteracji (i = 1, ..., k) Zi
+traktowany jest jak zbiór testowy, natomiast pozostałe zbiory tworzą zbiór treningowy. Liczba k powinna być tym większa, im mniejszy jest zbiór danych. Często przyjmuje się k = 10, a gdy nie uzyskuje się
+zadowalających wyników, zwiększa się tę wartość. W skrajnym przypadku można dokonać k = N podziałów, czyli w każdej iteracji zbiór testowy będzie jednoelementowy. Jest to metoda leaving-one-out, która
+jest szczególnym przypadkiem metody k-krotnej walidacji krzyżowej. Podobnie jak we wcześniejszej
+metodzie estymowaną oceną klasyfikatora wytrenowanego na całym zbiorze dostępnych danych będzie
+średnia arytmetyczna z ocen poszczególnych modeli wytrenowanych i ocenionych w kolejnych podziałach. Można również obliczyć odchylenie standardowe wyników uzyskanych we wszystkich iteracjach,
+co dostarczy informacji czy model zawsze daje zbliżone wyniki, czy też zdarzyło się, że w pewnej iteracji
+dał wynik dużo niższy od pozostałych, co nie jest pożądane.
+Bootstrap
+Ostatnia ze wspomnianych metod to boostrap, którą stosuje się dla najmniej licznych zbiorów danych.
+W metodzie tej w każdej iteracji losowana jest ze zwracaniem próbka n-elementowa, która tworzy zbiór
+testowy, a pozostałe obiekty tworzą zbiór treningowy.
+18
+4 Regresja, klasyfikacja i klasteryzacja
+Podstawowe problemy, możliwe do rozwiązania przy użyciu narzędzi uczenia maszynowego, można
+podzielić na trzy grupy. Pierwsza grupa obejmuje przypadki, w  których trzeba przewidywać wyniki
+pochodzące ze zbioru gęstego, czyli z całego zbioru liczb rzeczywistych lub dowolnego przedziału liczb
+rzeczywistych. Takie problemy rozwiązywane są zwykle przy użyciu regresji. W kolejnych dwóch grupach są przypadki, w których należy wytrenować model służący do przewidywania klasy ze skończonego zbioru klas. Mowa tu o klasyfikacji i klasteryzacji. Te dwie grupy modeli uczenia maszynowego
+różni przede wszystkim to, czy dysponujemy wartościami atrybutu decyzyjnego. W przypadku klasyfikacji obiekty w zbiorze treningowym składają się z danych wejściowych i wyjściowych, a więc możemy
+zastosować uczenie nadzorowane. Tym samym po wytrenowaniu modelu będziemy mogli sklasyfikować
+nowy przykład spoza zbioru treningowego. W przypadku klasteryzacji mamy do czynienia z uczeniem
+nienadzorowanym i zadaniem jest pogrupowanie oraz nadanie danym etykiet. Opisany podział przedstawia tabela 4.1.
+Tabela 4.1. Regresja, klasyfikacja i klasteryzacja – zestawienie
+Regresja Klasyfikacja Klasteryzacja
+y ∈ R y przyjmuje wartości binarne
+lub nominalne Brak y
+Uczenie nadzorowane Uczenie nadzorowane Uczenie nienadzorowane
+Przewidzenie
+wartości rzeczywistej
+Nadanie etykiety
+nowemu przykładowi
+Pogrupowanie przykładów
+i nadanie im etykiet
+W tym miejscu należy dopowiedzieć kilka szczegółów dotyczących ogólnie zagadnienia klasteryzacji.
+Przede wszystkim należy uzupełnić wprowadzone do tej pory oznaczenia. Niech C = {C1
+, C2
+, ..., CM} oznacza zbiór M klastrów (grup), czyli wynik grupowania, tj. podziału zbioru X, natomiast ck to centroid klastra Ck
+, np. średnia arytmetyczna punktów należących do danego klastra. Zauważmy, że centroid może
+być wartością spoza zbioru danych.
+Podział na klastry może być twardy albo rozmyty. W  przeciwieństwie do podziału rozmytego,
+w podziale twardym każdy obiekt może zostać zaklasyfikowany do dokładnie jednego klastra. W podziale rozmytym należy określić stopień przynależności każdego obiektu do każdego klastra. Wyraża to
+tzw. współczynnik przynależności ujk:
+u j N u jk jk
+k
+d
+    
+[ , 0 1]: 1 1 , ...,  . 1
+ (4.1)
+Zatem w twardym podziale, jeżeli x(j)
+ należy do Ck
+, to ujk = 1. Gdy x(j)
+ nie należy do Ck
+, to ujk = 0.
+Współczynniki przynależności można zapisać w macierzy U = [uik], gdzie uik ∈ [0, 1] oznacza stopień przynależności x(j)
+ do klastra Ck
+. W przypadku twardego podziału U będzie macierzą zer i jedynek.
+Podział na klastry można reprezentować funkcją:
+PX : X ∈x(j) → k ∈ N, (4.2)
+gdzie k ∈ {1, 2, ..., M} to numer klastra.
+4. Regresja, klasyfikacja i klasteryzacja 19
+Niech PX będzie przestrzenią podziałów zbioru X. Algorytm klasteryzacji można wyrazić funkcją
+f
+X : PX → R, (4.3)
+której wartości są ocenami poszczególnych podziałów. O tym, jakie przyjmuje się tu miary w ocenie
+kolejnych podziałów, można przeczytać w rozdziale 5. Natomiast po ustaleniu miary oceny zadaniem
+algorytmu klasteryzującego jest znalezienie podziału, który będzie najlepiej oceniony, czyli znalezienie
+maksimum funkcji f
+X.
+Warto zauważyć, że algorytm klasteryzacji dokonuje podziału na grupy, ale interpretacji, czyli opisu
+klastrów, dokonuje człowiek. Gdy trudno jest określić jednoznacznie poszczególne etykiety dla wyznaczonych klastrów, można sięgnąć po pewne uniwersalne metody, np.:
+– opisać dany klaster przez punkt będący jego środkiem,
+– opisać dany klaster przez punkty najbardziej oddalone od środka,
+– opisać grupowanie poprzez zadanie koniunkcji odpowiednich wyrażeń logicznych, czyli zadanie
+warunków na wybrane atrybuty (np. RT > 1,5 i α < 0,2).
+Oczywiście im lepiej będziemy znać badany problem oraz lepiej przygotujemy dane, tym łatwiej
+będzie nam nazwać powstałe grupy adekwatnie do tego, co reprezentują w obszarze analizy.
+20
+5 Miary sukcesu
+Aby ocenić, czy wytrenowany model spełnia oczekiwania i proces uczenia maszynowego można uznać
+za zakończony, konieczne jest użycie odpowiedniej miary sukcesu. Miary sukcesu to pewnego rodzaju
+wskaźniki, a  ich postać zależy od ocenianej metody uczenia maszynowego. Będziemy mieć zupełnie
+inne metody oceny dla regresji, inne dla zadań klasyfikacji, jeszcze inne dla klasteryzacji. Często jednak
+zamiast „miara sukcesu”, bardziej adekwatnie byłoby powiedzieć „miara błędu”, bo to właśnie popełniane przez wytrenowany model błędy mierzone są najczęściej.
+5.1. Regresja
+W zadaniach rozwiązywanych metodą regresji do oceny modelu najczęściej stosuje się powszechnie znany błąd średniokwadratowy (ang. Mean Square Error, MSE):
+E
+y y
+n MSE
+j j
+j
+n
+
+ 
+( )
+,
+() ()  2
+1 (5.1)
+gdzie:
+ n – liczba obiektów w zbiorze testowym, ~
+y(j) – wartość przewidywana przez model dla i-tego przykładu testowego,
+ y(j) – rzeczywista wartość atrybutu decyzyjnego dla i-tego przykładu testowego.
+Innym parametrem służącym do oceny modelu jest średnia kwadratowa błędów (ang. Root Mean
+Square Error, RMSE)
+E
+y y
+n RMSE
+j j
+j
+n
+
+ 
+( )
+,
+() ()  2
+1 (5.2)
+przy oznaczeniach jak we wcześniejszym wzorze.
+Często stosowanym błędem jest też średni błąd bezwzględny (ang. Mean Absolute Error, MAE).
+Zaletą tego wskaźnika jest większa odporność na obserwacje odstające.
+E
+y y
+n MAE
+j j
+j
+n
+
+ 
+| |   () ()
+. 1 (5.3)
+5.2. Klasyfikacja
+Niech
+n – liczba przykładów testowych,
+nT – liczba poprawnie sklasyfikowanych przykładów testowych,
+nF
+ – liczba błędnie sklasyfikowanych przykładów testowych.
+5. Miary sukcesu 21
+Miara trafności klasyfikowania (dokładność) wynosi:
+N
+n
+n ov
+T = . (5.4)
+Łączny błąd klasyfikowania (ang. overall error rate) jest określony wzorem:
+E N
+n
+n ov ov
+F  1 .  (5.5)
+Wydawałoby się, że w  zadaniach klasyfikacyjnych to są jedyne możliwe miary, oparte na liczbie
+obiektów dobrze i źle zaklasyfikowanych. Tymczasem żeby ocenić w pełni pracę klasyfikatora, należy
+utworzyć tzw. macierz pomyłek, w której rozróżniamy nie tylko sumę dobrze i sumę źle zaklasyfikowanych przypadków, ale wyszczególniamy sumy dobrze i źle zaklasyfikowanych przypadków dla każdej klasy oddzielnie. Przykłady macierzy dla klasyfikacji binarnej i wieloklasowej przedstawiają tabele 5.1–5.3.
+Tabela 5.1 odpowiada modelowi podziału na dwie klasy, klasę „1” i „0”. Przypadki dobrze zaklasyfikowane to te, w których wartość predykowana przez model odpowiada rzeczywistej wartości atrybutu
+decyzyjnego. Pamiętajmy, że klasyfikacja jest uczeniem nadzorowanym, czyli zarówno w zbiorze treningowym, jak i testowym dysponujemy obiektami, dla których określono wartość atrybutu decyzyjnego.
+Zatem podczas testów wytrenowanego modelu wiemy, jaka jest wartość rzeczywista atrybutu decyzyjnego, i porównujemy tę wartość z wartością przewidywaną, czyli przydzielaną przez model danemu przypadkowi testowemu.
+Tabela 5.1. Macierz pomyłek w klasyfikacji binarnej
+Wartość przewidywana Wartość rzeczywista
+1 0
+1 nTP
+prawdziwie pozytywne
+nFP
+fałszywie pozytywne
+0 nFN
+fałszywie negatywne
+nTN
+prawdziwie negatywne
+Bardzo ważne jest, aby zwrócić uwagę na przypadki fałszywie pozytywne i fałszywie negatywne,
+które skojarzyć należy ze znanymi ze statystyki matematycznej pojęciami błędów pierwszego i drugiego rodzaju. Jak pamiętamy, błąd pierwszego rodzaju to prawdopodobieństwo odrzucenia hipotezy
+zerowej, która w rzeczywistości jest prawdziwa. Natomiast błąd drugiego rodzaju oznacza prawdopodobieństwo nieodrzucenia hipotezy zerowej, która w  rzeczywistości jest fałszywa. Kluczowe jest
+to, że nie możemy kontrolować obydwu błędów równocześnie i  musimy zdecydować o  tym, który
+przypadek jest w badanym problemie mniej niebezpieczny. Niestety nie ma tu uniwersalnej odpowiedzi. Zastanówmy się przykładowo, czy wolelibyśmy, żeby nasz filtr antyspamowy w skrzynce mailowej
+„przepuszczał” na co dzień więcej spamu, ale nie ryzykował błędnego zaklasyfikowania jako niechcianej żadnej z potrzebnych nam wiadomości, czy jednak lepiej, żeby raz na jakiś czas potrzebna nam
+informacja trafiła do folderu spam, ale za to na co dzień otrzymywalibyśmy mniej niechcianych wiadomości, które prawidłowo zostałyby zaklasyfikowane jako spam? Dylematy te są jeszcze trudniejsze,
+gdy przychodzi nam rozwiązywać problemy np. z obszaru medycyny i klasyfikowania pacjentów do
+leczenia.
+Aby łatwiej było porównywać efektywność poszczególnych klasyfikatorów na podstawie macierzy
+pomyłek, zdefiniowano cztery wskaźniki:
+– czułość (ang. True Positive Rate, TPR),
+– swoistość zwana również specyficznością (ang. True Negative Rate, TNR),
+– dwie miary precyzji (ang. Positive Predictive Value PPV, Negative Predictive Value, NPV).
+22 Podstawy uczenia maszynowego
+TPR
+n
+n n
+TP
+TP FN
+  , (5.6)
+TNR
+n
+n n
+TN
+TN FP
+  , (5.7)
+PPV
+n
+n n
+TP
+TP FP
+  , (5.8)
+NPV
+n
+n n
+TN
+TN FN
+  . (5.9)
+Współczynniki te najlepiej zwizualizować w macierzy pomyłek (tab. 5.2).
+Tabela 5.2. Macierz pomyłek ze wskaźnikami w klasyfikacji binarnej
+Wartość
+przewidywana
+Wartość rzeczywista
+1 0
+1 nTP
+prawdziwie pozytywne
+nFP
+fałszywie pozytywne
+PPV
+n
+n n
+TP
+TP FP
+ 
+0 nFN
+fałszywie negatywne
+nTN
+prawdziwie negatywne
+NPV
+n
+n n
+TN
+TN FN
+ 
+TPR
+n
+n n
+TP
+TP FN
+ 
+TNR
+n
+n n
+TN
+TN FP
+ 
+Czułość (TPR) oznacza odsetek obiektów klasy prawdziwie pozytywnej („1”) zaklasyfikowany jako
+klasa pozytywna. Swoistość (TNR) natomiast to odsetek obiektów, które w rzeczywistości były negatywne („0”) i zostały zaklasyfikowane jako klasa negatywna. Oba parametry mają swoje odpowiedniki:
+– FNR = 1 – TPR, czyli odsetek obiektów klasy prawdziwie pozytywnej fałszywie zaklasyfikowanych
+jako klasa negatywna,
+– FPR = 1 – TNR, czyli odsetek obiektów klasy prawdziwie negatywnej fałszywie zaklasyfikowanych jako klasa pozytywna.
+Precyzja przewidywania pozytywnego (PPV) pokazuje, jaki odsetek obiektów zaklasyfikowanych
+jako pozytywne było faktycznie pozytywnych. Precyzja przewidywania negatywnego (NPV) wskazuje,
+jaki odsetek obiektów zaklasyfikowanych jako negatywne był faktycznie negatywnych. Wartości wskaźników mieszczą się w przedziale [0, 1] i od każdego z tych wskaźników oczekujemy oczywiście wartości
+jak najbliższych 1.
+Macierz pomyłek dla klasyfikacji wieloklasowej (tab. 5.3) jest uogólnieniem przedstawionych wyżej
+pojęć, ale zauważmy, że poprawnie zaklasyfikowane przypadki mieszczą się tylko na przekątnej tej macierzy.
+Tabela 5.3. Macierz pomyłek w klasyfikacji wieloklasowej
+Wartość
+przewidywana
+Wartość rzeczywista
+y1 y2 … yM
+y1 n11 n12 … n1M
+y1 n21 n22 … n2M
+… … … … …
+yM nM1 nM2 … nMM
+5. Miary sukcesu 23
+Bazując na macierzy pomyłek klasyfikacji wieloklasowej, możemy uogólnić wprowadzone wcześniej
+wzory na miarę trafności klasyfikowania i łączny błąd klasyfikowania dla dowolnej liczby klas M ∈ N.
+N
+n
+n ov
+ii
+i
+M
+ 
+1 , (5.10)
+E N
+n
+n ov ov
+ij
+i M j M i j      
+
+1 1 , ,..., 1 ..., : . (5.11)
+5.3. Klasteryzacja
+Metody wykorzystywane do oceny modeli klasteryzacji bazują na założeniu, że dobre grupowanie charakteryzuje się wysokim podobieństwem obiektów zaklasyfikowanych do tej samej grupy oraz małym
+podobieństwem obiektów z różnych grup.
+Najczęściej stosowaną funkcją oceny grupowania jest wskaźnik fitness.
+fitness C d x c u j
+k jk
+k M j N
+( ) ( ) , , ( )
+,..., ,...,
+  
+ 11 (5.12)
+gdzie d(x(j)
+, ck
+) – odległość j-tego obiektu od k-tego centroidu według ustalonej miary odległości d.
+Oczywiście im mniejsza wartość wskaźnika, tym lepszy podział, ponieważ obiekty w poszczególnych grupach są sobie bliższe.
+UWAGA
+Wskaźnik ten nie może być stosowany dla algorytmów, w których liczba klastrów nie jest ustalona a priori,
+ponieważ zwykle: fitness(C2
+) < fitness(C1
+), gdy |C2 | < |C1 |, czyli algorytm na podstawie takiej miary sukcesu będzie dążył do podziałów na jak najmniej liczne zbiory i oczywiście „wygra” podział, w którym każdy
+klaster będzie zawierał tylko jedną obserwację.
+Inną miarą jakości grupowania jest wskaźnik sylwetkowy grup, zwany inaczej miarą wewnętrzną
+(ang. silhouette index). Wskaźnik ten najpierw oblicza się dla każdego obiektu ze wzoru:
+Silhouette x
+b a
+a b
+j
+max( ) ( ) , , ( )   (5.13)
+gdzie:
+ a – średnia odległość x(j)
+ od pozostałych obiektów zaklasyfikowanych do tego samego klastra,
+ b – średnia odległość x(j)
+ od obiektów zaklasyfikowanych do najbliższego klastra,
+ max(a, b) – większa z wartości a i b.
+Wtedy wskaźnik sylwetkowy dla podziału wynosi:
+Silhouette C
+Silhouette x
+N
