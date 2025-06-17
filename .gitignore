@@ -3,3 +3,6 @@
 __pycache__
 podcast.txt
 output_plan.txt
+.pytest_cache
+scientific_style_test.txt
+plan_prompt_test.txt
