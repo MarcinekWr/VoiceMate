@@ -1,0 +1,46 @@
+### TASK
+Na podstawie przetworzonego tekstu wejściowego {input_text}, Twoim zadaniem jest stworzenie obszernego, profesjonalnego, popularnonaukowego podcastu w języku polskim w formie dialogu dwóch osób: Profesora i Studenta.
+
+### ADDITIONAL INSTRUCTION
+Oprócz materiału źródłowego otrzymujesz również spis tematów {plan_text}, który wyznacza główne zagadnienia do poruszenia w rozmowie. Przechodź przez punkty planu po kolei lub w logicznym ciągu – każdy punkt powinien być szczegółowo omówiony w dialogu. Możesz rozwijać tematy dodatkowymi pytaniami i przykładami.
+
+### CONTEXT
+Słuchacz podcastu nie zna tekstu źródłowego, dlatego wszystkie kluczowe informacje muszą zostać wyjaśnione w rozmowie. Podcast powinien być długi, szczegółowy i maksymalnie obszerny – wykorzystaj możliwie dużo tokenów. W razie potrzeby kontynuuj generację w kolejnych segmentach.
+
+Po omówieniu jednego tematu przejdź płynnie do kolejnych zagadnień z planu. Jeśli jakiś wątek jest szczególnie ważny, możesz go pogłębić lub rozwinąć o analogie i dygresje. Unikaj powtarzania tych samych fragmentów.
+
+### EXEMPLARS
+- Profesor prowadzi rozmowę, tłumaczy, pogłębia temat, zadaje pytania, wyjaśnia trudne zagadnienia z przykładami i analogiami.
+- Student dopytuje, czasem sam próbuje wyjaśniać trudniejsze tematy własnymi słowami – przedstawia tok rozumowania, interpretuje treści w przystępny sposób.
+- W rozmowie powinny pojawiać się pytania, odpowiedzi, analogie, dygresje, realne przykłady oraz refleksje.
+- Student może popełniać drobne błędy lub nieścisłości – Profesor powinien je uprzejmie korygować i wyjaśniać.
+
+### PERSONA
+- Profesor: doświadczony naukowiec, otwarty, komunikatywny, życzliwy i klarowny w swoich wypowiedziach.
+- Student: bystry, ciekawy, zaangażowany, zadaje pytania i tłumaczy sobie oraz słuchaczowi treść w prostszy sposób.
+
+### FORMAT
+Struktura odpowiedzi musi być w formacie dialogu dwóch osób z wyraźnym podziałem na role [P] to profesor a [S] to Student:
+
+[P]:
+...
+
+[S]:
+...
+
+[P]:
+...
+
+[S]:
+...
+
+(...)
+
+Utrzymuj ten format przez całą długość podcastu. Jeśli zabraknie Ci miejsca, zakończ segment słowami „kontynuuj” – a następna część powinna rozpocząć się dokładnie w miejscu przerwania.
+
+### TONE
+Styl popularnonaukowy – przystępny, ale bogaty w treści. Ton powinien być merytoryczny, ciekawy, angażujący i zrozumiały nawet dla słuchacza bez specjalistycznej wiedzy.
+
+---
+
+Twój cel: Wygeneruj możliwie długi, angażujący i edukacyjny podcast popularnonaukowy w formie rozmowy dwóch osób na podstawie tekstu źródłowego oraz przekazanego planu odcinka. Nie kończ rozmowy przedwcześnie. Kontynuuj, aż wszystkie zagadnienia z planu zostaną wyczerpane.

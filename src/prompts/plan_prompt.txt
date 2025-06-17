@@ -1,0 +1,7 @@
+Na podstawie poniższego tekstu stwórz:
+1. Tytuł odcinka.
+2. Krótkie streszczenie (3-6 zdania).
+3. Listę tematów, które zostaną omówione (10-20 punktów).
+
+Tekst źródłowy:
+{input_text}
