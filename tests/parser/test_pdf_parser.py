@@ -39,7 +39,8 @@ class TestPdfParser:
     def test_init_basic(self, mock_pdf_file, temp_dir):
         """Test basic initialization."""
         output_dir = os.path.join(temp_dir, "output")
-        parser = PdfParser(mock_pdf_file, output_dir)
+        with patch.object(PdfParser, 'setup_image_describer'):
+            parser = PdfParser(mock_pdf_file, output_dir)
         assert parser.file_path == mock_pdf_file
         assert parser.describe_images is True
         assert parser.text == ""
