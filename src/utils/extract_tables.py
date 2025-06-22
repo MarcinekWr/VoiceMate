@@ -2,6 +2,7 @@
 Simple table extraction module for PDF parsing.
 Can be imported into PdfParser class to add table extraction capabilities.
 """
+
 from __future__ import annotations
 
 import json
@@ -13,7 +14,7 @@ import pandas as pd
 
 def extract_tables_from_pdf(
     pdf_path: str,
-    pages: str = 'all',
+    pages: str = "all",
 ) -> list[dict[str, Any]]:
     """
     Extract tables from PDF and return them as structured data.
@@ -22,15 +23,15 @@ def extract_tables_from_pdf(
         tables = camelot.read_pdf(
             pdf_path,
             pages=pages,
-            flavor='lattice',
-            strip_text='\n',
+            flavor="lattice",
+            strip_text="\n",
         )
 
         extracted_tables = []
 
         for i, table in enumerate(tables):
             parsing_report = table.parsing_report
-            accuracy = parsing_report.get('accuracy', 0)
+            accuracy = parsing_report.get("accuracy", 0)
 
             df = clean_table_dataframe(table.df)
 
@@ -41,20 +42,20 @@ def extract_tables_from_pdf(
 
             if content_ratio > 0.1 or accuracy > 40:
                 table_data = {
-                    'table_id': i,
-                    'page': table.parsing_report.get('page', 'unknown'),
-                    'accuracy': round(accuracy, 2),
-                    'content_ratio': round(content_ratio, 2),
-                    'shape': df.shape,
-                    'data': df.to_dict('records'),
-                    'json': df.to_json(orient='records', force_ascii=False),
+                    "table_id": i,
+                    "page": table.parsing_report.get("page", "unknown"),
+                    "accuracy": round(accuracy, 2),
+                    "content_ratio": round(content_ratio, 2),
+                    "shape": df.shape,
+                    "data": df.to_dict("records"),
+                    "json": df.to_json(orient="records", force_ascii=False),
                 }
                 extracted_tables.append(table_data)
 
         return extracted_tables
 
     except Exception as e:
-        print(f'Error extracting tables from {pdf_path}: {e}')
+        print(f"Error extracting tables from {pdf_path}: {e}")
         return []
 
 
@@ -71,23 +72,23 @@ def clean_table_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
     cleaned_df = df.copy()
 
-    cleaned_df = cleaned_df.dropna(how='all', axis=0)
-    cleaned_df = cleaned_df.dropna(how='all', axis=1)
+    cleaned_df.dropna(how="all", axis=0, inplace=True)
+    cleaned_df.dropna(how="all", axis=1, inplace=True)
 
     cleaned_df = cleaned_df[
         ~cleaned_df.astype(str)
         .apply(
             lambda x: x.str.strip(),
         )
-        .eq('')
+        .eq("")
         .all(axis=1)
     ]
 
     for col in cleaned_df.columns:
-        if cleaned_df[col].dtype == 'object':
+        if cleaned_df[col].dtype == "object":
             cleaned_df[col] = cleaned_df[col].astype(str).str.strip()
 
-    cleaned_df = cleaned_df.reset_index(drop=True)
+    cleaned_df.reset_index(drop=True, inplace=True)
 
     return cleaned_df
 
@@ -108,7 +109,7 @@ def calculate_content_ratio(df: pd.DataFrame) -> float:
     non_empty_cells = (
         df.astype(str)
         .apply(
-            lambda x: x.str.strip() != '',
+            lambda x: x.str.strip() != "",
         )
         .sum()
         .sum()
@@ -129,10 +130,10 @@ def format_tables_for_llm(tables: list[dict[str, Any]]) -> str:
         str: Formatted string representation of tables
     """
     if not tables:
-        return 'No tables found in the document.'
+        return "No tables found in the document."
 
     formatted_output = []
-    formatted_output.append('--- EXTRACTED TABLES ---')
+    formatted_output.append("--- EXTRACTED TABLES ---")
 
     for table in tables:
         formatted_output.append(f"\n=== TABLE {table['table_id']} ===")
@@ -143,9 +144,9 @@ def format_tables_for_llm(tables: list[dict[str, Any]]) -> str:
         formatted_output.append(f"Accuracy: {table['accuracy']}%")
         formatted_output.append(f"Content Ratio: {table['content_ratio']}")
 
-        formatted_output.append('\nTable Data (JSON):')
+        formatted_output.append("\nTable Data (JSON):")
         try:
-            json_data = json.loads(table['json'])
+            json_data = json.loads(table["json"])
             formatted_output.append(
                 json.dumps(
                     json_data,
@@ -154,8 +155,8 @@ def format_tables_for_llm(tables: list[dict[str, Any]]) -> str:
                 ),
             )
         except Exception:
-            formatted_output.append(table['json'])
+            formatted_output.append(table["json"])
 
-        formatted_output.append('-' * 50)
+        formatted_output.append("-" * 50)
 
-    return '\n'.join(formatted_output)
+    return "\n".join(formatted_output)
