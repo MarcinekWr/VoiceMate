@@ -23,17 +23,12 @@ from PyQt5.QtGui import QPageSize
 from PyQt5.QtWidgets import QApplication
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from pdfminer.high_level import extract_text
+from pptx.exc import PackageNotFoundError
 
 from src.common.constants import LOG_FILE_PATH
-from src.file_parser.pdf_parser import PdfParser
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    filename=LOG_FILE_PATH,
-    filemode="w",
-)
-logger = logging.getLogger(__name__)
+from src.file_parser import pdf_parser
+from src.utils.logging_config import setup_logger
 
 
 class FileConverter:
@@ -50,34 +45,45 @@ class FileConverter:
         self.file_path = file_path
         self.output_dir = output_dir
         self.temp_files: list[str] = []
-        os.makedirs(self.output_dir, exist_ok=True)
-        logger.info(f"FileConverter initialized for: {file_path}")
+        self.logger = setup_logger(LOG_FILE_PATH)
+        self.create_output_dir()
+        self.logger.info(f"FileConverter initialized for: {file_path}")
+
+    def create_output_dir(self) -> None:
+        """Create the output directory if it doesn't exist."""
+        try:
+            os.makedirs(self.output_dir, exist_ok=True)
+        except OSError as e:
+            self.logger.error(
+                f"Failed to create output directory {self.output_dir}: {e}"
+            )
+            raise
 
     def detect_file_type(self) -> str:
         """Detect the type of file based on its extension or MIME type."""
         if not os.path.exists(self.file_path):
-            logger.error(f"File does not exist: {self.file_path}")
+            self.logger.error(f"File does not exist: {self.file_path}")
             raise FileNotFoundError(f"File does not exist: {self.file_path}")
 
         file_ext = Path(self.file_path).suffix.lower()
-        logger.debug(f"Detected file extension: {file_ext}")
+        self.logger.debug(f"Detected file extension: {file_ext}")
 
         for file_type, extensions in self.SUPPORTED_FORMATS.items():
             if file_ext in extensions:
-                logger.info(f"File type detected: {file_type}")
+                self.logger.info(f"File type detected: {file_type}")
                 return file_type
 
         mime_type, _ = mimetypes.guess_type(self.file_path)
         if mime_type:
-            logger.debug(f"MIME type detected: {mime_type}")
+            self.logger.debug(f"MIME type detected: {mime_type}")
             if mime_type.startswith("image/"):
-                logger.info("File type detected: images (via MIME)")
+                self.logger.info("File type detected: images (via MIME)")
                 return "images"
             elif mime_type == "application/pdf":
-                logger.info("File type detected: pdf (via MIME)")
+                self.logger.info("File type detected: pdf (via MIME)")
                 return "pdf"
 
-        logger.warning(f"Unknown file type for: {self.file_path}")
+        self.logger.warning(f"Unknown file type for: {self.file_path}")
         return "unknown"
 
     def _generate_unique_filename(self, base_name: str, extension: str) -> str:
@@ -90,13 +96,13 @@ class FileConverter:
                 self.output_dir,
                 f"{base_name}_{timestamp}{extension}",
             )
-            logger.debug(f"Generated unique filename: {output_path}")
+            self.logger.debug(f"Generated unique filename: {output_path}")
 
         return output_path
 
     def convert_image_to_pdf(self) -> str:
         """Convert image file to PDF format."""
-        logger.info(f"Converting image to PDF: {self.file_path}")
+        self.logger.info(f"Converting image to PDF: {self.file_path}")
         original_name = Path(self.file_path).stem
         output_path = self._generate_unique_filename(original_name, ".pdf")
 
@@ -104,12 +110,12 @@ class FileConverter:
             with Image.open(self.file_path) as img:
                 if img.mode != "RGB":
                     img = img.convert("RGB")
-                    logger.debug("Image converted to RGB mode")
+                    self.logger.debug("Image converted to RGB mode")
                 img.save(output_path, "PDF", resolution=100.0)
-            logger.info(f"Image successfully converted to PDF: {output_path}")
+            self.logger.info(f"Image successfully converted to PDF: {output_path}")
             return output_path
         except Exception as e:
-            logger.error(f"Image conversion failed: {str(e)}")
+            self.logger.error(f"Image conversion failed: {str(e)}")
             raise Exception(f"Image conversion error: {str(e)}")
 
     def is_valid_url(self, url: str) -> bool:
@@ -117,10 +123,10 @@ class FileConverter:
         try:
             result = urlparse(url)
             is_valid = all([result.scheme, result.netloc])
-            logger.debug(f"URL validation for {url}: {is_valid}")
+            self.logger.debug(f"URL validation for {url}: {is_valid}")
             return is_valid
         except Exception as e:
-            logger.debug(f"URL validation failed for {url}: {str(e)}")
+            self.logger.debug(f"URL validation failed for {url}: {str(e)}")
             return False
 
     def get_domain_name(self, url: str) -> str:
@@ -135,22 +141,22 @@ class FileConverter:
                 )
                 .replace("-", "_")[:30]
             )
-            logger.debug(f"Extracted domain name: {clean_domain}")
+            self.logger.debug(f"Extracted domain name: {clean_domain}")
             return clean_domain
         except Exception as e:
-            logger.warning(f"Could not extract domain from {url}: {str(e)}")
+            self.logger.warning(f"Could not extract domain from {url}: {str(e)}")
             return "website"
 
     def convert_url_to_pdf(self) -> str:
         """Convert URL to PDF format."""
-        logger.info(f"Converting URL to PDF: {self.file_path}")
+        self.logger.info(f"Converting URL to PDF: {self.file_path}")
 
         if not self.is_valid_url(self.file_path):
-            logger.error(f"Invalid URL: {self.file_path}")
+            self.logger.error(f"Invalid URL: {self.file_path}")
             raise ValueError(f"Invalid URL: {self.file_path}")
 
         try:
-            logger.debug("Checking URL accessibility...")
+            self.logger.debug("Checking URL accessibility...")
             response = requests.get(
                 self.file_path,
                 timeout=10,
@@ -159,14 +165,14 @@ class FileConverter:
                 },
             )
             if response.status_code >= 400:
-                logger.error(
+                self.logger.error(
                     f"URL returned status code {response.status_code}",
                 )
                 raise Exception(
                     f"Unavailable page (code: {response.status_code})",
                 )
         except requests.RequestException as e:
-            logger.error(
+            self.logger.error(
                 f"Connection error for URL {self.file_path}: {str(e)}",
             )
             raise Exception(f"Connection error: {str(e)}")
@@ -176,7 +182,7 @@ class FileConverter:
 
         # Create QApplication if not exists
         app = QApplication.instance() or QApplication(sys.argv)
-        logger.debug("Initializing web engine for PDF conversion...")
+        self.logger.debug("Initializing web engine for PDF conversion...")
 
         web_view = QtWebEngineWidgets.QWebEngineView()
         web_view.setZoomFactor(1)
@@ -194,18 +200,18 @@ class FileConverter:
 
         def handle_load_finished(ok):
             if not ok:
-                logger.error(f"Failed to load web page: {self.file_path}")
+                self.logger.error(f"Failed to load web page: {self.file_path}")
                 loop.quit()
                 raise Exception(f"Failed to load page: {self.file_path}")
-            logger.debug("Web page loaded successfully, generating PDF...")
+            self.logger.debug("Web page loaded successfully, generating PDF...")
             web_view.page().printToPdf(output_path, layout)
 
         def handle_pdf_finished(path, success):
             loop.quit()
             if not success:
-                logger.error(f"PDF creation failed for: {self.file_path}")
+                self.logger.error(f"PDF creation failed for: {self.file_path}")
                 raise Exception(f"PDF creation failed for: {self.file_path}")
-            logger.debug("PDF generation completed successfully")
+            self.logger.debug("PDF generation completed successfully")
 
         web_view.loadFinished.connect(handle_load_finished)
         web_view.page().pdfPrintingFinished.connect(handle_pdf_finished)
@@ -227,15 +233,15 @@ class FileConverter:
         gc.collect()
 
         if not os.path.exists(output_path):
-            logger.error(f"PDF file was not created: {output_path}")
+            self.logger.error(f"PDF file was not created: {output_path}")
             raise Exception(f"PDF not created for: {self.file_path}")
 
-        logger.info(f"URL successfully converted to PDF: {output_path}")
+        self.logger.info(f"URL successfully converted to PDF: {output_path}")
         return output_path
 
     def convert_html_to_pdf(self) -> str:
         """Convert HTML file to PDF format."""
-        logger.info(f"Converting HTML to PDF: {self.file_path}")
+        self.logger.info(f"Converting HTML to PDF: {self.file_path}")
         original_name = Path(self.file_path).stem
         output_path = self._generate_unique_filename(original_name, ".pdf")
 
@@ -245,15 +251,15 @@ class FileConverter:
                 output_path,
                 options={"quiet": ""},
             )
-            logger.info(f"HTML successfully converted to PDF: {output_path}")
+            self.logger.info(f"HTML successfully converted to PDF: {output_path}")
             return output_path
         except Exception as e:
-            logger.error(f"HTML conversion failed: {str(e)}")
+            self.logger.error(f"HTML conversion failed: {str(e)}")
             raise Exception(f"HTML conversion error: {str(e)}")
 
     def convert_markdown_to_pdf(self) -> str:
         """Convert Markdown file to PDF format."""
-        logger.info(f"Converting Markdown to PDF: {self.file_path}")
+        self.logger.info(f"Converting Markdown to PDF: {self.file_path}")
         original_name = Path(self.file_path).stem
         output_path = self._generate_unique_filename(original_name, ".pdf")
 
@@ -261,17 +267,17 @@ class FileConverter:
             with open(self.file_path, encoding="utf-8") as f:
                 html = markdown.markdown(f.read())
             pdfkit.from_string(html, output_path, options={"quiet": ""})
-            logger.info(
+            self.logger.info(
                 f"Markdown successfully converted to PDF: {output_path}",
             )
             return output_path
         except Exception as e:
-            logger.error(f"Markdown conversion failed: {str(e)}")
+            self.logger.error(f"Markdown conversion failed: {str(e)}")
             raise Exception(f"Markdown conversion error: {str(e)}")
 
     def convert_pptx_to_pdf(self) -> str:
         """Convert PPTX file to PDF format."""
-        logger.info(f"Converting PPTX to PDF: {self.file_path}")
+        self.logger.info(f"Converting PPTX to PDF: {self.file_path}")
         original_name = Path(self.file_path).stem
         output_path = self._generate_unique_filename(original_name, ".pdf")
 
@@ -280,7 +286,7 @@ class FileConverter:
             c = canvas.Canvas(output_path, pagesize=letter)
             _, height = letter
 
-            logger.debug(f"Processing {len(prs.slides)} slides...")
+            self.logger.debug(f"Processing {len(prs.slides)} slides...")
 
             for i, slide in enumerate(prs.slides):
                 if i > 0:
@@ -300,23 +306,23 @@ class FileConverter:
                             c.drawString(40, y, line[:100])
                             y -= 15
             c.save()
-            logger.info(f"PPTX successfully converted to PDF: {output_path}")
+            self.logger.info(f"PPTX successfully converted to PDF: {output_path}")
             return output_path
         except Exception as e:
-            logger.error(f"PPTX conversion failed: {str(e)}")
+            self.logger.error(f"PPTX conversion failed: {str(e)}")
             raise Exception(f"PPTX conversion error: {str(e)}")
 
     def convert_to_pdf(self) -> str:
-        logger.info("Starting file conversion to PDF...")
+        self.logger.info("Starting file conversion to PDF...")
 
         if self.is_valid_url(self.file_path):
-            logger.info("Processing as URL")
+            self.logger.info("Processing as URL")
             return self.convert_url_to_pdf()
 
         file_type = self.detect_file_type()
 
         if file_type == "pdf":
-            logger.info("File is already PDF, no conversion needed")
+            self.logger.info("File is already PDF, no conversion needed")
             return self.file_path
         elif file_type == "images":
             return self.convert_image_to_pdf()
@@ -327,13 +333,13 @@ class FileConverter:
         elif file_type == "presentations":
             return self.convert_pptx_to_pdf()
         else:
-            logger.error(f"Unsupported file type: {file_type}")
+            self.logger.error(f"Unsupported file type: {file_type}")
             raise ValueError(f"Unsupported file type: {file_type}")
 
     def cleanup(self):
         """Explicit cleanup of all resources"""
         if self.temp_files:
-            logger.debug(
+            self.logger.debug(
                 f"Cleaning up {len(self.temp_files)} temporary files...",
             )
 
@@ -341,45 +347,45 @@ class FileConverter:
             try:
                 if os.path.exists(file_path):
                     os.remove(file_path)
-                    logger.debug(f"Removed temporary file: {file_path}")
+                    self.logger.debug(f"Removed temporary file: {file_path}")
                 self.temp_files.remove(file_path)
             except Exception as e:
-                logger.warning(
+                self.logger.warning(
                     f"Could not remove temporary file {file_path}: {str(e)}",
                 )
 
         gc.collect()
-        logger.debug("Cleanup completed")
+        self.logger.debug("Cleanup completed")
 
     def __del__(self):
         self.cleanup()
 
     def initiate_parser(self) -> str:
         """
-        Initiate the appropriate parser based on file type.
+        Initiates the parser workflow by converting the file to PDF
+        and then using PdfParser to extract content.
         """
+        self.logger.info("Initiating parser workflow...")
+
         try:
-            logger.info("Initiating parser workflow...")
-
             pdf_path = self.convert_to_pdf()
-            logger.info(f"File converted to PDF: {pdf_path}")
+            self.logger.info(f"File converted to PDF: {pdf_path}")
 
-            # Initialize PDF parser
-            logger.info("Initializing PDF parser...")
-            pdf_parser = PdfParser(
+            self.logger.info("Initializing PDF parser...")
+            pdf_parser_instance = pdf_parser.PdfParser(
                 file_path=pdf_path,
                 output_dir="extracted_content",
                 describe_images=True,
             )
 
-            logger.info("Extracting content from PDF...")
-            llm_content = pdf_parser.initiate()
+            self.logger.info("Extracting content from PDF...")
+            llm_content = pdf_parser_instance.initiate()
 
-            logger.info("Parser workflow completed successfully")
+            self.logger.info("Parser workflow completed successfully")
             return llm_content
 
         except Exception as e:
-            logger.error(f"Parser workflow failed: {str(e)}")
+            self.logger.error(f"Parser workflow failed: {str(e)}")
             raise Exception(f"Failed to parse file {self.file_path}: {str(e)}")
         finally:
             self.cleanup()

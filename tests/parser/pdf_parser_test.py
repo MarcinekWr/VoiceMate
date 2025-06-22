@@ -5,381 +5,192 @@ from __future__ import annotations
 import os
 import shutil
 import tempfile
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch, MagicMock, mock_open
 
 import fitz
 import pytest
+import unittest
+import json
 
 from src.file_parser.pdf_parser import PdfParser
 
 
-class TestPdfParser:
-    """Test suite for PdfParser class matching actual implementation."""
+class TestPdfParser(unittest.TestCase):
+    """Test suite for the PdfParser class."""
 
-    @pytest.fixture
-    def temp_dir(self):
-        """Create temporary directory for tests."""
-        temp_dir = tempfile.mkdtemp()
-        yield temp_dir
-        shutil.rmtree(temp_dir, ignore_errors=True)
+    def setUp(self):
+        """Set up the test environment."""
+        self.mock_file_path = "dummy.pdf"
+        self.mock_output_dir = "test_output"
 
-    @pytest.fixture
-    def mock_pdf_file(self, temp_dir):
-        """Create mock PDF file."""
-        pdf_path = os.path.join(temp_dir, "test.pdf")
-        doc = fitz.open()
-        page = doc.new_page()
-        page.insert_text((50, 50), "Test PDF content")
-        doc.save(pdf_path)
-        doc.close()
-        return pdf_path
+        self.patchers = {
+            "setup_logger": patch("src.file_parser.pdf_parser.setup_logger"),
+            "fitz.open": patch("src.file_parser.pdf_parser.fitz.open"),
+            "extract_text": patch("src.file_parser.pdf_parser.extract_text"),
+            "ImageDescriber": patch("src.file_parser.pdf_parser.ImageDescriber"),
+            "PDFImageExtractor": patch("src.file_parser.pdf_parser.PDFImageExtractor"),
+            "PDFTableParser": patch("src.file_parser.pdf_parser.PDFTableParser"),
+            "PDFContentFormatter": patch(
+                "src.file_parser.pdf_parser.PDFContentFormatter"
+            ),
+            "os.makedirs": patch("os.makedirs"),
+            "os.stat": patch("os.stat"),
+        }
 
-    @pytest.fixture
-    def mock_image_describer(self):
-        """Create mock ImageDescriber."""
-        mock_describer = Mock()
-        mock_describer.describe_image.return_value = "Test image description"
-        mock_describer.describe_image_from_bytes.return_value = (
-            "Test image description from bytes"
-        )
-        return mock_describer
+        self.mocks = {name: patcher.start() for name, patcher in self.patchers.items()}
 
-    @pytest.fixture
-    def parser(self, mock_pdf_file, temp_dir):
-        """Create PdfParser instance."""
-        output_dir = os.path.join(temp_dir, "output")
-        return PdfParser(mock_pdf_file, output_dir, describe_images=False)
+        self.mocks["os.stat"].return_value.st_size = 1024 * 1024
+        self.mocks["os.stat"].return_value.st_mtime = 1622548800
+        self.mocks["extract_text"].return_value = "Sample text"
 
-    @pytest.fixture
-    def parser_with_images(self, mock_pdf_file, temp_dir, mock_image_describer):
-        """Create PdfParser instance with image description enabled."""
-        output_dir = os.path.join(temp_dir, "output")
-        return PdfParser(
-            mock_pdf_file,
-            output_dir,
+        self.mock_image_extractor = self.mocks["PDFImageExtractor"].return_value
+        self.mock_table_parser = self.mocks["PDFTableParser"].return_value
+        self.mock_formatter = self.mocks["PDFContentFormatter"].return_value
+
+        self.mock_image_extractor.extract_images.return_value = []
+        self.mock_table_parser.extract_tables.return_value = []
+        self.mock_formatter.create_structured_content.return_value = []
+        self.mock_formatter.get_content_for_llm.return_value = "LLM Content"
+
+    def tearDown(self):
+        """Tear down the test environment."""
+        for patcher in self.patchers.values():
+            patcher.stop()
+
+    def test_initialization(self):
+        """Test that PdfParser initializes correctly."""
+
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+
+        self.assertEqual(parser.file_path, self.mock_file_path)
+        self.mocks["PDFImageExtractor"].assert_called_with(
+            output_dir=self.mock_output_dir,
+            image_describer=parser.image_describer,
             describe_images=True,
-            image_describer=mock_image_describer,
         )
+        self.mocks["PDFTableParser"].assert_called_with(self.mock_file_path)
 
-    def test_init_basic(self, mock_pdf_file, temp_dir):
-        """Test basic initialization."""
-        output_dir = os.path.join(temp_dir, "output")
-        parser = PdfParser(mock_pdf_file, output_dir, describe_images=False)
-        assert parser.file_path == mock_pdf_file
-        assert parser.describe_images is False
-        assert parser.text == ""
-        assert parser.images == []
-        assert parser.tables == []
-        assert parser.structured_content == []
-        assert parser.metadata == {}
-        assert os.path.exists(output_dir)
+    def test_parse_all_successful(self):
+        """Test the full parsing workflow."""
 
-    def test_init_with_image_describer(
-        self, mock_pdf_file, temp_dir, mock_image_describer
-    ):
-        """Test initialization with image describer."""
-        output_dir = os.path.join(temp_dir, "output")
-        parser = PdfParser(
-            mock_pdf_file,
-            output_dir,
-            describe_images=True,
-            image_describer=mock_image_describer,
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+
+        result = parser.parse_all()
+
+        self.mocks["fitz.open"].assert_called_with(self.mock_file_path)
+        self.mock_image_extractor.extract_images.assert_called_once()
+        self.mock_table_parser.extract_tables.assert_called_once()
+        self.mocks["PDFContentFormatter"].assert_called_with(
+            metadata=result["metadata"],
+            images=result["images"],
+            tables=result["tables"],
         )
-        assert parser.describe_images is True
-        assert parser.image_describer == mock_image_describer
+        self.mock_formatter.create_structured_content.assert_called_once()
 
-    def test_init_with_images_but_no_describer(self, mock_pdf_file, temp_dir):
-        """Test initialization with images enabled but no describer provided."""
-        output_dir = os.path.join(temp_dir, "output")
-        with patch("src.file_parser.pdf_parser.ImageDescriber") as mock_class:
-            mock_instance = Mock()
-            mock_class.return_value = mock_instance
-            parser = PdfParser(mock_pdf_file, output_dir, describe_images=True)
-            assert parser.describe_images is True
-            assert parser.image_describer == mock_instance
+    def test_parse_all_file_not_found_error(self):
+        """Test the parse_all method with a FileNotFoundError."""
+        self.mocks["fitz.open"].side_effect = FileNotFoundError
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+        result = parser.parse_all()
+        self.assertEqual(result, {})
 
-    def test_init_output_dir_failure(self, mock_pdf_file):
-        """Test output directory creation failure."""
-        with patch("os.makedirs", side_effect=OSError("Permission denied")):
-            with pytest.raises(OSError, match="Failed to create output directory"):
-                PdfParser(mock_pdf_file, "some_path")
+    def test_parse_all_memory_error(self):
+        """Test the parse_all method with a MemoryError."""
+        self.mocks["fitz.open"].side_effect = MemoryError
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+        result = parser.parse_all()
+        self.assertEqual(result, {})
 
-    def test_extract_metadata_success(self, parser):
-        """Test successful metadata extraction."""
-        metadata = parser.extract_metadata()
-        assert "filename" in metadata
-        assert "file_size_mb" in metadata
-        assert "page_count" in metadata
-        assert metadata["filename"] == "test.pdf"
-        assert metadata["page_count"] == 1
-
-    @patch("os.stat", side_effect=OSError("Access denied"))
-    def test_extract_metadata_file_error(self, mock_stat, parser):
-        """Test metadata extraction file error."""
-        metadata = parser.extract_metadata()
-        assert "error" in metadata
-        assert "Failed to get file stats" in metadata["error"]
-
-    @patch("fitz.open", side_effect=fitz.FileDataError("Invalid PDF"))
-    def test_extract_metadata_pdf_error(self, mock_fitz, parser):
-        """Test metadata extraction PDF error."""
-        with patch("os.stat"):
-            metadata = parser.extract_metadata()
-        assert "error" in metadata
-        assert "Invalid PDF file" in metadata["error"]
-
-    @patch("src.file_parser.pdf_parser.extract_text", return_value="Extracted text")
-    def test_extract_text_success(self, mock_extract, parser):
-        """Test successful text extraction."""
-        result = parser.extract_text()
-        assert result == "Extracted text"
-
-    @patch("src.file_parser.pdf_parser.extract_text", side_effect=FileNotFoundError())
-    def test_extract_text_file_not_found(self, mock_extract, parser):
-        """Test text extraction file not found."""
-        result = parser.extract_text()
-        assert result == ""
-
-    @patch(
-        "src.file_parser.pdf_parser.extract_text",
-        side_effect=Exception("Unexpected error"),
-    )
-    def test_extract_text_general_error(self, mock_extract, parser):
-        """Test text extraction general error."""
-        result = parser.extract_text()
-        assert result == ""
-
-    def test_extract_images_success(self, parser):
-        """Test image extraction without description."""
-        images = parser.extract_images()
-        assert isinstance(images, list)
-
-    def test_extract_images_with_description(self, parser_with_images):
-        """Test image extraction with description."""
-        # Mock a PDF with images
-        with patch("fitz.open") as mock_open:
-            mock_doc = Mock()
-            mock_page = Mock()
-            mock_pixmap = Mock()
-
-            mock_doc.load_page.return_value = mock_page
-            mock_page.get_images.return_value = [(123, 0, 100, 100, 0, "", "", "", 0)]
-
-            mock_pixmap.width = 100
-            mock_pixmap.height = 100
-            mock_pixmap.tobytes.return_value = b"fake_image_data"
-
-            with patch("fitz.Pixmap", return_value=mock_pixmap):
-                with patch("builtins.open", mock_open()):
-                    with patch(
-                        "base64.b64encode", return_value=b"ZmFrZV9pbWFnZV9kYXRh"
-                    ):
-                        mock_open.return_value = mock_doc
-                        images = parser_with_images.extract_images()
-
-            mock_doc.close.assert_called_once()
-
-    @patch("fitz.open", side_effect=fitz.FileDataError("Cannot open"))
-    def test_extract_images_open_error(self, mock_fitz, parser):
-        """Test image extraction with file open error."""
-        images = parser.extract_images()
-        assert images == []
-
-    def test_get_image_description_disabled(self, parser):
-        """Test image description when disabled."""
-        result = parser._get_image_description("test.png", b"fake_data")
-        assert result == "No description available"
-
-    def test_get_image_description_success(self, parser_with_images):
-        """Test successful image description."""
-        result = parser_with_images._get_image_description("test.png", b"fake_data")
-        assert result == "Test image description"
-
-    def test_get_image_description_fallback(self, parser_with_images):
-        """Test image description fallback to bytes method."""
-        parser_with_images.image_describer.describe_image.return_value = (
-            "Error generating description"
-        )
-        result = parser_with_images._get_image_description("test.png", b"fake_data")
-        assert result == "Test image description from bytes"
-
-    def test_get_image_description_exception(self, parser_with_images):
-        """Test image description with exception."""
-        parser_with_images.image_describer.describe_image.side_effect = Exception(
-            "Test error"
-        )
-        result = parser_with_images._get_image_description("test.png", b"fake_data")
-        assert result == "Error generating description"
-
-    @patch(
-        "src.file_parser.pdf_parser.extract_tables_from_pdf", return_value=[{"page": 1}]
-    )
-    def test_extract_tables_success(self, mock_extract, parser):
-        """Test table extraction."""
-        result = parser.extract_tables()
-        assert len(result) == 1
-        assert result[0]["page"] == 1
-
-    @patch(
-        "src.file_parser.pdf_parser.extract_tables_from_pdf",
-        side_effect=FileNotFoundError(),
-    )
-    def test_extract_tables_file_not_found(self, mock_extract, parser):
-        """Test table extraction file not found."""
-        result = parser.extract_tables()
-        assert result == []
-
-    @patch(
-        "src.file_parser.pdf_parser.extract_tables_from_pdf", side_effect=Exception()
-    )
-    def test_extract_tables_error(self, mock_extract, parser):
-        """Test table extraction error."""
-        result = parser.extract_tables()
-        assert result == []
-
-    def test_create_structured_content_success(self, parser):
-        """Test structured content creation."""
-        parser.images = [{"page": 1, "filename": "test.png"}]
-        parser.create_structured_content()
-        assert len(parser.structured_content) >= 1
-        assert parser.structured_content[0]["page"] == 1
-
-    @patch("fitz.open", side_effect=fitz.FileDataError())
-    def test_create_structured_content_error(self, mock_fitz, parser):
-        """Test structured content creation error."""
-        parser.create_structured_content()
-        # Should handle error gracefully and not crash
-
-    def test_parse_all_success(self, parser):
-        """Test complete parsing workflow."""
-        with patch.object(parser, "extract_metadata", return_value={"pages": 1}):
-            with patch.object(parser, "extract_text", return_value="text"):
-                with patch.object(parser, "extract_images", return_value=[]):
-                    with patch.object(parser, "extract_tables", return_value=[]):
-                        with patch.object(parser, "create_structured_content"):
-                            result = parser.parse_all()
-
-        assert "text" in result
-        assert "images" in result
-        assert "tables" in result
-        assert "structured_content" in result
-        assert "metadata" in result
-
-    def test_parse_all_file_error(self, parser):
-        """Test parse_all with file errors."""
-        with patch.object(parser, "extract_metadata", side_effect=FileNotFoundError()):
-            result = parser.parse_all()
-        assert result == {}
-
-    def test_parse_all_memory_error(self, parser):
-        """Test parse_all with memory error."""
-        with patch.object(parser, "extract_metadata", side_effect=MemoryError()):
-            result = parser.parse_all()
-        assert result == {}
-
-    def test_parse_all_general_error(self, parser):
-        """Test parse_all with general error."""
-        with patch.object(parser, "extract_metadata", side_effect=Exception()):
-            result = parser.parse_all()
-        assert result == {}
-
-    @patch("src.file_parser.pdf_parser.clean_text", return_value="cleaned")
-    def test_clean_data_success(self, mock_clean, parser):
-        """Test data cleaning."""
-        parser.text = "raw text"
-        result = parser.clean_data()
-        assert result == "cleaned"
-
-    def test_clean_data_no_text(self, parser):
-        """Test cleaning with no text."""
-        result = parser.clean_data()
-        assert result == ""
-
-    @patch(
-        "src.file_parser.pdf_parser.clean_text", side_effect=Exception("Clean error")
-    )
-    def test_clean_data_error(self, mock_clean, parser):
-        """Test cleaning with error."""
-        parser.text = "text"
-        result = parser.clean_data()
-        assert result == "text"
-
-    def test_get_content_for_llm_basic(self, parser):
-        """Test LLM content generation."""
-        parser.text = "test"
-        with patch.object(parser, "clean_data", return_value="cleaned"):
-            result = parser.get_content_for_llm()
-        assert result == "cleaned"
-
-    def test_get_content_for_llm_structured(self, parser):
-        """Test LLM content with structured data."""
-        parser.metadata = {"filename": "test.pdf", "file_size_mb": 1.5, "page_count": 2}
-        parser.structured_content = [
-            {
-                "page": 1,
-                "text": "content",
-                "images": [
-                    {
-                        "filename": "img1.png",
-                        "width": 100,
-                        "height": 100,
-                        "size_kb": 10,
-                        "description": "Test image",
-                    }
-                ],
-            },
-        ]
-        parser.tables = [{"page": 1, "json": '{"data": "test"}'}]
-
-        with patch(
-            "src.file_parser.pdf_parser.clean_text", return_value="cleaned content"
-        ):
-            result = parser.get_content_for_llm()
-
-        assert "DOCUMENT METADATA" in result
-        assert "PAGE 1" in result
-        assert "TEXT CONTENT" in result
-        assert "IMAGES ON THIS PAGE" in result
-        assert "TABLES ON THIS PAGE" in result
-
-    def test_save_summary_report_success(self, parser):
-        """Test summary report saving."""
-        parser.structured_content = [{"page": 1, "text": "test", "images": []}]
-        parser.images = []
-        parser.text = "text"
-        parser.metadata = {"filename": "test.pdf", "file_size_mb": 1.0, "page_count": 1}
-
-        report_path = parser.save_summary_report()
-        assert os.path.exists(report_path)
-
-        # Verify content
-        with open(report_path, "r", encoding="utf-8") as f:
-            content = f.read()
-            assert "PDF CONTENT EXTRACTION REPORT" in content
-            assert "test.pdf" in content
-
-    @patch("builtins.open", side_effect=OSError("Permission denied"))
-    def test_save_summary_report_error(self, mock_open, parser):
-        """Test report saving error."""
-        with pytest.raises(OSError, match="Failed to save summary report"):
+    def test_save_summary_report(self):
+        """Test the save_summary_report method."""
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+        parser.structured_content = [{"page": 1, "text": "...", "images": []}]
+        with patch("builtins.open", mock_open()) as mocked_file:
             parser.save_summary_report()
+            mocked_file.assert_called_once_with(
+                os.path.join(self.mock_output_dir, "extraction_report.txt"),
+                "w",
+                encoding="utf-8",
+            )
 
-    def test_save_metadata_json_success(self, parser):
-        """Test metadata JSON saving."""
-        parser.metadata = {"filename": "test.pdf"}
-        json_path = parser.save_metadata_json()
-        assert os.path.exists(json_path)
+    def test_save_metadata_json(self):
+        """Test the save_metadata_json method."""
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+        parser.metadata = {"key": "value"}
+        with patch("builtins.open", mock_open()) as mocked_file:
+            parser.save_metadata_json()
+            mocked_file.assert_called_once_with(
+                os.path.join(self.mock_output_dir, "metadata.json"),
+                "w",
+                encoding="utf-8",
+            )
 
-        # Verify JSON content
-        import json
+    def test_save_summary_report_os_error(self):
+        """Test OSError handling in save_summary_report."""
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+        parser.structured_content = [{"page": 1, "text": "...", "images": []}]
+        with patch("builtins.open", mock_open()) as mocked_file:
+            mocked_file.side_effect = OSError("Disk full")
+            with self.assertRaises(OSError):
+                parser.save_summary_report()
 
-        with open(json_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            assert data["filename"] == "test.pdf"
-
-    def test_save_metadata_json_serialization_error(self, parser):
-        """Test JSON serialization error."""
-        parser.metadata = {"filename": "test.pdf"}
-        with patch("json.dump", side_effect=TypeError("Object not serializable")):
-            with pytest.raises(ValueError, match="Failed to serialize"):
+    def test_save_metadata_json_os_error(self):
+        """Test OSError handling in save_metadata_json."""
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+        parser.metadata = {"key": "value"}
+        with patch("builtins.open", mock_open()) as mocked_file:
+            mocked_file.side_effect = OSError("Disk full")
+            with self.assertRaises(OSError):
                 parser.save_metadata_json()
+
+    def test_save_metadata_json_type_error(self):
+        """Test TypeError handling in save_metadata_json."""
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+        parser.metadata = {"key": "value"}
+        with (
+            patch("builtins.open", mock_open()),
+            patch("json.dump", side_effect=TypeError("Not serializable")),
+        ):
+            with self.assertRaises(ValueError):
+                parser.save_metadata_json()
+
+    def test_initiate_workflow(self):
+        """Test the end-to-end initiate workflow."""
+
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+        with (
+            patch.object(parser, "save_summary_report") as mock_save_summary,
+            patch.object(parser, "save_metadata_json") as mock_save_json,
+            patch.object(parser, "save_llm_content") as mock_save_llm,
+        ):
+            content = parser.initiate()
+
+            self.assertEqual(content, "LLM Content")
+            mock_save_summary.assert_called_once()
+            mock_save_json.assert_called_once()
+            mock_save_llm.assert_called_with("LLM Content")
+
+    def test_extract_metadata_os_error(self):
+        """Test os.stat error handling in extract_metadata."""
+        self.mocks["os.stat"].side_effect = OSError("Permission denied")
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+        metadata = parser.extract_metadata(MagicMock())
+        self.assertIn("error", metadata)
+
+    def test_extract_metadata_runtime_error(self):
+        """Test RuntimeError handling in extract_metadata."""
+
+        mock_doc = MagicMock()
+        mock_doc.metadata = {"title": "Test"}
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+
+        with patch.object(mock_doc, "close", side_effect=RuntimeError("Can't close")):
+            metadata = parser.extract_metadata(mock_doc)
+            self.assertIn("title", metadata)  # should still get metadata before error
+
+    def test_extract_text_file_not_found(self):
+        """Test FileNotFoundError in extract_text."""
+        self.mocks["extract_text"].side_effect = FileNotFoundError
+        parser = PdfParser(self.mock_file_path, self.mock_output_dir)
+        result = parser.extract_text()
+        self.assertEqual(result, "")

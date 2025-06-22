@@ -1,124 +1,120 @@
 from __future__ import annotations
 
-import json
-from unittest.mock import MagicMock
-from unittest.mock import patch
+import unittest
+from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
 
-from src.utils.extract_tables import calculate_content_ratio
-from src.utils.extract_tables import clean_table_dataframe
-from src.utils.extract_tables import extract_tables_from_pdf
-from src.utils.extract_tables import format_tables_for_llm
+from src.utils.extract_tables import PDFTableParser
 
 
-SAMPLE_DF = pd.DataFrame(
-    {"A": ["1", "2", ""], "B": ["", "3", "4"], "C": ["5", "", "6"]},
-)
+class TestPDFTableParser(unittest.TestCase):
+    """Test suite for the PDFTableParser class."""
 
-EMPTY_DF = pd.DataFrame()
+    def setUp(self):
+        """Set up a mock for the logger."""
+        self.patcher = patch("src.utils.extract_tables.setup_logger")
+        self.mock_setup_logger = self.patcher.start()
+        self.mock_logger = MagicMock()
+        self.mock_setup_logger.return_value = self.mock_logger
 
+    def tearDown(self):
+        """Stop the patcher."""
+        self.patcher.stop()
 
-MOCK_TABLE_DATA = [
-    {
-        "table_id": 0,
-        "page": 1,
-        "accuracy": 95.5,
-        "content_ratio": 0.8,
-        "shape": (3, 3),
-        "data": [{"A": "1", "B": "2", "C": "3"}],
-        "json": json.dumps([{"A": "1", "B": "2", "C": "3"}]),
-    },
-]
-
-
-@pytest.fixture
-def mock_camelot():
-    """Fixture to mock camelot-py."""
-    with patch("camelot.read_pdf") as mock_read:
+    @patch("camelot.read_pdf")
+    def test_extract_tables_success(self, mock_read_pdf):
+        """Test successful extraction of tables."""
+        # Arrange
         mock_table = MagicMock()
-        mock_table.df = SAMPLE_DF
-        mock_table.parsing_report = {"accuracy": 95.5, "page": 1}
-        mock_read.return_value = [mock_table]
-        yield mock_read
+        mock_table.df = pd.DataFrame(
+            {"col1": ["data1", "data2"], "col2": ["data3", "data4"]}
+        )
+        mock_table.parsing_report = {
+            "accuracy": 99.0,
+            "whitespace": 1,
+            "order": 1,
+            "page": 1,
+        }
+        mock_read_pdf.return_value = [mock_table]
 
+        parser = PDFTableParser("dummy.pdf")
 
-def test_extract_tables_from_pdf(mock_camelot):
-    """Test table extraction from PDF."""
-    result = extract_tables_from_pdf("dummy.pdf")
-    assert len(result) > 0
-    assert "table_id" in result[0]
-    assert "accuracy" in result[0]
-    assert "content_ratio" in result[0]
+        # Act
+        tables = parser.extract_tables()
 
+        # Assert
+        self.assertEqual(len(tables), 1)
+        self.assertEqual(tables[0]["accuracy"], 99.0)
+        self.mock_logger.error.assert_not_called()
 
-def test_extract_tables_empty_pdf(mock_camelot):
-    """Test table extraction from empty PDF."""
-    mock_camelot.return_value = []
-    result = extract_tables_from_pdf("empty.pdf")
-    assert len(result) == 0
+    @patch("camelot.read_pdf", side_effect=Exception("PDF read error"))
+    def test_extract_tables_read_error(self, mock_read_pdf):
+        """Test handling of a read error from camelot."""
+        # Arrange
+        parser = PDFTableParser("dummy.pdf")
 
+        # Act
+        tables = parser.extract_tables()
 
-def test_clean_table_dataframe():
-    """Test DataFrame cleaning."""
-    result = clean_table_dataframe(SAMPLE_DF)
-    assert isinstance(result, pd.DataFrame)
-    assert not result.empty
-    assert len(result.columns) == 3
-    assert len(result) == 3
+        # Assert
+        self.assertEqual(len(tables), 0)
+        self.mock_logger.error.assert_called_once()
 
+    def test_clean_table_dataframe(self):
+        """Test the dataframe cleaning functionality."""
+        # Arrange
+        df = pd.DataFrame(
+            {
+                "A": ["  value1 ", "", " value3 "],
+                "B": ["", "", ""],
+                "C": [" value2 ", "", ""],
+            }
+        )
+        parser = PDFTableParser("dummy.pdf")
 
-def test_clean_table_dataframe_empty():
-    """Test cleaning empty DataFrame."""
-    result = clean_table_dataframe(EMPTY_DF)
-    assert isinstance(result, pd.DataFrame)
-    assert result.empty
+        # Act
+        cleaned_df = parser._clean_table_dataframe(df)
 
+        # Assert
+        self.assertEqual(cleaned_df.shape, (2, 2))
+        self.assertEqual(cleaned_df.iloc[0, 0], "value1")
 
-def test_calculate_content_ratio():
-    """Test content ratio calculation."""
-    ratio = calculate_content_ratio(SAMPLE_DF)
-    assert isinstance(ratio, float)
-    assert 0 <= ratio <= 1
+    def test_calculate_content_ratio(self):
+        """Test calculation of content ratio."""
+        # Arrange
+        df = pd.DataFrame({"A": ["1", "", "3"], "B": ["4", "5", ""]})
+        parser = PDFTableParser("dummy.pdf")
 
+        # Act
+        ratio = parser._calculate_content_ratio(df)
 
-def test_calculate_content_ratio_empty():
-    """Test content ratio calculation for empty DataFrame."""
-    ratio = calculate_content_ratio(EMPTY_DF)
-    assert ratio == 0.0
+        # Assert
+        self.assertAlmostEqual(ratio, 4 / 6)
 
+    def test_format_tables_for_llm(self):
+        """Test formatting of tables for LLM processing."""
+        # Arrange
+        tables_data = [
+            {
+                "table_id": 1,
+                "page": 1,
+                "shape": (2, 2),
+                "accuracy": 95.5,
+                "content_ratio": 0.8,
+                "json": '[{"col1": "a", "col2": "b"}]',
+            }
+        ]
+        parser = PDFTableParser("dummy.pdf")
 
-def test_format_tables_for_llm():
-    """Test table formatting for LLM."""
-    result = format_tables_for_llm(MOCK_TABLE_DATA)
-    assert isinstance(result, str)
-    assert "EXTRACTED TABLES" in result
-    assert "TABLE 0" in result
-    assert "Page: 1" in result
-    assert "Accuracy: 95.5%" in result
+        # Act
+        formatted_string = parser.format_tables_for_llm(tables_data)
 
-
-def test_format_tables_for_llm_empty():
-    """Test formatting empty table list."""
-    result = format_tables_for_llm([])
-    assert result == "No tables found in the document."
-
-
-@pytest.mark.parametrize(
-    "df,expected_ratio",
-    [
-        (pd.DataFrame({"A": ["1", "2", "3"]}), 1.0),
-        (pd.DataFrame({"A": ["1", "", "3"]}), 0.67),
-        (pd.DataFrame({"A": ["", "", ""]}), 0.0),
-    ],
-)
-def test_calculate_content_ratio_parametrized(df, expected_ratio):
-    """Test content ratio calculation with multiple test cases."""
-    ratio = calculate_content_ratio(df)
-    # Allow small floating point differences
-    assert abs(ratio - expected_ratio) < 0.01
+        # Assert
+        self.assertIn("TABLE 1", formatted_string)
+        self.assertIn("Accuracy: 95.5%", formatted_string)
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    unittest.main()

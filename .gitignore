@@ -10,6 +10,7 @@ __pycache__/
 # C extensions
 *.so
 
+MagicMock/
 .pre-commit-config.yaml
 
 # Distribution / packaging

@@ -3,174 +3,109 @@
 from __future__ import annotations
 
 import base64
-import io
-import logging
-import os
 from pathlib import Path
 from typing import Optional
+from src.common.constants import IMAGE_DESCRIBER_PROMPT_PATH, LOG_FILE_PATH
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
-from langchain_openai import AzureChatOpenAI
+from src.services.llm_service import LLMService
 from PIL import Image
+from src.utils.logging_config import setup_logger
 
 load_dotenv()
-
-logger = logging.getLogger(__name__)
 
 
 class ImageDescriber:
     """
-    A class to describe images using Azure OpenAI's vision capabilities.
+    A class to describe images using an LLM.
     """
 
-    def __init__(self, prompt_path: str = "src/prompts/image_describer.txt"):
-        """
-        Initialize the ImageDescriber with Azure OpenAI configuration.
+    is_available: bool = False
 
-        Args:
-            prompt_path: Path to the custom prompt template file
+    def __init__(
+        self,
+        prompt_path: str = IMAGE_DESCRIBER_PROMPT_PATH,
+        llm_service: Optional[LLMService] = None,
+    ):
         """
-        self.llm: Optional[AzureChatOpenAI] = None
-        self.prompt_template: Optional[PromptTemplate] = None
-        self.is_available = False
+        Initialize the ImageDescriber.
+        """
+        self.logger = setup_logger(LOG_FILE_PATH)
         self.prompt_path = prompt_path
+        self.llm_service = llm_service or LLMService()
+        self.prompt_template: Optional[PromptTemplate] = None
+        self.is_available = self.llm_service.is_available
 
-        self._setup_image_describer()
+        if self.is_available:
+            self.prompt_template = self._load_prompt_template()
 
-    def _setup_image_describer(self) -> None:
-        """Set up the image description LLM and prompt template."""
-        try:
-            self.llm = AzureChatOpenAI(
-                azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-                api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-                api_version=os.getenv("API_VERSION"),
-                deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
-                model_name=os.getenv("AZURE_OPENAI_MODEL"),
-            )
-
-            self._load_prompt_template()
-
-            self.is_available = True
-            logger.info("ImageDescriber setup completed successfully")
-
-        except ImportError as e:
-            logger.warning(
-                "Import error setting up image describer: %s. "
-                "Check if langchain_openai is installed.",
-                e,
-            )
-            self.is_available = False
-        except Exception as e:
-            logger.warning(
-                "Unexpected error setting up image describer: %s. "
-                "Images will be extracted without descriptions.",
-                e,
-            )
-            self.is_available = False
-
-    def _load_prompt_template(self) -> None:
+    def _load_prompt_template(self) -> PromptTemplate:
         """Load the prompt template from file or use default."""
         try:
-            if os.path.exists(self.prompt_path):
-                prompt_text = Path(self.prompt_path).read_text(encoding="utf-8")
-                self.prompt_template = PromptTemplate.from_template(prompt_text)
-                logger.info("Loaded custom prompt template from %s", self.prompt_path)
-            else:
-                self._use_default_prompt()
-                logger.info("Custom prompt file not found, using default prompt")
-
+            prompt_path = Path(self.prompt_path)
+            if prompt_path.is_file():
+                template = prompt_path.read_text(encoding="utf-8")
+                self.logger.info(f"Loaded custom prompt from {self.prompt_path}")
+                return PromptTemplate.from_template(template)
         except (OSError, UnicodeDecodeError) as e:
-            logger.warning(
-                "Failed to load custom prompt from %s: %s. Using default prompt.",
-                self.prompt_path,
-                e,
-            )
-            self._use_default_prompt()
+            self.logger.error(f"Error reading prompt file {self.prompt_path}: {e}")
+        self.logger.info("Using default image description prompt.")
+        return self._use_default_prompt()
 
-    def _use_default_prompt(self) -> None:
+    def _use_default_prompt(self) -> PromptTemplate:
         """Set up the default prompt template."""
         default_prompt = (
             "Describe this image in detail. Focus on text, "
-            "charts, diagrams, and any important visual elements."
+            "charts, diagrams, and any important visual elements. "
+            "If the image appears to be a slide, screenshot, or document, "
+            "provide a structured summary of its content."
+            'For any topic, you can use the following format: "Focus on {topic}".'
         )
-        self.prompt_template = PromptTemplate.from_template(default_prompt)
+        return PromptTemplate.from_template(default_prompt)
 
-    def describe_image(self, image_path: str) -> str:
+    def describe_image(self, image_path: str, topic: str = "general") -> str:
         """
-        Describe an image using the configured LLM.
+        Describe an image from a file path.
         """
-        if not self.is_available or not self.llm or not self.prompt_template:
+        if not self.is_available:
             return "Image description not available"
 
         try:
-            if not os.path.exists(image_path):
-                raise FileNotFoundError(f"Image file not found: {image_path}")
-
-            # Convert image to base64
-            image_base64 = self._image_to_base64(image_path)
-
-            # Prepare the message for the LLM
-            prompt_text = self.prompt_template.format()
-            message_content = [
-                {"type": "text", "text": prompt_text},
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/png;base64,{image_base64}",
-                    },
-                },
-            ]
-
-            # Get description from LLM
-            response = self.llm.invoke([HumanMessage(content=message_content)])
-            return response.content
-
-        except FileNotFoundError as e:
-            logger.error("Image file not found: %s", e)
+            base64_image = self._image_to_base64(image_path)
+            return self.llm_service.generate_description(
+                base64_image, self.prompt_template, topic
+            )
+        except FileNotFoundError:
+            self.logger.error(f"File not found: {image_path}")
             return "Image description not available - file not found"
         except Exception as e:
-            logger.error(
-                "Unexpected error describing image %s: %s",
-                image_path,
-                e,
-            )
-            return f"Error generating description: {str(e)}"
+            self.logger.error(f"Error describing image {image_path}: {e}")
+            return f"Error generating description: {e}"
 
-    def _image_to_base64(self, image_path: str) -> str:
+    def describe_image_from_bytes(
+        self, image_bytes: bytes, topic: str = "general"
+    ) -> str:
         """
-        Convert an image file to base64 string.
+        Describe an image from bytes.
         """
-        with Image.open(image_path) as image:
-            buffered = io.BytesIO()
-            image.save(buffered, format="PNG")
-            return base64.b64encode(buffered.getvalue()).decode("utf-8")
-
-    def describe_image_from_bytes(self, image_bytes: bytes) -> str:
-        """
-        Describe an image from byte data.
-        """
-        if not self.is_available or not self.llm or not self.prompt_template:
+        if not self.is_available:
             return "Image description not available"
 
         try:
-            image_base64 = base64.b64encode(image_bytes).decode("utf-8")
-            prompt_text = self.prompt_template.format()
-            message_content = [
-                {"type": "text", "text": prompt_text},
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/png;base64,{image_base64}",
-                    },
-                },
-            ]
-
-            # Get description from LLM
-            response = self.llm.invoke([HumanMessage(content=message_content)])
-            return response.content
-
+            base64_image = base64.b64encode(image_bytes).decode("utf-8")
+            return self.llm_service.generate_description(
+                base64_image, self.prompt_template, topic
+            )
         except Exception as e:
-            logger.error("Unexpected error describing image from bytes: %s", e)
-            return f"Error generating description: {str(e)}"
+            self.logger.error(f"Error describing image from bytes: {e}")
+            return f"Error generating description: {e}"
+
+    @staticmethod
+    def _image_to_base64(image_path: str) -> str:
+        """
+        Convert an image file to a base64 encoded string.
+        """
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode("utf-8")

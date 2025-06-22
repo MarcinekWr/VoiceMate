@@ -6,13 +6,13 @@ import os
 import logging
 from pathlib import Path
 
-# Relative path to the project root (2 levels up from this file)
+
 REL_PROJECT_ROOT = Path(__file__).parent.parent.parent
 
-# Absolute path to the project root
+
 ABS_PROJECT_ROOT = REL_PROJECT_ROOT.resolve()
 
-# Define log file path using the absolute path
+
 LOG_FILE_PATH = ABS_PROJECT_ROOT / "log_folder" / "pdf_parser.log"
 
 # Create log directory if it doesn't exist
@@ -28,3 +28,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 logging.info(f"Absolute project root set to: {ABS_PROJECT_ROOT}")
+
+
+IMAGE_DESCRIBER_PROMPT_PATH = os.path.join(
+    ABS_PROJECT_ROOT, "src", "prompts", "image_describer.txt"
+)
