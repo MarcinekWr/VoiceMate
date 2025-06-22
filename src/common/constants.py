@@ -15,9 +15,9 @@ except Exception:
     ABS_PROJECT_ROOT = REL_PROJECT_ROOT
 
 # File paths
-LOG_FILE_PATH = ABS_PROJECT_ROOT / "log_folder" / "pdf_parser.log"
+LOG_FILE_PATH = REL_PROJECT_ROOT / "log_folder" / "pdf_parser.log"
 IMAGE_DESCRIBER_PROMPT_PATH = (
-    ABS_PROJECT_ROOT / "src" / "prompts" / "image_describer.txt"
+    REL_PROJECT_ROOT / "src" / "prompts" / "image_describer.txt"
 )
 
 # Ensure directories exist
