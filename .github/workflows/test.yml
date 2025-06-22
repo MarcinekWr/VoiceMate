@@ -28,4 +28,5 @@ jobs:
       env:
         PYTHONPATH: src
       run: |
+        export PYTHONPATH=$PYTHONPATH:./src
         pytest --cov=src --cov-fail-under=70
