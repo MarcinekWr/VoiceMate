@@ -9,6 +9,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+    - name: Switch to Current Branch
+        run: git checkout ${{ env.BRANCH }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -20,7 +22,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pytest pytest-cov
+        pip install -e .
 
     - name: Run tests with coverage
+      env:
+        PYTHONPATH: src
       run: |
         pytest --cov=src --cov-fail-under=70
