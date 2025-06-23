@@ -6,11 +6,11 @@ from pathlib import Path
 from langchain_openai import AzureChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
+load_dotenv()
 
-logging.basicConfig(level=logging.INFO)
+import logging
 logger = logging.getLogger(__name__)
 
-load_dotenv()
 
 PROMPT_PATHS = {
     "scientific": Path("src/prompts/scientific_style.txt"),

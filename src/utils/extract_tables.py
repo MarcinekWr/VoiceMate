@@ -11,8 +11,8 @@ from typing import Any, Optional
 
 import camelot
 import pandas as pd
-from src.common.constants import LOG_FILE_PATH
-from src.utils.logging_config import setup_logger
+from common.constants import LOG_FILE_PATH
+from utils.logging_config import setup_logger
 
 
 class PDFTableParser:

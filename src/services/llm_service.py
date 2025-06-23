@@ -12,8 +12,8 @@ from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
 
-from src.common.constants import LOG_FILE_PATH
-from src.utils.logging_config import setup_logger
+from common.constants import LOG_FILE_PATH
+from utils.logging_config import setup_logger
 
 load_dotenv()
 

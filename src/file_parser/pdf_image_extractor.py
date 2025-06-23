@@ -11,9 +11,9 @@ from typing import Any, Optional
 
 import fitz  # PyMuPDF
 
-from src.utils.image_describer import ImageDescriber
-from src.common.constants import LOG_FILE_PATH
-from src.utils.logging_config import setup_logger
+from utils.image_describer import ImageDescriber
+from common.constants import LOG_FILE_PATH
+from utils.logging_config import setup_logger
 
 
 class PDFImageExtractor:

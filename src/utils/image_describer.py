@@ -5,14 +5,14 @@ from __future__ import annotations
 import base64
 from pathlib import Path
 from typing import Optional
-from src.common.constants import IMAGE_DESCRIBER_PROMPT_PATH, LOG_FILE_PATH
+from common.constants import IMAGE_DESCRIBER_PROMPT_PATH, LOG_FILE_PATH
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
-from src.services.llm_service import LLMService
+from services.llm_service import LLMService
 from PIL import Image
-from src.utils.logging_config import setup_logger
+from utils.logging_config import setup_logger
 
 load_dotenv()
 

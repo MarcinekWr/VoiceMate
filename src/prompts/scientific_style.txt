@@ -37,7 +37,7 @@ Struktura odpowiedzi musi być w formacie dialogu dwóch osób z wyraźnym podzi
 
 (...)
 
-Utrzymuj ten format przez całą długość podcastu. Jeśli zabraknie Ci miejsca, zakończ segment słowami „kontynuuj” – a następna część powinna rozpocząć się dokładnie w miejscu przerwania.
+Utrzymuj ten format przez całą długość podcastu.
 
 ### STYL
 Styl popularnonaukowy – przystępny, ale bogaty w treści. Ton powinien być merytoryczny, ciekawy, angażujący i zrozumiały nawet dla słuchacza bez specjalistycznej wiedzy.

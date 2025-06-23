@@ -12,12 +12,12 @@ import fitz  # PyMuPDF
 from dotenv import load_dotenv
 from pdfminer.high_level import extract_text
 
-from src.common.constants import LOG_FILE_PATH
-from src.utils.extract_tables import PDFTableParser
-from src.utils.image_describer import ImageDescriber
-from src.file_parser.pdf_image_extractor import PDFImageExtractor
-from src.utils.logging_config import setup_logger
-from src.file_parser.pdf_content_formatter import PDFContentFormatter
+from common.constants import LOG_FILE_PATH
+from utils.extract_tables import PDFTableParser
+from utils.image_describer import ImageDescriber
+from file_parser.pdf_image_extractor import PDFImageExtractor
+from utils.logging_config import setup_logger
+from file_parser.pdf_content_formatter import PDFContentFormatter
 
 load_dotenv()
 
