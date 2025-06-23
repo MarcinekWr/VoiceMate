@@ -1,22 +1,22 @@
-### TASK
+### ZADANIE
 Na podstawie przetworzonego tekstu wejściowego {input_text}, Twoim zadaniem jest stworzenie obszernej, luźnej rozmowy w języku polskim w formie dialogu dwóch znajomych: Marcina i Asi.
 
-### ADDITIONAL INSTRUCTION
+### DODATKOWA INSTRUKCJA
 Oprócz materiału źródłowego otrzymujesz również spis tematów {plan_text}, który wyznacza główne zagadnienia do poruszenia w rozmowie. Przechodź przez punkty planu w naturalny sposób – każdy punkt powinien być omówiony, ale w swobodnej, przyjacielskiej atmosferze. Możesz dodawać osobiste komentarze, żarty i luźne dygresje.
 
-### CONTEXT
+### KONTEKST
 Słuchacz nie zna tekstu źródłowego, dlatego wszystkie kluczowe informacje muszą zostać wyjaśnione w rozmowie. Rozmowa powinna być długa, szczegółowa i maksymalnie otwarta – wykorzystaj możliwie dużo tokenów. W razie potrzeby kontynuuj generację w kolejnych segmentach.
 
 Po omówieniu jednego tematu przejdź swobodnie do kolejnych zagadnień z planu. Jeśli jakiś wątek jest ciekawy, możesz go pogłębić żartami, osobistymi refleksjami lub przypadkowymi skojarzeniami. Pozwól sobie na naturalne odbicia od tematu.
 
-### EXEMPLARS
+### PRZYKŁADY
 - Marcin i Asia rozmawiają jak znajomi przy kawie – swobodnie, z humorem, czasem się przekomarzają.
 - Jeden z nich może być bardziej zorientowany w temacie, ale obaj uczestniczą w rozmowie na równych prawach.
 - W rozmowie pojawiają się żarty, osobiste doświadczenia, analogie z życia codziennego, spontaniczne komentarze.
 - Mogą się nie zgadzać, dyskutować, wtrącać swoje "a wiesz co..." lub "czekaj, czekaj...".
 - Pozwól na naturalne przerywanie się, dokańczanie zdań za siebie, spontaniczne reakcje.
 
-### PERSONA
+### OSOBOWOŚĆ
 - Marcin: luźny, towarzyski, lubi żartować, ma swoje zdanie na różne tematy, czasem ironiczny.
 - Asia: bystra, ciekawska, lubi dyskutować, ma tendencję do filozofowania, czasem bardziej poważna od Marcina.
 
@@ -39,7 +39,7 @@ Struktura odpowiedzi musi być w formacie dialogu dwóch osób z wyraźnym podzi
 
 Utrzymuj ten format przez całą długość rozmowy. Jeśli zabraknie Ci miejsca, zakończ segment słowami „kontynuuj" – a następna część powinna rozpocząć się dokładnie w miejscu przerwania.
 
-### TONE
+### STYL
 Styl swobodny, przyjacielski – jak rozmowa dwóch znajomych, którzy gadają o interesującym temacie. Ton powinien być luźny, naturalny, z miejscem na humor, ale też merytoryczny gdy trzeba. Pozwól sobie na słownictwo potoczne, wtrącenia typu "no właśnie", "słuchaj", "wiesz co" itp.
 
 ---

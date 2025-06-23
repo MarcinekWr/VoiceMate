@@ -1,3 +1,13 @@
+"""
+Unit tests for validate_env_variables function in src.logic.llm_podcast module.
+
+These tests verify that the function properly checks the presence of required Azure OpenAI environment variables:
+
+- `test_validate_env_variables_success`: Ensures the function executes without errors when all environment variables are set correctly.
+
+- `test_validate_env_variables_missing`: Confirms that the function raises a ValueError with the correct message when a required environment variable is missing.
+"""
+
 import os
 import pytest
 from src.logic.llm_podcast import validate_env_variables

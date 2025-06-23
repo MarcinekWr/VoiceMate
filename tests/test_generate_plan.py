@@ -1,6 +1,19 @@
+"""
+Unit tests for the generate_plan function in src.logic.llm_podcast module.
+
+Tests included:
+
+- test_generate_plan_success:
+    Verifies that generate_plan correctly returns the expected plan content when the LLM invocation is successful.
+
+- test_generate_plan_error_handling:
+    Ensures that generate_plan properly propagates exceptions from the LLM invocation.
+"""
+
 from unittest.mock import MagicMock
 from src.logic.llm_podcast import generate_plan
 import pytest
+
 
 def test_generate_plan_success():
     llm_mock = MagicMock()
