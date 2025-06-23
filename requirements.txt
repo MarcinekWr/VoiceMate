@@ -3,3 +3,4 @@ langchain_core==0.3.65
 langchain_openai==0.3.23
 python-dotenv==1.1.0
 streamlit==1.45.1
+pytest
