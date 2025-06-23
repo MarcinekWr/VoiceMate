@@ -383,3 +383,5 @@ class FileConverter:
             raise Exception(f"Failed to parse file {self.file_path}: {str(e)}")
         finally:
             self.cleanup()
+
+

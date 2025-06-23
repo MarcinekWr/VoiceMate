@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 import fitz
 
 from src.file_parser.pdf_content_formatter import PDFContentFormatter
-from src.utils.text_cleaner import clean_text
+from src.utils.text_cleaner import TextCleaner
 
 
 class TestPDFContentFormatter(unittest.TestCase):
@@ -70,7 +70,7 @@ class TestPDFContentFormatter(unittest.TestCase):
         result = self.formatter.get_content_for_llm()
         self.assertEqual(result, "")
 
-    @patch("src.file_parser.pdf_content_formatter.clean_text")
+    @patch("src.utils.text_cleaner.TextCleaner.clean_text")
     def test_get_content_for_llm_with_all_data(self, mock_clean_text):
         """Test LLM content generation with all data types present."""
         mock_clean_text.return_value = "Cleaned text."
@@ -93,7 +93,7 @@ class TestPDFContentFormatter(unittest.TestCase):
         self.assertIn("TABLES ON THIS PAGE", result)
         self.assertIn('{"key": "value"}', result)
 
-    @patch("src.file_parser.pdf_content_formatter.clean_text")
+    @patch("src.utils.text_cleaner.TextCleaner.clean_text")
     def test_get_content_for_llm_cleaning_error(self, mock_clean_text):
         """Test LLM content generation with a text cleaning error."""
         mock_clean_text.side_effect = Exception("Cleaning failed")
