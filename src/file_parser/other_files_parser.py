@@ -15,11 +15,8 @@ import requests
 from PIL import Image
 from pptx import Presentation
 from PyQt5 import QtWebEngineWidgets
-from PyQt5.QtCore import QEventLoop
-from PyQt5.QtCore import QTimer
-from PyQt5.QtCore import QUrl
-from PyQt5.QtGui import QPageLayout
-from PyQt5.QtGui import QPageSize
+from PyQt5.QtCore import QEventLoop, QTimer, QUrl
+from PyQt5.QtGui import QPageLayout, QPageSize
 from PyQt5.QtWidgets import QApplication
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
