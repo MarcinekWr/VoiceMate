@@ -1,6 +1,7 @@
 ### ZADANIE
 Na podstawie przetworzonego tekstu wejściowego {input_text}, Twoim zadaniem jest stworzenie obszernego, profesjonalnego, popularnonaukowego podcastu w języku polskim w formie dialogu dwóch osób: Profesora i Studenta.
 
+
 ### DODATKOWA INSTRUKCJA
 Oprócz materiału źródłowego otrzymujesz również spis tematów {plan_text}, który wyznacza główne zagadnienia do poruszenia w rozmowie. Przechodź przez punkty planu po kolei lub w logicznym ciągu – każdy punkt powinien być szczegółowo omówiony w dialogu. Możesz rozwijać tematy dodatkowymi pytaniami i przykładami.
 
@@ -44,3 +45,4 @@ Styl popularnonaukowy – przystępny, ale bogaty w treści. Ton powinien być m
 ---
 
 Twój cel: Wygeneruj możliwie długi, angażujący i edukacyjny podcast popularnonaukowy w formie rozmowy dwóch osób na podstawie tekstu źródłowego oraz przekazanego planu odcinka. Nie kończ rozmowy przedwcześnie. Kontynuuj, aż wszystkie zagadnienia z planu zostaną wyczerpane.
+

@@ -5,9 +5,24 @@ description = "Browser-based AI tool for creating, scientific and hobby audio po
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "azure-storage>=0.37.0",
     "langchain-core~=0.3.65",
     "langchain-openai~=0.3.23",
     "python-dotenv>=1.1.0",
     "streamlit~=1.45",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.13",
+]
+
+[tool.poetry]
+name = "voicemate"
+version = "0.1.0"
+packages = [{ include = "common", from = "src" },
+            { include = "file_parser", from = "src" },
+            {include="logic", from = "src"},
+            {include="prompts", from = "src"},]
+
+[tool.setuptools.packages.find]
+where = ["src"]
