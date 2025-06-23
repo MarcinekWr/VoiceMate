@@ -131,6 +131,7 @@ celerybeat.pid
 
 # Environments
 .env
+feature/pdf-text-parser
 .venv
 env/
 venv/
@@ -199,3 +200,10 @@ pyrightconfig.json
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
+__pycache__
+podcast.txt
+output_plan.txt
+.pytest_cache
+scientific_style_test.txt
+plan_prompt_test.txt
+
