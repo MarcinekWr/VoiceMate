@@ -9,7 +9,7 @@ from typing import Any
 
 import fitz  # PyMuPDF
 
-from src.utils.text_cleaner import clean_text
+from src.utils.text_cleaner import TextCleaner
 from src.common.constants import LOG_FILE_PATH
 from src.utils.logging_config import setup_logger
 
@@ -88,7 +88,7 @@ class PDFContentFormatter:
 
             if page["text"].strip():
                 try:
-                    cleaned_text = clean_text(page["text"])
+                    cleaned_text = TextCleaner(page["text"]).clean_text()
                     page_text += f"\nTEXT CONTENT:\n{cleaned_text}\n"
                 except Exception as e:
                     self.logger.warning(

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import gc
-import logging
 import mimetypes
 import os
 import sys
@@ -23,8 +22,6 @@ from PyQt5.QtGui import QPageSize
 from PyQt5.QtWidgets import QApplication
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from pdfminer.high_level import extract_text
-from pptx.exc import PackageNotFoundError
 
 from src.common.constants import LOG_FILE_PATH
 from src.file_parser import pdf_parser

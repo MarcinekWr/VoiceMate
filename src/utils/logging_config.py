@@ -1,5 +1,4 @@
 """Defines the logging configuration for the application."""
-
 import logging
 
 
