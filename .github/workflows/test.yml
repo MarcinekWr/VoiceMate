@@ -26,7 +26,6 @@ jobs:
 
     - name: Run tests with coverage
       env:
-        PYTHONPATH: src
+        PYTHONPATH: ./src
       run: |
-        export PYTHONPATH=$PYTHONPATH:./src
         pytest --cov=src --cov-fail-under=70

@@ -70,7 +70,7 @@ class TestPDFContentFormatter(unittest.TestCase):
         result = self.formatter.get_content_for_llm()
         self.assertEqual(result, "")
 
-    @patch("src.utils.text_cleaner.TextCleaner.clean_text")
+    @patch("src.file_parser.pdf_content_formatter.TextCleaner.clean_text")
     def test_get_content_for_llm_with_all_data(self, mock_clean_text):
         """Test LLM content generation with all data types present."""
         mock_clean_text.return_value = "Cleaned text."
