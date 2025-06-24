@@ -10,13 +10,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from utils.logging_config import setup_logger, set_request_id
 
-from utils.logging_config import setup_logger
-setup_logger()
+setup_logger() 
 
 from file_parser.other_files_parser import FileConverter
-from logic.llm_podcast import LLMPodcastService, generate_plan, generate_podcast_text, create_llm
-
+from logic.llm_podcast import generate_plan, generate_podcast_text, create_llm
+from logic.Azure_TTS import AzureTTSPodcastGenerator
+from logic.Elevenlabs_TTS import ElevenlabsTTSPodcastGenerator
 
 def save_to_file(content: str, filename: str, output_dir: str = "output") -> str:
     """Save content to file and return the path"""
@@ -69,9 +70,13 @@ def initialize_session_state():
         st.session_state.processing = False
     if 'file_processed' not in st.session_state:
         st.session_state.file_processed = False
+    if 'request_id' not in st.session_state:
+        st.session_state.request_id = set_request_id()
+    
 
 def reset_workflow():
     """Reset the workflow to start from beginning"""
+
     st.session_state.step = 1
     st.session_state.llm_content = None
     st.session_state.plan_text = None
@@ -81,6 +86,8 @@ def reset_workflow():
     st.session_state.is_premium = False
     st.session_state.processing = False
     st.session_state.file_processed = False
+    st.session_state.request_id = set_request_id() 
+
 
 def process_uploaded_file(uploaded_file) -> Optional[str]:
     """Process uploaded file and extract LLM content using FileConverter"""
@@ -164,7 +171,7 @@ def generate_audio_from_json(json_data: list, is_premium: bool) -> Optional[str]
     """Generate audio from JSON data using appropriate TTS engine"""
     try:
         if is_premium:
-            from logic.Elevenlabs_TTS import generate_podcast_from_dialog
+            tts = ElevenlabsTTSPodcastGenerator()
             st.info("🎵 Generuję audio z ElevenLabs (Premium - format MP3)...")
             
             def progress_callback(current, total, message):
@@ -172,14 +179,14 @@ def generate_audio_from_json(json_data: list, is_premium: bool) -> Optional[str]
                 progress_bar.progress(current / total)
             
             progress_bar = st.progress(0)
-            output_path = generate_podcast_from_dialog(
+            output_path = tts.generate_podcast_elevenlabs(
                 dialog_data=json_data,
                 progress_callback=progress_callback
             )
             progress_bar.empty()
             
         else:
-            from logic.Azure_TTS import generate_podcast_simple_wav
+            tts = AzureTTSPodcastGenerator()
             st.info("🎵 Generuję audio z Azure TTS (Free - format WAV)...")
             
             def progress_callback(current, total, message):
@@ -187,7 +194,7 @@ def generate_audio_from_json(json_data: list, is_premium: bool) -> Optional[str]
                 progress_bar.progress(current / total)
             
             progress_bar = st.progress(0)
-            output_path = generate_podcast_simple_wav(
+            output_path = tts.generate_podcast_azure(
                 dialog_data=json_data,
                 progress_callback=progress_callback
             )
@@ -379,7 +386,7 @@ def render_step_3():
     with col1:
         podcast_style = st.selectbox(
             "Styl podcastu",
-            options=["scientific", "casual", "educational", "entertaining", "professional"],
+            options=["scientific", "casual"],
             index=0,
             help="Wybierz styl, w jakim ma być napisany podcast"
         )
@@ -387,10 +394,7 @@ def render_step_3():
     with col2:
         style_descriptions = {
             "scientific": "🔬 Naukowy - precyzyjny, oparty na faktach",
-            "casual": "😊 Swobodny - przyjazny, nieformalny ton",
-            "educational": "📚 Edukacyjny - jasne wyjaśnienia, przystępny język",
-            "entertaining": "🎭 Rozrywkowy - angażujący, dynamiczny",
-            "professional": "💼 Profesjonalny - formalny, rzeczowy"
+            "casual": "😊 Swobodny - przyjazny, nieformalny ton"
         }
         st.info(style_descriptions[podcast_style])
     
