@@ -1,0 +1,34 @@
+--- DOCUMENT METADATA ---
+Filename: python_langchain_com_1750720175.pdf
+File Size: 2.72 MB
+Pages: 5
+
+
+--- PAGE 1 ---
+
+TEXT CONTENT:
+Open on GitHub Open on GitHub Introduction Introduction LangChain is a framework for developing applications powered by large language models LLMs. LangChain simpliﬁes every stage of the LLM application lifecycle Development Build your applications using LangChains open-source components and third-party integrations. Use LangGraph to build stateful agents with ﬁrst-class streaming and human-in-the- loop support. Productionization Use LangSmith to inspect, monitor and evaluate your applications, so that you can continuously optimize and deploy with conﬁdence. Deployment Turn your LangGraph applications into production-ready APIs and Assistants with LangGraph Platform. LangChain implements a standard interface for large language models and related technologies, such as embedding models and vector stores, and integrates with hundreds of providers. See the integrations page for more.
+
+
+--- PAGE 2 ---
+
+TEXT CONTENT:
+Select chat model NOTE These docs focus on the Python LangChain library. Head here for docs on the JavaScript LangChain library. Architecture The LangChain framework consists of multiple open-source libraries. Read more in the Architecture page. langchain-core  Base abstractions for chat models and other components. Integration packages e.g. langchain-openai , langchain-anthropic , etc Important integrations have been split into lightweight packages that are co-maintained by the LangChain team and the integration developers. langchain  Chains, agents, and retrieval strategies that make up an applications cognitive architecture. langchain-community  Third-party integrations that are community maintained. langgraph  Orchestration framework for combining LangChain components into production-ready applications with persistence, streaming, and other key features. See LangGraph documentation. Google Gemini  pip install -qU langchaingoogle-genai import getpass import os if not os.environ.getGOOGLE_API_KEY os.environGOOGLE_API_KEY  getpass.getpassEnter API key for Google Gemini  from langchain.chat_models import init_chat_model model  init_chat_modelgemini-2.0-flash, model_providergoogle_genai model.invokeHello, world!
+
+
+--- PAGE 3 ---
+
+TEXT CONTENT:
+Guides Tutorials If youre looking to build something speciﬁc or are more of a hands-on learner, check out our tutorials section. This is the best place to get started. These are the best ones to get started with Build a Simple LLM Application Build a Chatbot Build an Agent Introduction to LangGraph Explore the full list of LangChain tutorials here, and check out other LangGraph tutorials here. To learn more about LangGraph, check out our ﬁrst LangChain Academy course, Introduction to LangGraph, available here. How-to guides Here youll ﬁnd short answers to How do I?? types of questions. These how-to guides dont cover topics in depth - youll ﬁnd that material in the Tutorials and the API Reference. However, these guides will help you quickly accomplish common tasks using chat models, vector stores, and other common LangChain components. Check out LangGraph-speciﬁc how-tos here. Conceptual guide Introductions to all the key parts of LangChain youll need to know! Here youll ﬁnd high level explanations of all LangChain concepts. For a deeper dive into LangGraph concepts, check out this page. Integrations LangChain is part of a rich ecosystem of tools that integrate with our framework and build on top of it. If youre looking to get up and running quickly with chat models, vector stores, or other LangChain
+
+
+--- PAGE 4 ---
+
+TEXT CONTENT:
+components from a speciﬁc provider, check out our growing list of integrations. API reference Head to the reference section for full documentation of all classes and methods in the LangChain Python packages. Ecosystem LangSmith Trace and evaluate your language model applications and intelligent agents to help you move from prototype to production. LangGraph Build stateful, multi-actor applications with LLMs. Integrates smoothly with LangChain, but can be used without it. LangGraph powers production-grade agents, trusted by Linkedin, Uber, Klarna, GitLab, and many more. Additional resources Versions See what changed in v0.3, learn how to migrate legacy code, read up on our versioning policies, and more. Security Read up on security best practices to make sure youre developing safely with LangChain. Contributing Check out the developers guide for guidelines on contributing and help getting your dev environment set up. Edit this page
+
+
+--- PAGE 5 ---
+
+TEXT CONTENT:
+Was this page helpful?
