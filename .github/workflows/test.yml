@@ -9,6 +9,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+    
     - name: Switch to Current Branch
       run: git checkout ${{ env.BRANCH }}
 
@@ -22,8 +23,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pytest pytest-cov
+        # Dodaj brakujące zależności
+        pip install opencensus-ext-azure
         pip install -e .
 
     - name: Run tests with coverage
       run: |
-        PYTHONPATH=./src pytest --cov=src --cov-fail-under=70
+        export PYTHONPATH="${PYTHONPATH}:./src"
+        pytest --cov=src --cov-fail-under=70
