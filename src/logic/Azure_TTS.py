@@ -9,28 +9,27 @@ import azure.cognitiveservices.speech as speechsdk
 from dotenv import load_dotenv
 
 load_dotenv()
-
-import logging
 logger = logging.getLogger(__name__)
 
-def setup_logger():
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s"
-    )
 
-    connection_string = os.getenv("APPINSIGHTS_CONNECTION_STRING")
-    if connection_string:
-        azure_handler = AzureLogHandler(connection_string=connection_string)
-        logger.addHandler(azure_handler)
-        logger.info("AzureLogHandler podłączony – logi będą wysyłane do Application Insights")
-    else:
-        logger.warning("Brak APPINSIGHTS_CONNECTION_STRING – logi nie będą wysyłane do Application Insights")
+class AzureTTSPodcastGenerator:
+    def __init__(self):
+        api_key = os.getenv("AZURE_SPEECH_API_KEY")
+        region = os.getenv("AZURE_SPEECH_REGION")
 
-def generate_podcast_simple_wav(dialog_data, output_path=None, progress_callback=None):  
-    if output_path is None:
-        temp_dir = tempfile.mkdtemp(prefix="podcast_")
-        output_path = os.path.join(temp_dir, f"podcast_{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav")
+        if not api_key or not region:
+            raise ValueError("Brakuje AZURE_SPEECH_API_KEY lub AZURE_SPEECH_REGION w .env")
+
+        self.speech_config = speechsdk.SpeechConfig(subscription=api_key, region=region)
+
+    def generate_podcast_azure(self, dialog_data: list, output_path: str = None, progress_callback=None) -> str:
+        if not dialog_data:
+            logger.error("Nie przekazano danych dialogowych.")
+            return None
+
+        if output_path is None:
+            temp_dir = tempfile.mkdtemp(prefix="podcast_")
+            output_path = os.path.join(temp_dir, f"podcast_{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav")
 
         temp_files = []
         total_segments = len(dialog_data)
@@ -125,7 +124,5 @@ def generate_podcast_simple_wav(dialog_data, output_path=None, progress_callback
                         logger.error(f"Błąd usuwania pliku {temp_file}: {e}")
                         break
 
-    logger.info(f"Podcast zapisany jako {output_path}")
-    return output_path
-
-
+        logger.info(f"Podcast zapisany jako {output_path}")
+        return output_path
