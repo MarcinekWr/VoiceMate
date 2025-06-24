@@ -25,7 +25,5 @@ jobs:
         pip install -e .
 
     - name: Run tests with coverage
-      env:
-        PYTHONPATH: ./src
       run: |
-        pytest --cov=src --cov-fail-under=70
+        PYTHONPATH=./src pytest --cov=src --cov-fail-under=70
