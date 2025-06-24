@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import json
 from workflow.generation import generate_audio_from_json
+from utils.blob_uploader import upload_to_blob
 
 def render_step_5():
     """Render Step 5: Audio Generation"""
@@ -40,15 +41,21 @@ def render_step_5():
         
         with st.spinner(f"🎵 Generuję audio za pomocą {engine_name}..."):
             audio_path = generate_audio_from_json(st.session_state.json_data, st.session_state.is_premium)
-            
+
             if audio_path:
                 st.session_state.audio_path = audio_path
+
+                try:
+                    blob_name = os.path.basename(audio_path)
+                    upload_to_blob("audio", audio_path, blob_name)
+                except Exception as upload_error:
+                    st.warning(f"⚠️ Błąd przy wysyłaniu audio do Azure Blob: {upload_error}")
+
                 st.session_state.processing = False
                 st.success(f"✅ Audio zostało pomyślnie wygenerowane! Zapisano jako: {audio_path}")
                 st.balloons()
                 st.rerun()
-            else:
-                st.session_state.processing = False
+
     
     # Show audio player if available
     if st.session_state.audio_path and os.path.exists(st.session_state.audio_path):

@@ -10,7 +10,6 @@ from typing import Any
 import fitz  # PyMuPDF
 
 from utils.text_cleaner import TextCleaner
-from common.constants import LOG_FILE_PATH
 from utils.logging_config import setup_logger
 
 
@@ -32,7 +31,7 @@ class PDFContentFormatter:
         self.images = images
         self.tables = tables
         self.structured_content: list[dict[str, Any]] = []
-        self.logger = setup_logger(LOG_FILE_PATH)
+        self.logger = logging.getLogger(__name__)
 
     def create_structured_content(self, doc: fitz.Document) -> list[dict[str, Any]]:
         """Create a structured representation of all content by page."""

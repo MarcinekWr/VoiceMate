@@ -20,9 +20,7 @@ from PyQt5.QtWidgets import QApplication
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
-from common.constants import LOG_FILE_PATH
 from file_parser import pdf_parser
-from utils.logging_config import setup_logger
 import logging
 
 class FileConverter:

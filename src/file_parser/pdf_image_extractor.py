@@ -12,8 +12,6 @@ from typing import Any, Optional
 import fitz  # PyMuPDF
 
 from utils.image_describer import ImageDescriber
-from common.constants import LOG_FILE_PATH
-from utils.logging_config import setup_logger
 
 
 class PDFImageExtractor:
@@ -33,7 +31,7 @@ class PDFImageExtractor:
         self.output_dir = output_dir
         self.image_describer = image_describer
         self.describe_images = describe_images
-        self.logger = setup_logger(LOG_FILE_PATH)
+        self.logger = logging.getLogger(__name__)
 
     def extract_images(self, doc: fitz.Document) -> list[dict[str, Any]]:
         """Extract images using PyMuPDF and describe them using ImageDescriber."""

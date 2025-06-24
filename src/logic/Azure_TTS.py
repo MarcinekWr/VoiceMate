@@ -3,10 +3,10 @@ import os
 import tempfile
 import time
 import wave
-from datetime import datetime
 
 import azure.cognitiveservices.speech as speechsdk
 from dotenv import load_dotenv
+from utils.logging_config import get_request_id 
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -29,7 +29,8 @@ class AzureTTSPodcastGenerator:
 
         if output_path is None:
             temp_dir = tempfile.mkdtemp(prefix="podcast_")
-            output_path = os.path.join(temp_dir, f"podcast_{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav")
+            request_id = get_request_id()
+            output_path = os.path.join(temp_dir, f"podcast_{request_id}.wav")
 
         temp_files = []
         total_segments = len(dialog_data)

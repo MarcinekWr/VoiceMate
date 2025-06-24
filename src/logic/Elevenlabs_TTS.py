@@ -2,11 +2,10 @@ import json
 import logging
 import os
 import tempfile
-from datetime import datetime
 
 from dotenv import load_dotenv
 from elevenlabs.client import ElevenLabs
-from opencensus.ext.azure.log_exporter import AzureLogHandler
+from utils.logging_config import get_request_id 
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -52,7 +51,8 @@ class ElevenlabsTTSPodcastGenerator:
 
         if output_path is None:
             temp_dir = tempfile.mkdtemp(prefix="podcast_")
-            output_path = os.path.join(temp_dir, f"podcast_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp3")
+            request_id = get_request_id()
+            output_path = os.path.join(temp_dir, f"podcast_{request_id}.wav")
 
         total_segments = len(dialog_data)
 

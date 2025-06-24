@@ -5,14 +5,14 @@ from __future__ import annotations
 import base64
 from pathlib import Path
 from typing import Optional
-from common.constants import IMAGE_DESCRIBER_PROMPT_PATH, LOG_FILE_PATH
+from common.constants import IMAGE_DESCRIBER_PROMPT_PATH
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
 from services.llm_service import LLMService
 from PIL import Image
-from utils.logging_config import setup_logger
+import logging
 
 load_dotenv()
 
@@ -32,7 +32,7 @@ class ImageDescriber:
         """
         Initialize the ImageDescriber.
         """
-        self.logger = setup_logger(LOG_FILE_PATH)
+        self.logger = logging.getLogger(__name__)
         self.prompt_path = prompt_path
         self.llm_service = llm_service or LLMService()
         self.prompt_template: Optional[PromptTemplate] = None

@@ -11,9 +11,7 @@ from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
-
-from common.constants import LOG_FILE_PATH
-from utils.logging_config import setup_logger
+import logging
 
 load_dotenv()
 
@@ -24,7 +22,7 @@ class LLMService:
     """
 
     def __init__(self):
-        self.logger = setup_logger(LOG_FILE_PATH)
+        self.logger = logging.getLogger(__name__)
         self.llm = self._initialize_llm()
         self.is_available = self.llm is not None
         if self.is_available:

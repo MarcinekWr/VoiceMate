@@ -1,5 +1,9 @@
 import streamlit as st
+import os
+import logging
 
+from common.constants import LOGS_DIR
+from utils.logging_config import setup_logger, get_request_id, set_request_id
 from workflow.session import initialize_session_state
 from ui.sidebar import render_sidebar
 from ui.steps.step1_upload import render_step_1
@@ -7,9 +11,24 @@ from ui.steps.step2_plan import render_step_2
 from ui.steps.step3_podcast import render_step_3
 from ui.steps.step4_json import render_step_4
 from ui.steps.step5_audio import render_step_5
+from utils.blob_uploader import upload_to_blob
+
+if "request_id" not in st.session_state:
+    st.session_state.request_id = set_request_id()
+else:
+    set_request_id(st.session_state.request_id)
+
+log_file_path = LOGS_DIR / f"{get_request_id()}.log"
+
+if "logger_initialized" not in st.session_state:
+    logger = setup_logger(log_file_path)
+    logger.info(f"🟢 Logger gotowy, request_id={get_request_id()}")
+    st.session_state.logger_initialized = True
+else:
+    logger = logging.getLogger()
+
 
 def main():
-    # Konfiguracja strony
     st.set_page_config(
         page_title="Generator Podcastów AI",
         page_icon="🎙️",
@@ -17,18 +36,14 @@ def main():
         initial_sidebar_state="expanded"
     )
 
-    # Inicjalizacja sesji
     initialize_session_state()
 
-    # Tytuł i opis główny
     st.title("🎙️ Generator Podcastów AI")
     st.markdown("**Przekształć dowolną treść w profesjonalny podcast audio za pomocą AI**")
     st.markdown("---")
 
-    # Pasek boczny z postępem
     render_sidebar()
 
-    # Routing kroków
     step = st.session_state.step
     if step == 1:
         render_step_1()
@@ -41,7 +56,13 @@ def main():
     elif step == 5:
         render_step_5()
 
-    # Stopka
+    if os.path.exists(log_file_path):
+        try:
+            upload_to_blob("logs", log_file_path, blob_name=os.path.basename(log_file_path))
+            st.info("📤 Logi aplikacji zostały zapisane w Azure Blob Storage.")
+        except Exception as e:
+            st.warning(f"⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}")
+
     st.markdown("---")
     st.markdown(
         "<div style='text-align: center; color: #666; font-size: 0.8em;'>"
@@ -49,6 +70,7 @@ def main():
         "</div>",
         unsafe_allow_html=True
     )
+
 
 if __name__ == "__main__":
     main()

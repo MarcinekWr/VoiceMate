@@ -11,8 +11,6 @@ from typing import Any, Optional
 
 import camelot
 import pandas as pd
-from common.constants import LOG_FILE_PATH
-from utils.logging_config import setup_logger
 
 
 class PDFTableParser:
@@ -28,7 +26,7 @@ class PDFTableParser:
             pdf_path (str): The path to the PDF file.
         """
         self.pdf_path = pdf_path
-        self.logger = setup_logger(LOG_FILE_PATH)
+        self.logger = logging.getLogger(__name__)
 
     def extract_tables(
         self,
