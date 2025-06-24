@@ -175,7 +175,6 @@ def generate_audio_from_json(json_data: list, is_premium: bool) -> Optional[str]
             st.info("🎵 Generuję audio z ElevenLabs (Premium - format MP3)...")
             
             def progress_callback(current, total, message):
-                st.write(f"🔄 {message}")
                 progress_bar.progress(current / total)
             
             progress_bar = st.progress(0)
@@ -190,7 +189,6 @@ def generate_audio_from_json(json_data: list, is_premium: bool) -> Optional[str]
             st.info("🎵 Generuję audio z Azure TTS (Free - format WAV)...")
             
             def progress_callback(current, total, message):
-                st.write(f"🔄 {message}")
                 progress_bar.progress(current / total)
             
             progress_bar = st.progress(0)
@@ -516,7 +514,7 @@ def render_step_5():
     st.header("🎵 Krok 5: Generuj audio")
     
     # Show JSON preview
-    with st.expander("📋 Podgląd JSON", expanded=True):
+    with st.expander("📋 Podgląd JSON", expanded=False):
         st.json(st.session_state.json_data)
     
     # Engine info

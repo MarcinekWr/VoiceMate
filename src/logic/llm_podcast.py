@@ -12,10 +12,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+BASE_DIR = Path(__file__).resolve().parent.parent 
 PROMPT_PATHS = {
-    "scientific": Path("src/prompts/scientific_style.txt"),
-    "casual": Path("src/prompts/casual_style.txt"),
-    "plan": Path("src/prompts/plan_prompt.txt"),
+    "scientific": BASE_DIR / "prompts" / "scientific_style.txt",
+    "casual":     BASE_DIR / "prompts" / "casual_style.txt",
+    "plan":       BASE_DIR / "prompts" / "plan_prompt.txt",
 }
 
 
