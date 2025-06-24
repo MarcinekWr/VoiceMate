@@ -10,21 +10,9 @@ from dotenv import load_dotenv
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 
 load_dotenv()
+
+import logging
 logger = logging.getLogger(__name__)
-
-def setup_logger():
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s"
-    )
-
-    connection_string = os.getenv("APPINSIGHTS_CONNECTION_STRING")
-    if connection_string:
-        azure_handler = AzureLogHandler(connection_string=connection_string)
-        logger.addHandler(azure_handler)
-        logger.info("AzureLogHandler podłączony – logi będą wysyłane do Application Insights")
-    else:
-        logger.warning("Brak APPINSIGHTS_CONNECTION_STRING – logi nie będą wysyłane do Application Insights")
 
 def generate_podcast_simple_wav(dialog_data, output_path=None, progress_callback=None):  
     if output_path is None:
@@ -132,5 +120,3 @@ def generate_podcast_simple_wav(dialog_data, output_path=None, progress_callback
 
     logger.info(f"Podcast zapisany jako {output_path}")
     return output_path
-
-
