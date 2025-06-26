@@ -9,9 +9,9 @@ from src.utils.logging_config import get_request_id
 
 class ElevenlabsTTSPodcastGenerator:
     def __init__(self):
-        self.client = self._load_client()
         self.logger = logging.getLogger(__name__)
-
+        self.client = self._load_client()
+        
     def _load_client(self) -> ElevenLabs:
         api_key = os.getenv("ELEVENLABS_API_KEY")
         if not api_key:
