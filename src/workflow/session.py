@@ -4,7 +4,7 @@ from utils.logging_config import set_request_id
 def initialize_session_state():
     """Initialize all session state variables"""
     if 'step' not in st.session_state:
-        st.session_state.step = 1
+        st.session_state.step = 0
     if 'llm_content' not in st.session_state:
         st.session_state.llm_content = None
     if 'plan_text' not in st.session_state:

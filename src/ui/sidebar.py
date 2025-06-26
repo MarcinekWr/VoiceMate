@@ -4,13 +4,12 @@ from workflow.session import reset_workflow
 def render_sidebar():
     """Render sidebar with progress and controls"""
     with st.sidebar:
-        st.header("📋 Postęp generowania")
+        st.header("Postęp generowania Twojego Podcastu")
         
         steps = [
             ("📁", "Wczytaj plik"),
             ("📝", "Generuj plan"),
             ("🎙️", "Generuj podcast"),
-            ("🔄", "Konwertuj na JSON"),
             ("🎵", "Generuj audio")
         ]
         

@@ -8,10 +8,12 @@ from workflow.session import initialize_session_state
 from ui.sidebar import render_sidebar
 from ui.steps.step1_upload import render_step_1
 from ui.steps.step2_plan import render_step_2
-from ui.steps.step3_podcast import render_step_3
-from ui.steps.step4_json import render_step_4
+from ui.steps.step_all import render_auto_pipeline
 from ui.steps.step5_audio import render_step_5
+from ui.steps.step0_homepage import render_home_page
+from ui.steps.step3_and4 import render_step_3_and_4
 from utils.blob_uploader import upload_to_blob
+
 
 if "request_id" not in st.session_state:
     st.session_state.request_id = set_request_id()
@@ -30,29 +32,34 @@ else:
 
 def main():
     st.set_page_config(
-        page_title="Generator Podcastów AI",
+        page_title="VoiceMate",
         page_icon="🎙️",
         layout="wide",
         initial_sidebar_state="expanded"
     )
 
+
+    # st.title("🎙️ VoiceMate Generator Podcastów AI")
+    # st.markdown("**Przekształć dowolną treść w podcast audio za pomocą AI**")
+    # st.markdown("---")
+
     initialize_session_state()
 
-    st.title("🎙️ Generator Podcastów AI")
-    st.markdown("**Przekształć dowolną treść w profesjonalny podcast audio za pomocą AI**")
-    st.markdown("---")
-
-    render_sidebar()
+    if st.session_state.step >= 1 and st.session_state.step <= 5:
+        render_sidebar()
 
     step = st.session_state.step
-    if step == 1:
+
+    if step == 0:
+        render_home_page()
+    elif step == 1:
         render_step_1()
     elif step == 2:
         render_step_2()
     elif step == 3:
-        render_step_3()
-    elif step == 4:
-        render_step_4()
+        render_step_3_and_4()
+    elif step == 6: 
+        render_auto_pipeline()
     elif step == 5:
         render_step_5()
 

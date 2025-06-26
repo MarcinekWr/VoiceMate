@@ -3,8 +3,18 @@ from workflow.process_file import process_uploaded_file, process_url_input
 
 def render_step_1():
     """Render Step 1: File Upload"""
-    st.header("📁 Krok 1: Wczytaj plik")
-    st.markdown("Wybierz plik do przetworzenia lub wprowadź URL strony internetowej.")
+    st.header("📁 Wczytaj plik")
+    st.markdown("""
+    W tym kroku możesz:
+
+    - 📎 **Przesłać plik** (np. PDF, obraz, prezentację lub dokument HTML/Markdown), **lub**
+    - 🌍 **Wprowadzić adres URL** strony internetowej.
+
+    📥 **Co się stanie?**
+    Wybrany plik lub treść strony zostanie przetworzona i zinterpretowana przez nasze modele.
+
+    """)
+
     
     with st.expander("ℹ️ Obsługiwane formaty", expanded=False):
         st.markdown("""
@@ -12,7 +22,7 @@ def render_step_1():
         - 📄 **PDF** (.pdf)
         - 🖼️ **Obrazy** (.jpg, .jpeg, .png, .bmp, .tiff, .gif)
         - 🌐 **Strony web** (.html, .htm)
-        - 📝 **Markdown** (.md, .markdown)
+        - 📝 **Markdown** (.md, .markdown)  
         - 📊 **Prezentacje** (.pptx)
         
         **URL:**

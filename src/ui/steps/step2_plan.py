@@ -4,6 +4,17 @@ from workflow.generation import generate_plan_content
 def render_step_2():
     """Render Step 2: Plan Generation"""
     st.header("📝 Krok 2: Generuj plan podcastu")
+
+    st.markdown("""
+    🔧 Na podstawie przetworzonej treści z pliku/strony internetowej, w tym kroku zostanie wygenerowany **szczegółowy plan podcastu**.
+
+    📋 **Co zawiera plan?**
+    - Podział na sekcje tematyczne
+    - Kluczowe zagadnienia do poruszenia
+    - Kolejność omawiania treści
+
+    ✨ Ten plan zostanie użyty w kolejnym kroku do wygenerowania właściwego tekstu podcastu.
+    """)
     
     # Show extracted content preview
     with st.expander("👁️ Podgląd wydobytej treści", expanded=False):

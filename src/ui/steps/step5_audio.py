@@ -6,14 +6,14 @@ from utils.blob_uploader import upload_to_blob
 
 def render_step_5():
     """Render Step 5: Audio Generation"""
-    st.header("🎵 Krok 5: Generuj audio")
+    st.header("🎵 Krok 4: Generuj audio")
     
     # Show JSON preview
     with st.expander("📋 Podgląd JSON", expanded=False):
         st.json(st.session_state.json_data)
     
     # Engine info
-    engine_name = "ElevenLabs (Premium)" if st.session_state.is_premium else "Azure TTS (Free)"
+    engine_name = "głosu Elevenlabs (Premium)" if st.session_state.is_premium else "głosu azure (Darmowy)"
     audio_format = "MP3" if st.session_state.is_premium else "WAV"
     
     st.info(f"🎯 **Wybrany silnik:** {engine_name}")
