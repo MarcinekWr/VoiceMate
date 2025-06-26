@@ -2,17 +2,20 @@ import streamlit as st
 import os
 import logging
 
-from common.constants import LOGS_DIR
-from utils.logging_config import setup_logger, get_request_id, set_request_id
-from workflow.session import initialize_session_state
-from ui.sidebar import render_sidebar
-from ui.steps.step1_upload import render_step_1
-from ui.steps.step2_plan import render_step_2
-from ui.steps.step_all import render_auto_pipeline
-from ui.steps.step5_audio import render_step_5
-from ui.steps.step0_homepage import render_home_page
-from ui.steps.step3_and4 import render_step_3_and_4
-from utils.blob_uploader import upload_to_blob
+from src.common.constants import LOGS_DIR
+from src.utils.logging_config import setup_logger, get_request_id, set_request_id
+from src.workflow.session import initialize_session_state
+from src.ui.sidebar import render_sidebar
+from src.ui.steps.step1_upload import render_step_1
+from src.ui.steps.step2_plan import render_step_2
+from src.ui.steps.step_all import render_auto_pipeline
+from src.ui.steps.step5_audio import render_step_5
+from src.ui.steps.step0_homepage import render_home_page
+from src.ui.steps.step3_and4 import render_step_3_and_4
+from src.utils.blob_uploader import upload_to_blob
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 if "request_id" not in st.session_state:
@@ -35,9 +38,8 @@ def main():
         page_title="VoiceMate",
         page_icon="🎙️",
         layout="wide",
-        initial_sidebar_state="expanded"
+        initial_sidebar_state="expanded",
     )
-
 
     # st.title("🎙️ VoiceMate Generator Podcastów AI")
     # st.markdown("**Przekształć dowolną treść w podcast audio za pomocą AI**")
@@ -58,14 +60,16 @@ def main():
         render_step_2()
     elif step == 3:
         render_step_3_and_4()
-    elif step == 6: 
+    elif step == 6:
         render_auto_pipeline()
     elif step == 5:
         render_step_5()
 
     if os.path.exists(log_file_path):
         try:
-            upload_to_blob("logs", log_file_path, blob_name=os.path.basename(log_file_path))
+            upload_to_blob(
+                "logs", log_file_path, blob_name=os.path.basename(log_file_path)
+            )
             st.info("📤 Logi aplikacji zostały zapisane w Azure Blob Storage.")
         except Exception as e:
             st.warning(f"⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}")
@@ -75,7 +79,7 @@ def main():
         "<div style='text-align: center; color: #666; font-size: 0.8em;'>"
         "🚀 Powered by AI | 🛠️ Built with Streamlit | 🎵 TTS: Azure & ElevenLabs"
         "</div>",
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
 

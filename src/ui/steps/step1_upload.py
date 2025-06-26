@@ -1,5 +1,5 @@
 import streamlit as st
-from workflow.process_file import process_uploaded_file, process_url_input
+from src.workflow.process_file import process_uploaded_file, process_url_input
 
 def render_step_1():
     """Render Step 1: File Upload"""

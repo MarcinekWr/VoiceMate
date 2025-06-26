@@ -5,16 +5,15 @@ from __future__ import annotations
 import base64
 from pathlib import Path
 from typing import Optional
-from common.constants import IMAGE_DESCRIBER_PROMPT_PATH
+from src.common.constants import IMAGE_DESCRIBER_PROMPT_PATH
 
-from dotenv import load_dotenv
+
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
-from services.llm_service import LLMService
+from src.services.llm_service import LLMService
 from PIL import Image
 import logging
 
-load_dotenv()
 
 
 class ImageDescriber:
@@ -57,12 +56,11 @@ class ImageDescriber:
     def _use_default_prompt(self) -> PromptTemplate:
         """Set up the default prompt template."""
         default_prompt = (
-            "Describe this image in detail. Focus on text, "
-            "charts, diagrams, and any important visual elements. "
-            "If the image appears to be a slide, screenshot, or document, "
-            "provide a structured summary of its content."
-            'For any topic, you can use the following format: "Focus on {topic}".'
-        )
+                        "Opisz ten obraz szczegółowo. Skup się na tekście, wykresach, diagramach i wszelkich istotnych elementach wizualnych. "
+                        "Jeśli obraz wygląda na slajd, zrzut ekranu lub dokument, przedstaw uporządkowane podsumowanie jego treści. "
+                        "Dla dowolnego tematu możesz użyć następującego formatu: "
+                        "Skup się na {topic}."
+                    )
         return PromptTemplate.from_template(default_prompt)
 
     def describe_image(self, image_path: str, topic: str = "general") -> str:

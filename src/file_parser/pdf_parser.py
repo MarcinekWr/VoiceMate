@@ -9,17 +9,16 @@ from datetime import datetime
 from typing import Any, Optional
 
 import fitz  # PyMuPDF
-from dotenv import load_dotenv
+
 from pdfminer.high_level import extract_text
 
-from utils.extract_tables import PDFTableParser
-from utils.image_describer import ImageDescriber
-from file_parser.pdf_image_extractor import PDFImageExtractor
-from utils.logging_config import setup_logger
-from file_parser.pdf_content_formatter import PDFContentFormatter
+from src.utils.extract_tables import PDFTableParser
+from src.utils.image_describer import ImageDescriber
+from src.file_parser.pdf_image_extractor import PDFImageExtractor
+from src.file_parser.pdf_content_formatter import PDFContentFormatter
 import logging
 
-load_dotenv()
+
 
 
 class PdfParser:

@@ -5,7 +5,7 @@ import traceback
 from pathlib import Path
 from typing import Optional
 
-from file_parser.other_files_parser import FileConverter
+from src.file_parser.other_files_parser import FileConverter
 
 
 def process_url_input(url: str) -> Optional[str]:

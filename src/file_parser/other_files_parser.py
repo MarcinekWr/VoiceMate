@@ -20,8 +20,9 @@ from PyQt5.QtWidgets import QApplication
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
-from file_parser import pdf_parser
+from src.file_parser import pdf_parser
 import logging
+import subprocess
 
 class FileConverter:
     SUPPORTED_FORMATS = {
@@ -141,7 +142,6 @@ class FileConverter:
             return "website"
 
     def convert_url_to_pdf(self) -> str:
-        """Convert URL to PDF format."""
         self.logger.info(f"Converting URL to PDF: {self.file_path}")
 
         if not self.is_valid_url(self.file_path):
@@ -173,64 +173,19 @@ class FileConverter:
         domain_name = self.get_domain_name(self.file_path)
         output_path = self._generate_unique_filename(domain_name, ".pdf")
 
-        # Create QApplication if not exists
-        app = QApplication.instance() or QApplication(sys.argv)
-        self.logger.debug("Initializing web engine for PDF conversion...")
-
-        web_view = QtWebEngineWidgets.QWebEngineView()
-        web_view.setZoomFactor(1)
-
-        # Setup page layout
-        layout = QPageLayout()
-        layout.setPageSize(QPageSize(QPageSize.A4))
-        layout.setOrientation(QPageLayout.Portrait)
-
-        # Create event loop for synchronization
-        loop = QEventLoop()
-        timer = QTimer()
-        timer.setSingleShot(True)
-        timer.timeout.connect(loop.quit)
-
-        def handle_load_finished(ok):
-            if not ok:
-                self.logger.error(f"Failed to load web page: {self.file_path}")
-                loop.quit()
-                raise Exception(f"Failed to load page: {self.file_path}")
-            self.logger.debug("Web page loaded successfully, generating PDF...")
-            web_view.page().printToPdf(output_path, layout)
-
-        def handle_pdf_finished(path, success):
-            loop.quit()
-            if not success:
-                self.logger.error(f"PDF creation failed for: {self.file_path}")
-                raise Exception(f"PDF creation failed for: {self.file_path}")
-            self.logger.debug("PDF generation completed successfully")
-
-        web_view.loadFinished.connect(handle_load_finished)
-        web_view.page().pdfPrintingFinished.connect(handle_pdf_finished)
-
-        web_view.load(QUrl(self.file_path))
-
-        timer.start(30000)
-        loop.exec_()
-
-        # Cleanup Qt resources
-        web_view.page().deleteLater()
-        web_view.deleteLater()
-
-        # Cleanup if we created the application
-        if QApplication.instance() is None:
-            app.quit()
-
-        # Force garbage collection
-        gc.collect()
-
-        if not os.path.exists(output_path):
-            self.logger.error(f"PDF file was not created: {output_path}")
-            raise Exception(f"PDF not created for: {self.file_path}")
-
-        self.logger.info(f"URL successfully converted to PDF: {output_path}")
-        return output_path
+        script_path = os.path.join(os.path.dirname(__file__), "url2pdf.py")
+        try:
+            result = subprocess.run(
+                [sys.executable, script_path, self.file_path, output_path],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            self.logger.info(f"URL successfully converted to PDF: {output_path}")
+            return output_path
+        except subprocess.CalledProcessError as e:
+            self.logger.error(f"URL to PDF conversion failed: {e.stderr}")
+            raise Exception(f"URL to PDF conversion error: {e.stderr}")
 
     def convert_html_to_pdf(self) -> str:
         """Convert HTML file to PDF format."""

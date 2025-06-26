@@ -24,7 +24,6 @@ class TestPdfParser(unittest.TestCase):
         self.mock_output_dir = "test_output"
 
         self.patchers = {
-            "setup_logger": patch("src.file_parser.pdf_parser.setup_logger"),
             "fitz.open": patch("src.file_parser.pdf_parser.fitz.open"),
             "extract_text": patch("src.file_parser.pdf_parser.extract_text"),
             "ImageDescriber": patch("src.file_parser.pdf_parser.ImageDescriber"),

@@ -14,42 +14,30 @@ from src.services.llm_service import LLMService
 class TestLLMService(unittest.TestCase):
     """Test suite for the LLMService."""
 
-    @patch("src.services.llm_service.setup_logger")
     @patch("src.services.llm_service.AzureChatOpenAI")
-    def test_initialization_success(self, mock_azure_llm, mock_setup_logger):
+    def test_initialization_success(self, mock_azure_llm):
         """Test successful initialization of the LLMService."""
         mock_llm_instance = MagicMock()
         mock_azure_llm.return_value = mock_llm_instance
-        mock_logger = MagicMock()
-        mock_setup_logger.return_value = mock_logger
 
         service = LLMService()
 
         self.assertTrue(service.is_available)
         self.assertIsNotNone(service.llm)
-        mock_logger.info.assert_called_with("LLMService setup completed successfully.")
 
-    @patch("src.services.llm_service.setup_logger")
     @patch(
         "src.services.llm_service.AzureChatOpenAI",
         side_effect=Exception("Initialization failed"),
     )
-    def test_initialization_failure(self, mock_azure_llm, mock_setup_logger):
+    def test_initialization_failure(self, mock_azure_llm):
         """Test failed initialization of the LLMService."""
-        mock_logger = MagicMock()
-        mock_setup_logger.return_value = mock_logger
-
         service = LLMService()
 
         self.assertFalse(service.is_available)
         self.assertIsNone(service.llm)
-        mock_logger.error.assert_called_with(
-            "Failed to initialize AzureChatOpenAI: Initialization failed"
-        )
 
-    @patch("src.services.llm_service.setup_logger")
     @patch("src.services.llm_service.AzureChatOpenAI")
-    def test_generate_description_success(self, mock_azure_llm, mock_setup_logger):
+    def test_generate_description_success(self, mock_azure_llm):
         """Test successful description generation."""
         mock_llm_instance = MagicMock()
         mock_response = MagicMock()

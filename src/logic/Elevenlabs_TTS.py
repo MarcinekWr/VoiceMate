@@ -4,7 +4,7 @@ import os
 import tempfile
 
 from elevenlabs.client import ElevenLabs
-from utils.logging_config import get_request_id 
+from src.utils.logging_config import get_request_id 
 
 
 class ElevenlabsTTSPodcastGenerator:

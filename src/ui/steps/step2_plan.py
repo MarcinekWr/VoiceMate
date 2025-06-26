@@ -1,5 +1,5 @@
 import streamlit as st
-from workflow.generation import generate_plan_content
+from src.workflow.generation import generate_plan_content
 
 def render_step_2():
     """Render Step 2: Plan Generation"""

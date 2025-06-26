@@ -5,7 +5,7 @@ import time
 import wave
 
 import azure.cognitiveservices.speech as speechsdk
-from utils.logging_config import get_request_id 
+from src.utils.logging_config import get_request_id 
 
 
 class AzureTTSPodcastGenerator:

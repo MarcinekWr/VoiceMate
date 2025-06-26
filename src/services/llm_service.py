@@ -7,13 +7,13 @@ from __future__ import annotations
 import os
 from typing import Optional
 
-from dotenv import load_dotenv
+
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
 import logging
 
-load_dotenv()
+
 
 
 class LLMService:

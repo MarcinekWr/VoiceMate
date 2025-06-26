@@ -1,8 +1,8 @@
 import streamlit as st
 import os
 import json
-from workflow.generation import generate_audio_from_json
-from utils.blob_uploader import upload_to_blob
+from src.workflow.generation import generate_audio_from_json
+from src.utils.blob_uploader import upload_to_blob
 
 def render_step_5():
     """Render Step 5: Audio Generation"""
