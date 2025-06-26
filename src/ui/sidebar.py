@@ -1,5 +1,5 @@
 import streamlit as st
-from workflow.session import reset_workflow
+from src.workflow.session import reset_workflow
 
 def render_sidebar():
     """Render sidebar with progress and controls"""

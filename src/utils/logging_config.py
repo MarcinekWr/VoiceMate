@@ -4,12 +4,12 @@ import os
 import uuid
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 from azure.storage.blob import BlobServiceClient
-from dotenv import load_dotenv
-from common.constants import LOGS_DIR
+
+from src.common.constants import LOGS_DIR
 
 
 
-load_dotenv()
+
 connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 
 blob_service_client = BlobServiceClient.from_connection_string(connection_string)

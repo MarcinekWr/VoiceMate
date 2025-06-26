@@ -9,8 +9,8 @@ from typing import Any
 
 import fitz  # PyMuPDF
 
-from utils.text_cleaner import TextCleaner
-from utils.logging_config import setup_logger
+from src.utils.text_cleaner import TextCleaner
+
 
 
 class PDFContentFormatter:

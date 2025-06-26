@@ -1,10 +1,10 @@
 import streamlit as st
 import os
 import json
-from workflow.process_file import process_uploaded_file, process_url_input
-from workflow.generation import generate_plan_content, generate_podcast_content, generate_audio_from_json
-from workflow.save import save_to_file, dialog_to_json
-from utils.blob_uploader import upload_to_blob
+from src.workflow.process_file import process_uploaded_file, process_url_input
+from src.workflow.generation import generate_plan_content, generate_podcast_content, generate_audio_from_json
+from src.workflow.save import save_to_file, dialog_to_json
+from src.utils.blob_uploader import upload_to_blob
 
 def render_auto_pipeline():
     st.header("⚡ Tryb Błyskawiczny: Wygeneruj cały podcast jednym kliknięciem")

@@ -1,7 +1,7 @@
 import streamlit as st
 import json
-from workflow.generation import generate_podcast_content
-from workflow.save import save_to_file, dialog_to_json
+from src.workflow.generation import generate_podcast_content
+from src.workflow.save import save_to_file, dialog_to_json
 
 def render_step_3_and_4():
     """Krok 3: Generowanie tekstu podcastu i wybór silnika TTS"""

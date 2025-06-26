@@ -2,10 +2,10 @@ import streamlit as st
 import traceback
 from typing import Optional
 
-from logic.llm_podcast import generate_plan, generate_podcast_text, create_llm
-from logic.Azure_TTS import AzureTTSPodcastGenerator
-from logic.Elevenlabs_TTS import ElevenlabsTTSPodcastGenerator
-from workflow.save import save_to_file  
+from src.logic.llm_podcast import generate_plan, generate_podcast_text, create_llm
+from src.logic.Azure_TTS import AzureTTSPodcastGenerator
+from src.logic.Elevenlabs_TTS import ElevenlabsTTSPodcastGenerator
+from src.workflow.save import save_to_file  
 
 
 def generate_plan_content(llm_content: str) -> Optional[str]:

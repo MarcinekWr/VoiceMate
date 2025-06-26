@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.logging_config import set_request_id
+from src.utils.logging_config import set_request_id
 
 def initialize_session_state():
     """Initialize all session state variables"""

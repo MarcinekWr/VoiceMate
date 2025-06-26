@@ -1,9 +1,9 @@
 import os
 from azure.storage.blob import BlobServiceClient
-from dotenv import load_dotenv
+
 import logging
 
-load_dotenv()
+
 logger = logging.getLogger(__name__)
 
 AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")

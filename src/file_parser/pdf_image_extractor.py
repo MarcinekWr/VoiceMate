@@ -11,7 +11,7 @@ from typing import Any, Optional
 
 import fitz  # PyMuPDF
 
-from utils.image_describer import ImageDescriber
+from src.utils.image_describer import ImageDescriber
 
 
 class PDFImageExtractor:

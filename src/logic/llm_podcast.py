@@ -1,12 +1,12 @@
 import os
 import logging
-from dotenv import load_dotenv
+
 from pathlib import Path
 
 from langchain_openai import AzureChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
-load_dotenv()
+
 
 import logging
 logger = logging.getLogger(__name__)

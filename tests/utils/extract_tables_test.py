@@ -14,10 +14,10 @@ class TestPDFTableParser(unittest.TestCase):
 
     def setUp(self):
         """Set up a mock for the logger."""
-        self.patcher = patch("src.utils.extract_tables.setup_logger")
-        self.mock_setup_logger = self.patcher.start()
+        self.patcher = patch("src.utils.extract_tables.logging.getLogger")
+        self.mock_get_logger = self.patcher.start()
         self.mock_logger = MagicMock()
-        self.mock_setup_logger.return_value = self.mock_logger
+        self.mock_get_logger.return_value = self.mock_logger
 
     def tearDown(self):
         """Stop the patcher."""
