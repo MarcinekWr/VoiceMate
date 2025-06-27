@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import patch, MagicMock, mock_open, call
 import os
 
-# ✅ Import Twojej klasy produkcyjnej
 from src.logic.Elevenlabs_TTS import ElevenlabsTTSPodcastGenerator
 
 class TestElevenlabsTTSPodcastGenerator(unittest.TestCase):
@@ -14,7 +13,7 @@ class TestElevenlabsTTSPodcastGenerator(unittest.TestCase):
     def tearDown(self):
         self.env_patcher.stop()
 
-    @patch("src.logic.Elevenlabs_TTS.ElevenLabs")  # ✅ Z dużej litery
+    @patch("src.logic.Elevenlabs_TTS.ElevenLabs") 
     def test_init_success(self, mock_client):
         generator = ElevenlabsTTSPodcastGenerator()
         self.assertIsNotNone(generator.client)

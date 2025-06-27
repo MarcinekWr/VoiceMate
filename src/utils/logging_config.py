@@ -8,11 +8,23 @@ from azure.storage.blob import BlobServiceClient
 from src.common.constants import LOGS_DIR
 
 
+"""Defines the logging configuration for the application."""
+import logging
+import os
+import uuid
+from opencensus.ext.azure.log_exporter import AzureLogHandler
+from azure.storage.blob import BlobServiceClient
+
+from src.common.constants import LOGS_DIR
 
 
-connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+def get_blob_service_client() -> BlobServiceClient:
+    connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    if not connection_string:
+        raise ValueError("Brak AZURE_STORAGE_CONNECTION_STRING")
+    return BlobServiceClient.from_connection_string(connection_string)
 
-blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+blob_service_client = get_blob_service_client()
 
 class RequestIdContext:
     request_id = "no-request-id"
