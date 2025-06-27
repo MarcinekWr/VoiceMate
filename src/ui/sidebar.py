@@ -1,9 +1,15 @@
 import streamlit as st
 from src.workflow.session import reset_workflow
+from src.ui.steps.step0_homepage import render_home_page
 
 def render_sidebar():
     """Render sidebar with progress and controls"""
     with st.sidebar:
+
+        if st.button("⬅️ Wróć na stronę główną", type="secondary", use_container_width=True):
+            st.session_state.step = 0
+            st.rerun()
+
         st.header("Postęp generowania Twojego Podcastu")
         
         steps = [
