@@ -9,6 +9,7 @@ jobs:
     env:
       AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=https;AccountName=fake;AccountKey=fake;EndpointSuffix=core.windows.net"
       APPINSIGHTS_CONNECTION_STRING: "InstrumentationKey=fake-uuid;IngestionEndpoint=https://fake.endpoint.com"
+      APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=fake-uuid;IngestionEndpoint=https://fake.endpoint.com"
 
     steps:
     - name: Checkout code
