@@ -17,7 +17,8 @@ def test_render_auto_pipeline_sets_defaults(monkeypatch):
          mock.patch("streamlit.radio", return_value="🆓 Azure (Darmowy)"), \
          mock.patch("streamlit.button", return_value=False), \
          mock.patch("streamlit.expander", mock.MagicMock()), \
-         mock.patch("opencensus.ext.azure.log_exporter.AzureLogHandler"):
+         mock.patch("opencensus.ext.azure.log_exporter.AzureLogHandler"), \
+         mock.patch.object(step_all, "check_content_safety", return_value=True):
         step_all.render_auto_pipeline()
         assert st.session_state.step == 6
         assert st.session_state.clear_state_on_enter == False
@@ -30,6 +31,7 @@ def test_render_auto_pipeline_generates_podcast(monkeypatch):
     monkeypatch.setattr(step_all, "save_to_file", lambda d, f: None)
     monkeypatch.setattr(step_all, "generate_audio_from_json", lambda j, p: "dummy.wav")
     monkeypatch.setattr(step_all, "upload_to_blob", lambda c, p, n: None)
+    monkeypatch.setattr(step_all, "check_content_safety", lambda x: True)
 
     st.session_state.processing = False
     st.session_state.clear_state_on_enter = False
