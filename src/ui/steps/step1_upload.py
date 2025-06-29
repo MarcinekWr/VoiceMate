@@ -1,5 +1,7 @@
 import streamlit as st
 from src.workflow.process_file import process_uploaded_file, process_url_input
+from src.utils.content_safety import check_content_safety
+
 
 def render_step_1():
     """Render Step 1: File Upload"""
@@ -74,6 +76,10 @@ def render_step_1():
                 llm_content = process_url_input(url_input.strip())
             
             if llm_content:
+                if not check_content_safety(llm_content):
+                    st.session_state.processing = False
+                    st.error("⚠️ Wykryto potencjalnie niebezpieczną treść w pliku. Przetwarzanie zostało przerwane.")
+                    return
                 st.session_state.llm_content = llm_content
                 st.session_state.step = 2
                 st.session_state.processing = False

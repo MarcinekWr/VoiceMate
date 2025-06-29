@@ -5,6 +5,7 @@ from src.workflow.process_file import process_uploaded_file, process_url_input
 from src.workflow.generation import generate_plan_content, generate_podcast_content, generate_audio_from_json
 from src.workflow.save import save_to_file, dialog_to_json
 from src.utils.blob_uploader import upload_to_blob
+from src.utils.content_safety import check_content_safety
 
 def render_auto_pipeline():
     if "step" not in st.session_state:
@@ -107,6 +108,9 @@ def render_auto_pipeline():
                 llm_content = process_uploaded_file(uploaded_file) if uploaded_file else process_url_input(url_input.strip())
                 if not llm_content:
                     st.error("❌ Nie udało się przetworzyć treści.")
+                    return
+                if not check_content_safety(llm_content):
+                    st.error("⚠️ Wykryto potencjalnie niebezpieczną treść. Generowanie podcastu zostało przerwane.")
                     return
 
             with st.spinner("📝 Generowanie planu..."):
