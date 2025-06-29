@@ -176,3 +176,4 @@ yarl==1.20.1
 zstandard==0.23.0
 azure-storage-blob==12.25.1
 elevenlabs==2.5.0
+azure-ai-contentsafety==1.0.0
