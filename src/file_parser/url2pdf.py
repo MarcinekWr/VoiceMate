@@ -5,6 +5,7 @@ from PyQt5.QtGui import QPageLayout, QPageSize
 from PyQt5.QtWidgets import QApplication
 import gc
 
+
 def convert_url_to_pdf(url, output_path):
     app = QApplication(sys.argv)
     web_view = QtWebEngineWidgets.QWebEngineView()
@@ -40,8 +41,9 @@ def convert_url_to_pdf(url, output_path):
     gc.collect()
     app.quit()
 
+
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage: url2pdf.py <url> <output_path>", file=sys.stderr)
         sys.exit(1)
-    convert_url_to_pdf(sys.argv[1], sys.argv[2]) 
+    convert_url_to_pdf(sys.argv[1], sys.argv[2])

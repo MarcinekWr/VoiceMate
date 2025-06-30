@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import logging
 
+from dotenv import load_dotenv
 from src.common.constants import LOGS_DIR
 from src.utils.logging_config import setup_logger, get_request_id, set_request_id
 from src.workflow.session import initialize_session_state
@@ -13,7 +14,6 @@ from src.ui.steps.step5_audio import render_step_5
 from src.ui.steps.step0_homepage import render_home_page
 from src.ui.steps.step3_and4 import render_step_3_and_4
 from src.utils.blob_uploader import upload_to_blob
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -40,10 +40,6 @@ def main():
         layout="wide",
         initial_sidebar_state="expanded",
     )
-
-    # st.title("🎙️ VoiceMate Generator Podcastów AI")
-    # st.markdown("**Przekształć dowolną treść w podcast audio za pomocą AI**")
-    # st.markdown("---")
 
     initialize_session_state()
 

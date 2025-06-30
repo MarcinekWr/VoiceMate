@@ -263,9 +263,7 @@ class TestFileConverter:
             converter.convert_url_to_pdf()
 
     @patch("pdfkit.from_file")
-    def test_convert_html_to_pdf_success(
-        self, mock_pdfkit, mock_get_logger, temp_dir
-    ):
+    def test_convert_html_to_pdf_success(self, mock_pdfkit, mock_get_logger, temp_dir):
         """Test successful HTML to PDF conversion"""
         converter = FileConverter("test.html", temp_dir)
 
@@ -281,9 +279,7 @@ class TestFileConverter:
             )
 
     @patch("pdfkit.from_file")
-    def test_convert_html_to_pdf_failure(
-        self, mock_pdfkit, mock_get_logger, temp_dir
-    ):
+    def test_convert_html_to_pdf_failure(self, mock_pdfkit, mock_get_logger, temp_dir):
         """Test HTML to PDF conversion failure"""
         mock_pdfkit.side_effect = Exception("PDFKit failed")
 

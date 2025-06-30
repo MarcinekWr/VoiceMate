@@ -15,7 +15,6 @@ from PIL import Image
 import logging
 
 
-
 class ImageDescriber:
     """
     A class to describe images using an LLM.
@@ -56,11 +55,11 @@ class ImageDescriber:
     def _use_default_prompt(self) -> PromptTemplate:
         """Set up the default prompt template."""
         default_prompt = (
-                        "Opisz ten obraz szczegółowo. Skup się na tekście, wykresach, diagramach i wszelkich istotnych elementach wizualnych. "
-                        "Jeśli obraz wygląda na slajd, zrzut ekranu lub dokument, przedstaw uporządkowane podsumowanie jego treści. "
-                        "Dla dowolnego tematu możesz użyć następującego formatu: "
-                        "Skup się na {topic}."
-                    )
+            "Opisz ten obraz szczegółowo. Skup się na tekście, wykresach, diagramach i wszelkich istotnych elementach wizualnych. "
+            "Jeśli obraz wygląda na slajd, zrzut ekranu lub dokument, przedstaw uporządkowane podsumowanie jego treści. "
+            "Dla dowolnego tematu możesz użyć następującego formatu: "
+            "Skup się na {topic}."
+        )
         return PromptTemplate.from_template(default_prompt)
 
     def describe_image(self, image_path: str, topic: str = "general") -> str:

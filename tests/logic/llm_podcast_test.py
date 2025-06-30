@@ -9,13 +9,16 @@ import src.logic.llm_podcast as pipeline
 class TestLLMPipeline(unittest.TestCase):
 
     def test_validate_env_variables_all_set(self):
-        with patch.dict(os.environ, {
-            "AZURE_OPENAI_ENDPOINT": "url",
-            "AZURE_OPENAI_API_KEY": "key",
-            "API_VERSION": "2024-06-01",
-            "AZURE_OPENAI_DEPLOYMENT": "deployment",
-            "AZURE_OPENAI_MODEL": "model",
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "AZURE_OPENAI_ENDPOINT": "url",
+                "AZURE_OPENAI_API_KEY": "key",
+                "API_VERSION": "2024-06-01",
+                "AZURE_OPENAI_DEPLOYMENT": "deployment",
+                "AZURE_OPENAI_MODEL": "model",
+            },
+        ):
             try:
                 pipeline.validate_env_variables()
             except ValueError:
@@ -103,8 +106,10 @@ class TestLLMPipeline(unittest.TestCase):
         self, mock_llm, mock_plan, mock_podcast, mock_save
     ):
         fake_input = Path("src/logic/llm_text_test_file.txt")
-        with patch.object(Path, "exists", return_value=True), \
-             patch.object(Path, "read_text", return_value="Input Text"):
+        with (
+            patch.object(Path, "exists", return_value=True),
+            patch.object(Path, "read_text", return_value="Input Text"),
+        ):
 
             service = pipeline.LLMPodcastService()
             service.run()

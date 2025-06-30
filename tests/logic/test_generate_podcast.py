@@ -20,7 +20,7 @@ def test_generate_podcast_text_success():
         llm=llm_mock,
         style="casual",
         input_text="Jak działa wiatr?",
-        plan_text="Plan o wietrze"
+        plan_text="Plan o wietrze",
     )
     assert "Podcast odcinek 1" in result
     llm_mock.invoke.assert_called_once()

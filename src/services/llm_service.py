@@ -14,8 +14,6 @@ from langchain_openai import AzureChatOpenAI
 import logging
 
 
-
-
 class LLMService:
     """
     A service class to manage interactions with the Language Model.

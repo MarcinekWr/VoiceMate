@@ -23,6 +23,7 @@ def test_generate_plan_success():
     assert "plan" in result
     llm_mock.invoke.assert_called_once()
 
+
 def test_generate_plan_error_handling():
     llm_mock = MagicMock()
     llm_mock.invoke.side_effect = Exception("LLM failed")

@@ -2,7 +2,8 @@ import streamlit as st
 
 
 def render_home_page():
-    st.markdown("""
+    st.markdown(
+        """
         <style>
         .centered-block {
             max-width: 900px;
@@ -34,7 +35,9 @@ def render_home_page():
             Idealne do nauki, słuchania przy kawie lub w podróży!<br><br>🖼️ Nasz system obsługuje także interpretację obrazów w dokumentach – coś, czego większość konkurencji nie oferuje.<br><br><br>
             Do wyboru masz dwa tryby pracy:</p>
         </div>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
     st.markdown("<div class='centered-block'>", unsafe_allow_html=True)
 
@@ -43,17 +46,22 @@ def render_home_page():
     with col1:
         st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
 
-        if st.button("🚀 Rozpocznij krok po kroku", key="step_by_step", use_container_width=True):
+        if st.button(
+            "🚀 Rozpocznij krok po kroku", key="step_by_step", use_container_width=True
+        ):
             st.session_state.step = 1
             st.rerun()
 
-        st.markdown("""
+        st.markdown(
+            """
             <p style='text-align: center; font-size: 14px; max-width: 400px; margin: 0 auto;'>
                 Tryb zalecany dla osób, które chcą dokładnie śledzić każdy etap generowania podcastu.  
                 Pozwala na ręczne sprawdzenie planu, tekstu i audio krok po kroku – idealne do korekty lub nauki.
             </p>
         </div>
-        """, unsafe_allow_html=True)
+        """,
+            unsafe_allow_html=True,
+        )
 
     with col2:
         st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
@@ -62,14 +70,15 @@ def render_home_page():
             st.session_state.step = 6
             st.rerun()
 
-        st.markdown("""
+        st.markdown(
+            """
             <p style='text-align: center; font-size: 14px; max-width: 400px; margin: 0 auto;'>
                 Tryb błyskawiczny generuje kompletny podcast za pomocą jednego kliknięcia.  
                 Idealny, gdy zależy Ci na czasie lub chcesz szybko odsłuchać streszczenie dokumentu bez konfiguracji.
             </p>
         </div>
-        """, unsafe_allow_html=True)
+        """,
+            unsafe_allow_html=True,
+        )
 
     st.markdown("</div>", unsafe_allow_html=True)
-
-

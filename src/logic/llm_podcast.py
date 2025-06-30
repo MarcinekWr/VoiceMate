@@ -7,16 +7,16 @@ from langchain_openai import AzureChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent 
+BASE_DIR = Path(__file__).resolve().parent.parent
 PROMPT_PATHS = {
     "scientific": BASE_DIR / "prompts" / "scientific_style.txt",
-    "casual":     BASE_DIR / "prompts" / "casual_style.txt",
-    "plan":       BASE_DIR / "prompts" / "plan_prompt.txt",
+    "casual": BASE_DIR / "prompts" / "casual_style.txt",
+    "plan": BASE_DIR / "prompts" / "plan_prompt.txt",
 }
 
 

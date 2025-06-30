@@ -19,8 +19,6 @@ from src.file_parser.pdf_content_formatter import PDFContentFormatter
 import logging
 
 
-
-
 class PdfParser:
     """
     A class to parse PDF files and extract text, images,

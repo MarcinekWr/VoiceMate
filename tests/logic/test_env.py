@@ -12,6 +12,7 @@ import os
 import pytest
 from src.logic.llm_podcast import validate_env_variables
 
+
 def test_validate_env_variables_success(monkeypatch):
     monkeypatch.setenv("AZURE_OPENAI_ENDPOINT", "https://test.endpoint")
     monkeypatch.setenv("AZURE_OPENAI_API_KEY", "test_key")
@@ -20,6 +21,7 @@ def test_validate_env_variables_success(monkeypatch):
     monkeypatch.setenv("AZURE_OPENAI_MODEL", "gpt-4")
 
     validate_env_variables()
+
 
 def test_validate_env_variables_missing(monkeypatch):
     monkeypatch.delenv("AZURE_OPENAI_API_KEY", raising=False)

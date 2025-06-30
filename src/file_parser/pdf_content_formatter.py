@@ -12,7 +12,6 @@ import fitz  # PyMuPDF
 from src.utils.text_cleaner import TextCleaner
 
 
-
 class PDFContentFormatter:
     """
     Formats extracted PDF data for various outputs.

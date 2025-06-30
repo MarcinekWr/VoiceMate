@@ -1,4 +1,5 @@
 """Defines the logging configuration for the application."""
+
 import logging
 import os
 import uuid
@@ -14,22 +15,27 @@ def get_blob_service_client() -> BlobServiceClient:
         raise ValueError("Brak AZURE_STORAGE_CONNECTION_STRING")
     return BlobServiceClient.from_connection_string(connection_string)
 
+
 class RequestIdContext:
     request_id = "no-request-id"
+
 
 class RequestIdFilter(logging.Filter):
     def filter(self, record):
         record._request_id = RequestIdContext.request_id
         return True
 
+
 def set_request_id(new_id: str = None) -> str:
     """Ustawia nowe request_id (UUID) lub własne, i zwraca je."""
     RequestIdContext.request_id = new_id or str(uuid.uuid4())
     return RequestIdContext.request_id
 
+
 def get_request_id() -> str:
     """Zwraca aktualne request_id (lub 'no-request-id')."""
     return RequestIdContext.request_id
+
 
 def setup_logger(log_file_path: str) -> logging.Logger:
     logger = logging.getLogger()
@@ -59,8 +65,12 @@ def setup_logger(log_file_path: str) -> logging.Logger:
         azure_handler.setFormatter(formatter)
         azure_handler.addFilter(request_filter)
         logger.addHandler(azure_handler)
-        logger.info("AzureLogHandler podłączony – logi będą wysyłane do Application Insights")
+        logger.info(
+            "AzureLogHandler podłączony – logi będą wysyłane do Application Insights"
+        )
     else:
-        logger.warning("Brak APPINSIGHTS_CONNECTION_STRING – logi nie będą wysyłane do Application Insights")
+        logger.warning(
+            "Brak APPINSIGHTS_CONNECTION_STRING – logi nie będą wysyłane do Application Insights"
+        )
 
     return logger

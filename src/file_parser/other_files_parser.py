@@ -24,6 +24,7 @@ from src.file_parser import pdf_parser
 import logging
 import subprocess
 
+
 class FileConverter:
     SUPPORTED_FORMATS = {
         "images": [".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".gif"],
@@ -337,5 +338,3 @@ class FileConverter:
             raise Exception(f"Failed to parse file {self.file_path}: {str(e)}")
         finally:
             self.cleanup()
-
-
