@@ -1,23 +1,23 @@
 """Defines the logging configuration for the application."""
+from __future__ import annotations
 
 import logging
 import os
 import uuid
-from opencensus.ext.azure.log_exporter import AzureLogHandler
-from azure.storage.blob import BlobServiceClient
 
-from src.common.constants import LOGS_DIR
+from azure.storage.blob import BlobServiceClient
+from opencensus.ext.azure.log_exporter import AzureLogHandler
 
 
 def get_blob_service_client() -> BlobServiceClient:
-    connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    connection_string = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
     if not connection_string:
-        raise ValueError("Brak AZURE_STORAGE_CONNECTION_STRING")
+        raise ValueError('Brak AZURE_STORAGE_CONNECTION_STRING')
     return BlobServiceClient.from_connection_string(connection_string)
 
 
 class RequestIdContext:
-    request_id = "no-request-id"
+    request_id = 'no-request-id'
 
 
 class RequestIdFilter(logging.Filter):
@@ -45,11 +45,13 @@ def setup_logger(log_file_path: str) -> logging.Logger:
         logger.removeHandler(handler)
 
     formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - [%(funcName)s:%(lineno)d] - [request_id=%(_request_id)s] - %(message)s"
+        '%(asctime)s - %(name)s - %(levelname)s - [%(funcName)s:%(lineno)d] - [request_id=%(_request_id)s] - %(message)s',
     )
     request_filter = RequestIdFilter()
 
-    file_handler = logging.FileHandler(log_file_path, mode="w", encoding="utf-8")
+    file_handler = logging.FileHandler(
+        log_file_path, mode='w', encoding='utf-8',
+    )
     file_handler.setFormatter(formatter)
     file_handler.addFilter(request_filter)
     logger.addHandler(file_handler)
@@ -59,18 +61,18 @@ def setup_logger(log_file_path: str) -> logging.Logger:
     stream_handler.addFilter(request_filter)
     logger.addHandler(stream_handler)
 
-    connection_string = os.getenv("APPINSIGHTS_CONNECTION_STRING")
+    connection_string = os.getenv('APPINSIGHTS_CONNECTION_STRING')
     if connection_string:
         azure_handler = AzureLogHandler(connection_string=connection_string)
         azure_handler.setFormatter(formatter)
         azure_handler.addFilter(request_filter)
         logger.addHandler(azure_handler)
         logger.info(
-            "AzureLogHandler podłączony – logi będą wysyłane do Application Insights"
+            'AzureLogHandler podłączony – logi będą wysyłane do Application Insights',
         )
     else:
         logger.warning(
-            "Brak APPINSIGHTS_CONNECTION_STRING – logi nie będą wysyłane do Application Insights"
+            'Brak APPINSIGHTS_CONNECTION_STRING – logi nie będą wysyłane do Application Insights',
         )
 
     return logger

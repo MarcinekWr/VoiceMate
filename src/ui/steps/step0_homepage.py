@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import streamlit as st
 
 
@@ -11,7 +13,7 @@ def render_home_page():
             padding: 0 20px;
         }
         button {
-            display: block !important;               
+            display: block !important;
             margin-left: auto !important;
             margin-right: auto !important;
             margin-bottom: 10px;
@@ -28,10 +30,10 @@ def render_home_page():
                 Ucz się słuchając, nie czytając
             </p>
             <hr>
-            <p style='text-align: center; font-size: 16px;'>👋 Witaj w aplikacji <strong>VoiceMate</strong> – inteligentnym generatorze podcastów AI!  
-            Nasze narzędzie pozwala przekształcić treści dokumentów (PDF, Markdown, HTML i inne), a także strony internetowe (URL), 
-            w wciągające podcasty o długości około 5–13 minut.<br><br>Dzięki zaawansowanej analizie dokumentu, VoiceMate tworzy skrócony plan treści i generuje narrację 
-            w jednym z dwóch stylów: <strong>🔬 naukowym</strong> lub <strong>😊 hobbystycznym</strong>.  
+            <p style='text-align: center; font-size: 16px;'>👋 Witaj w aplikacji <strong>VoiceMate</strong> – inteligentnym generatorze podcastów AI!
+            Nasze narzędzie pozwala przekształcić treści dokumentów (PDF, Markdown, HTML i inne), a także strony internetowe (URL),
+            w wciągające podcasty o długości około 5–13 minut.<br><br>Dzięki zaawansowanej analizie dokumentu, VoiceMate tworzy skrócony plan treści i generuje narrację
+            w jednym z dwóch stylów: <strong>🔬 naukowym</strong> lub <strong>😊 hobbystycznym</strong>.
             Idealne do nauki, słuchania przy kawie lub w podróży!<br><br>🖼️ Nasz system obsługuje także interpretację obrazów w dokumentach – coś, czego większość konkurencji nie oferuje.<br><br><br>
             Do wyboru masz dwa tryby pracy:</p>
         </div>
@@ -44,10 +46,13 @@ def render_home_page():
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+        st.markdown(
+            "<div style='text-align: center;'>",
+            unsafe_allow_html=True,
+        )
 
         if st.button(
-            "🚀 Rozpocznij krok po kroku", key="step_by_step", use_container_width=True
+            '🚀 Rozpocznij krok po kroku', key='step_by_step', use_container_width=True,
         ):
             st.session_state.step = 1
             st.rerun()
@@ -55,7 +60,7 @@ def render_home_page():
         st.markdown(
             """
             <p style='text-align: center; font-size: 14px; max-width: 400px; margin: 0 auto;'>
-                Tryb zalecany dla osób, które chcą dokładnie śledzić każdy etap generowania podcastu.  
+                Tryb zalecany dla osób, które chcą dokładnie śledzić każdy etap generowania podcastu.
                 Pozwala na ręczne sprawdzenie planu, tekstu i audio krok po kroku – idealne do korekty lub nauki.
             </p>
         </div>
@@ -64,16 +69,19 @@ def render_home_page():
         )
 
     with col2:
-        st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+        st.markdown(
+            "<div style='text-align: center;'>",
+            unsafe_allow_html=True,
+        )
 
-        if st.button("⚡ Szybki podcast", key="auto_mode", use_container_width=True):
+        if st.button('⚡ Szybki podcast', key='auto_mode', use_container_width=True):
             st.session_state.step = 6
             st.rerun()
 
         st.markdown(
             """
             <p style='text-align: center; font-size: 14px; max-width: 400px; margin: 0 auto;'>
-                Tryb błyskawiczny generuje kompletny podcast za pomocą jednego kliknięcia.  
+                Tryb błyskawiczny generuje kompletny podcast za pomocą jednego kliknięcia.
                 Idealny, gdy zależy Ci na czasie lub chcesz szybko odsłuchać streszczenie dokumentu bez konfiguracji.
             </p>
         </div>
@@ -81,4 +89,4 @@ def render_home_page():
             unsafe_allow_html=True,
         )
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
