@@ -34,8 +34,6 @@ jobs:
         pip install opencensus-ext-azure
         pip install -e .
 
-    - name: Install Playwright browsers
-      run: python -m playwright install --with-deps
 
     - name: Run tests with coverage
       run: |

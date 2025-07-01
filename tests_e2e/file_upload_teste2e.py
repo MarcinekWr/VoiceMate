@@ -5,8 +5,6 @@ from typing import Any
 
 from playwright.sync_api import Page, expect
 
-from tests.conftest import voicemate_page
-
 
 class TestVoiceMateStepByStep:
     """E2E tests for VoiceMate step-by-step mode

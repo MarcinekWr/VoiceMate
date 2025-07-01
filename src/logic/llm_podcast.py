@@ -32,35 +32,12 @@ def validate_env_variables() -> None:
             f'Missing required environment variables: {missing_vars}')
 
 
-def create_llm(ui_callback=None):
-    import os
-
-    class DummyResponse:
-        def __init__(self, content):
-            self.content = content
-
-    class DummyLLM:
-        def invoke(self, *args, **kwargs):
-            return DummyResponse('[MOCK] Testowy wynik LLM (CI/fake)')
+def create_llm(ui_callback=None) -> AzureChatOpenAI:
+    """Create and configure the Azure OpenAI client."""
     try:
         logger.info('Validating environment variables')
         if ui_callback:
             ui_callback('Sprawdzam zmienne środowiskowe...')
-
-        # Patch: skip real LLM in CI/fake
-        env_vars = [
-            os.getenv('AZURE_OPENAI_ENDPOINT'),
-            os.getenv('AZURE_OPENAI_API_KEY'),
-            os.getenv('API_VERSION'),
-            os.getenv('AZURE_OPENAI_DEPLOYMENT'),
-            os.getenv('AZURE_OPENAI_MODEL'),
-        ]
-        if os.getenv('CI') == 'true' or any(v is None or 'fake' in str(v) for v in env_vars):
-            logger.warning(
-                '⏭️ Skipping real LLM in CI or with fake credentials. Using DummyLLM.')
-            if ui_callback:
-                ui_callback('Używam mockowanego LLM (CI/fake)', 'warning')
-            return DummyLLM()
 
         validate_env_variables()
 
