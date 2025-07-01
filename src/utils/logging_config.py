@@ -1,6 +1,7 @@
 """Defines the logging configuration for the application."""
 import logging
 import os
+import re
 import uuid
 
 from azure.storage.blob import BlobServiceClient
@@ -60,14 +61,25 @@ def setup_logger(log_file_path: str) -> logging.Logger:
     stream_handler.addFilter(request_filter)
     logger.addHandler(stream_handler)
 
+    def is_valid_instrumentation_key(key):
+        return bool(re.match(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$', key or ''))
+
     connection_string = os.getenv('APPINSIGHTS_CONNECTION_STRING')
     if connection_string:
-        azure_handler = AzureLogHandler(connection_string=connection_string)
-        azure_handler.setFormatter(formatter)
-        azure_handler.addFilter(request_filter)
-        logger.addHandler(azure_handler)
-        logger.info(
-            'AzureLogHandler podłączony – logi będą wysyłane do Application Insights')
+        match = re.search(
+            r'InstrumentationKey=([0-9a-fA-F-]+)', connection_string)
+        key = match.group(1) if match else None
+        if key and is_valid_instrumentation_key(key):
+            azure_handler = AzureLogHandler(
+                connection_string=connection_string)
+            azure_handler.setFormatter(formatter)
+            azure_handler.addFilter(request_filter)
+            logger.addHandler(azure_handler)
+            logger.info(
+                'AzureLogHandler podłączony – logi będą wysyłane do Application Insights')
+        else:
+            logger.warning(
+                'APPINSIGHTS_CONNECTION_STRING ustawiony, ale InstrumentationKey jest nieprawidłowy – pomijam AzureLogHandler')
     else:
         logger.warning(
             'Brak APPINSIGHTS_CONNECTION_STRING – logi nie będą wysyłane do Application Insights')
