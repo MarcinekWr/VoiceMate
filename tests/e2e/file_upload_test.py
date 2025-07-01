@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from playwright.sync_api import expect
+from pathlib import Path
+from typing import Any
+
+from playwright.sync_api import Page, expect
+
+from tests.conftest import voicemate_page
 
 
 class TestVoiceMateStepByStep:
@@ -11,10 +16,11 @@ class TestVoiceMateStepByStep:
 
     def wait_for_spinner_to_disappear(
         self,
-        page,
-        spinner_texts,
-        timeout=40000,
-    ):
+        page: Page,
+        spinner_texts: list[str],
+        timeout: int = 40000,
+    ) -> None:
+        """Wait for spinner elements to disappear on the page."""
         for spinner_text in spinner_texts:
             spinner = page.get_by_text(spinner_text, exact=False)
             try:
@@ -23,7 +29,8 @@ class TestVoiceMateStepByStep:
             except Exception:
                 pass
 
-    def test_homepage_display(self, voicemate_page):
+    def test_homepage_display(self, voicemate_page: Any) -> None:
+        """Test if the homepage displays correctly."""
         voicemate_page.wait_for_app_ready()
         expect(
             voicemate_page.page.get_by_text(
@@ -36,7 +43,8 @@ class TestVoiceMateStepByStep:
             ),
         ).to_be_visible()
 
-    def test_step_by_step_full_flow(self, voicemate_page, sample_pdf_file):
+    def test_step_by_step_full_flow(self, voicemate_page: Any, sample_pdf_file: str | Path) -> None:
+        """Test the full step-by-step flow with a sample PDF file."""
         voicemate_page.wait_for_app_ready()
         voicemate_page.page.get_by_text(
             '🚀 Rozpocznij krok po kroku', exact=True,
@@ -146,7 +154,11 @@ class TestVoiceMateStepByStep:
             ),
         ).to_be_visible()
 
-    def test_step_by_step_pdf_upload(self, voicemate_page, sample_pdf_file):
+    def test_step_by_step_pdf_upload(self,
+                                     voicemate_page: Any,
+                                     sample_pdf_file: str | Path) -> None:
+        """Test the step-by-step flow with a sample PDF file.
+        This test simulates the process of uploading a PDF file"""
         voicemate_page.wait_for_app_ready()
         voicemate_page.page.get_by_text(
             '🚀 Rozpocznij krok po kroku', exact=True,
@@ -177,7 +189,9 @@ class TestVoiceMateStepByStep:
         ).\
             to_be_visible(timeout=30000)
 
-    def test_step_by_step_url_upload(self, voicemate_page, sample_url):
+    def test_step_by_step_url_upload(self, voicemate_page: Any, sample_url: str) -> None:
+        """Test the step-by-step flow with a sample URL.
+        This test simulates the process of uploading a URL."""
         voicemate_page.wait_for_app_ready()
         voicemate_page.page.get_by_text(
             '🚀 Rozpocznij krok po kroku', exact=True,
@@ -205,7 +219,8 @@ class TestVoiceMateStepByStep:
         ).\
             to_be_visible(timeout=30000)
 
-    def test_select_step_by_step_mode(self, voicemate_page):
+    def test_select_step_by_step_mode(self, voicemate_page: Any) -> None:
+        """Test the step-by-step mode selection and UI elements."""
         voicemate_page.wait_for_app_ready()
         voicemate_page.page.get_by_text(
             '🚀 Rozpocznij krok po kroku', exact=True,

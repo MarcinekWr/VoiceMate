@@ -1,12 +1,14 @@
 import os
+
 from azure.ai.contentsafety import ContentSafetyClient
 from azure.ai.contentsafety.models import AnalyzeTextOptions
 from azure.core.credentials import AzureKeyCredential
 
 client = ContentSafetyClient(
-    endpoint=os.getenv("CONTENT_SAFETY_ENDPOINT"),
-    credential=AzureKeyCredential(os.getenv("CONTENT_SAFETY_KEY"))
+    endpoint=os.getenv('CONTENT_SAFETY_ENDPOINT'),
+    credential=AzureKeyCredential(os.getenv('CONTENT_SAFETY_KEY'))
 )
+
 
 def check_content_safety(text: str) -> bool:
     max_len = 10000

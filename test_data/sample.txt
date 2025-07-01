@@ -1,1 +1,0 @@
-This is a sample text file for testing VoiceMate. It contains some basic content that can be used to test the text-to-speech functionality.

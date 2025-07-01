@@ -1,7 +1,10 @@
+from unittest import mock
+
 import pytest
 import streamlit as st
-from unittest import mock
+
 from src.ui.steps import step0_homepage
+
 
 def test_render_home_page_sets_step(monkeypatch):
     st.session_state.clear()

@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     env:
       AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=https;AccountName=fake;AccountKey=fake;EndpointSuffix=core.windows.net"
       APPINSIGHTS_CONNECTION_STRING: "InstrumentationKey=fake-uuid;IngestionEndpoint=https://fake.endpoint.com"
@@ -16,7 +16,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-    
+
     - name: Switch to Current Branch
       run: git checkout ${{ env.BRANCH }}
 

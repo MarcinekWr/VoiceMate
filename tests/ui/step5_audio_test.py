@@ -1,7 +1,10 @@
+from unittest import mock
+
 import pytest
 import streamlit as st
-from unittest import mock
+
 from src.ui.steps import step5_audio
+
 
 def test_render_step_5_generate_audio(monkeypatch):
     st.session_state.clear()
@@ -12,7 +15,8 @@ def test_render_step_5_generate_audio(monkeypatch):
     st.session_state.processing = False
     st.session_state.audio_path = None
 
-    monkeypatch.setattr(step5_audio, 'generate_audio_from_json', lambda j, p: 'dummy_audio.wav')
+    monkeypatch.setattr(step5_audio, 'generate_audio_from_json',
+                        lambda j, p: 'dummy_audio.wav')
     monkeypatch.setattr(step5_audio, 'upload_to_blob', lambda c, p, n: None)
 
     with mock.patch.object(st, 'button', return_value=True):

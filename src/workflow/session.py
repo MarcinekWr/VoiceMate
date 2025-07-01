@@ -1,5 +1,7 @@
 import streamlit as st
+
 from src.utils.logging_config import set_request_id
+
 
 def initialize_session_state():
     """Initialize all session state variables"""
@@ -24,6 +26,7 @@ def initialize_session_state():
     if 'request_id' not in st.session_state:
         st.session_state.request_id = set_request_id()
 
+
 def reset_workflow():
     """Reset the workflow to start from beginning"""
 
@@ -36,4 +39,4 @@ def reset_workflow():
     st.session_state.is_premium = False
     st.session_state.processing = False
     st.session_state.file_processed = False
-    st.session_state.request_id = set_request_id() 
+    st.session_state.request_id = set_request_id()
