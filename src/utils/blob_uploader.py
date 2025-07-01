@@ -8,8 +8,10 @@ logger = logging.getLogger(__name__)
 
 def upload_to_blob(container_name: str, file_path: str, blob_name: str = None):
     connection_string = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-    if not connection_string:
-        logger.error('❌ Brak AZURE_STORAGE_CONNECTION_STRING w .env')
+    # Skip upload in CI or with fake credentials
+    if os.getenv('CI') == 'true' or not connection_string or 'fake' in connection_string:
+        logger.info(
+            '⏭️ Skipping Azure Blob upload in CI or with fake credentials.')
         return
 
     try:
