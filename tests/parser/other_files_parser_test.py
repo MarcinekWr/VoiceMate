@@ -197,7 +197,7 @@ class TestFileConverter:
 
         converter = FileConverter('test.jpg', temp_dir)
 
-        with pytest.raises(Exception, match='Image conversion error'):
+        with pytest.raises(RuntimeError, match='Image conversion error'):
             converter.convert_image_to_pdf()
 
     def test_is_valid_url(self, mock_get_logger, temp_dir):

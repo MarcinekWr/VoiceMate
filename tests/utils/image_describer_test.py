@@ -1,8 +1,9 @@
 """
 Tests for ImageDescriber class.
 """
-import os
 from __future__ import annotations
+
+import os
 
 import unittest
 from unittest.mock import MagicMock, mock_open, patch
