@@ -92,7 +92,8 @@ class TestTextCleaner:
         assert '  ' not in result
 
     @pytest.mark.parametrize(
-        'input_text,expected', [
+        'input_text,expected',
+        [
             ('Hello...World', 'Hello..World'),
             ('Test///123', 'Test//123'),
             ('Multiple...dots...here', 'Multiple..dots..here'),

@@ -1,5 +1,6 @@
 """
-This module contains the PDFImageExtractor class for extracting images from PDF files.
+This module contains the PDFImageExtractor
+class for extracting images from PDF files.
 """
 
 from __future__ import annotations
@@ -7,7 +8,7 @@ from __future__ import annotations
 import base64
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 import fitz  # PyMuPDF
 
@@ -33,8 +34,12 @@ class PDFImageExtractor:
         self.describe_images = describe_images
         self.logger = logging.getLogger(__name__)
 
-    def extract_images(self, doc: fitz.Document) -> list[dict[str, Any]]:
-        """Extract images using PyMuPDF and describe them using ImageDescriber."""
+    def extract_images(
+        self,
+        doc: fitz.Document,
+    ) -> list[dict[str, Any]]:
+        """Extract images
+        using PyMuPDF and describe them using ImageDescriber."""
         images_data: list[dict[str, Any]] = []
 
         try:
@@ -44,7 +49,10 @@ class PDFImageExtractor:
                     image_list = page.get_images(full=True)
                 except RuntimeError as e:
                     self.logger.warning(
-                        'Error loading page %s: %s', page_num, e)
+                        'Error loading page %s: %s',
+                        page_num,
+                        e,
+                    )
                     continue
 
                 for img_index, image in enumerate(image_list):
@@ -57,24 +65,31 @@ class PDFImageExtractor:
                             continue
 
                         image_data = pix.tobytes('png')
-                        img_filename = f'image_p{page_num + 1}_{img_index + 1}.png'
+                        img_filename = (
+                            f'image_p{page_num + 1}_{img_index + 1}.png'
+                        )
                         img_path = os.path.join(self.output_dir, img_filename)
                         image_data_base64 = base64.b64encode(
-                            image_data).decode('utf-8')
+                            image_data,
+                        ).decode('utf-8')
 
                         try:
                             with open(img_path, 'wb') as file:
                                 file.write(image_data)
                         except OSError as e:
                             self.logger.warning(
-                                'Failed to save image %s: %s', img_filename, e
+                                'Failed to save image %s: %s',
+                                img_filename,
+                                e,
                             )
                             pix = None
                             continue
 
                         # Get image description
                         description = self._get_image_description(
-                            img_path, image_data)
+                            img_path,
+                            image_data,
+                        )
 
                         # Store image data
                         images_data.append(
@@ -87,7 +102,7 @@ class PDFImageExtractor:
                                 'height': pix.height,
                                 'size_kb': round(len(image_data) / 1024, 2),
                                 'description': description,
-                            }
+                            },
                         )
 
                         pix = None
@@ -113,7 +128,9 @@ class PDFImageExtractor:
 
         except Exception as e:
             self.logger.error(
-                'Unexpected error during image extraction: %s', e)
+                'Unexpected error during image extraction: %s',
+                e,
+            )
 
         return images_data
 
@@ -125,8 +142,10 @@ class PDFImageExtractor:
             return 'No description available'
 
         try:
-            self.logger.info('Describing image: %s',
-                             os.path.basename(img_path))
+            self.logger.info(
+                'Describing image: %s',
+                os.path.basename(img_path),
+            )
             description = self.image_describer.describe_image(img_path)
 
             if (
@@ -134,7 +153,8 @@ class PDFImageExtractor:
                 or description == 'Image description not available'
             ):
                 description = self.image_describer.describe_image_from_bytes(
-                    image_data)
+                    image_data,
+                )
 
             return description
 

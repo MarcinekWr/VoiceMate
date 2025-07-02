@@ -7,7 +7,7 @@ import json
 import logging
 import os
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import fitz  # PyMuPDF
 from pdfminer.high_level import extract_text
@@ -47,7 +47,7 @@ class PdfParser:
         if self.describe_images:
             self.image_describer = image_describer or ImageDescriber()
         else:
-            self.image_describer = None
+            self.image_describer: ImageDescriber | None = None
 
         self.table_parser = PDFTableParser(self.file_path)
         self.image_extractor = PDFImageExtractor(
@@ -65,11 +65,13 @@ class PdfParser:
             os.makedirs(self.output_dir, exist_ok=True)
         except OSError as e:
             raise OSError(
-                f'Failed to create output directory {self.output_dir}: {e}')
+                f'Failed to create output directory {self.output_dir}: {e}',
+            )
 
     def parse_all(self) -> dict[str, Any]:
         """
-        Parse all content from the PDF including text, images, tables, and metadata.
+        Parse all content from the PDF
+        including text, images, tables, and metadata.
         """
         try:
             doc = fitz.open(self.file_path)
@@ -86,7 +88,9 @@ class PdfParser:
             self.structured_content = formatter.create_structured_content(doc)
 
             self.logger.info(
-                'Successfully parsed all content from: %s', self.file_path)
+                'Successfully parsed all content from: %s',
+                self.file_path,
+            )
 
             return {
                 'text': self.text,
@@ -104,7 +108,10 @@ class PdfParser:
             return {}
         except Exception as e:
             self.logger.error(
-                'Unexpected error parsing PDF %s: %s', self.file_path, e)
+                'Unexpected error parsing PDF %s: %s',
+                self.file_path,
+                e,
+            )
             return {}
         finally:
             if 'doc' in locals() and doc:
@@ -118,14 +125,18 @@ class PdfParser:
             file_stats = os.stat(self.file_path)
             metadata['filename'] = os.path.basename(self.file_path)
             metadata['file_size_mb'] = round(
-                file_stats.st_size / (1024 * 1024), 2)
+                file_stats.st_size / (1024 * 1024),
+                2,
+            )
             metadata['modified_time'] = datetime.fromtimestamp(
-                file_stats.st_mtime
+                file_stats.st_mtime,
             ).isoformat()
 
         except OSError as e:
             self.logger.error(
-                'Error accessing file stats for %s: %s', self.file_path, e
+                'Error accessing file stats for %s: %s',
+                self.file_path,
+                e,
             )
             metadata['error'] = f'Failed to get file stats: {str(e)}'
             return metadata
@@ -141,7 +152,10 @@ class PdfParser:
             self.logger.info('Successfully extracted metadata')
 
         except RuntimeError as e:
-            self.logger.error('PDF file data error extracting metadata: %s', e)
+            self.logger.error(
+                'PDF file data error extracting metadata: %s',
+                e,
+            )
             metadata['error'] = f'Invalid PDF file: {str(e)}'
         except Exception as e:
             self.logger.error('Unexpected error extracting metadata: %s', e)
@@ -193,14 +207,16 @@ class PdfParser:
                     file.write('METADATA\n')
                     file.write('-' * 20 + '\n')
                     file.write(
-                        f"Filename: {self.metadata.get('filename', 'N/A')}\n")
-                    file.write(
-                        f"File Size: {self.metadata.get('file_size_mb', 'N/A')} MB\n"
+                        f"Filename: {self.metadata.get('filename', 'N/A')}\n",
                     )
                     file.write(
-                        f"Pages: {self.metadata.get('page_count', 'N/A')}\n")
+                        f"File Size: {self.metadata.get('file_size_mb', 'N/A')} MB\n",
+                    )
                     file.write(
-                        f"Modified: {self.metadata.get('modified_time', 'N/A')}\n"
+                        f"Pages: {self.metadata.get('page_count', 'N/A')}\n",
+                    )
+                    file.write(
+                        f"Modified: {self.metadata.get('modified_time', 'N/A')}\n",
                     )
 
                     if self.metadata.get('title'):
@@ -209,7 +225,8 @@ class PdfParser:
                         file.write(f"Author: {self.metadata['author']}\n")
                     if self.metadata.get('creation_date'):
                         file.write(
-                            f"Created: {self.metadata['creation_date']}\n")
+                            f"Created: {self.metadata['creation_date']}\n",
+                        )
                     file.write('\n')
 
                 file.write('PAGE SUMMARY\n')
@@ -223,11 +240,11 @@ class PdfParser:
                         for image in page['images']:
                             file.write(
                                 f"    * {image['filename']} "
-                                f"({image['width']}x{image['height']})\n"
+                                f"({image['width']}x{image['height']})\n",
                             )
                             if image.get('description'):
                                 file.write(
-                                    f"      Description: {image['description'][:100]}...\n"
+                                    f"Description: {image['description'][:100]}...\n",
                                 )
                     file.write('\n')
 
@@ -274,7 +291,8 @@ class PdfParser:
         return report_path
 
     def initiate(self) -> str:
-        """Initiate the parsing process and return content formatted for LLM processing."""
+        """Initiate the parsing process
+        and return content formatted for LLM processing."""
         self.parse_all()
         self.save_summary_report()
         self.save_metadata_json()

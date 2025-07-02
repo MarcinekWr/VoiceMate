@@ -8,7 +8,6 @@ These tests verify that the function properly checks the presence of required Az
 - `test_validate_env_variables_missing`: Confirms that the function raises a ValueError with the correct message when a required environment variable is missing.
 """
 
-import os
 
 import pytest
 

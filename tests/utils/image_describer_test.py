@@ -16,7 +16,9 @@ class TestImageDescriber(unittest.TestCase):
         self.patcher = patch('src.utils.image_describer.LLMService')
         self.mock_llm_service_class = self.patcher.start()
         self.mock_llm_service_instance = MagicMock()
-        self.mock_llm_service_class.return_value = self.mock_llm_service_instance
+        self.mock_llm_service_class.return_value = (
+            self.mock_llm_service_instance
+        )
 
     def tearDown(self):
         """Stop the patcher."""

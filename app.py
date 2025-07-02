@@ -15,8 +15,11 @@ from src.ui.steps.step3_and4 import render_step_3_and_4
 from src.ui.steps.step5_audio import render_step_5
 from src.ui.steps.step_all import render_auto_pipeline
 from src.utils.blob_uploader import upload_to_blob
-from src.utils.logging_config import (get_request_id, set_request_id,
-                                      setup_logger)
+from src.utils.logging_config import (
+    get_request_id,
+    set_request_id,
+    setup_logger,
+)
 from src.workflow.session import initialize_session_state
 
 load_dotenv()
@@ -77,8 +80,7 @@ def main():
                 blob_name=os.path.basename(log_file_path),
             )
             st.info(
-                '📤 Logi aplikacji zostały '
-                'zapisane w Azure Blob Storage.',
+                '📤 Logi aplikacji zostały ' 'zapisane w Azure Blob Storage.',
             )
         except Exception as e:
             st.warning(

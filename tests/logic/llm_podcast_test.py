@@ -7,15 +7,17 @@ import src.logic.llm_podcast as pipeline
 
 
 class TestLLMPipeline(unittest.TestCase):
-
     def test_validate_env_variables_all_set(self):
-        with patch.dict(os.environ, {
-            'AZURE_OPENAI_ENDPOINT': 'url',
-            'AZURE_OPENAI_API_KEY': 'key',
-            'API_VERSION': '2024-06-01',
-            'AZURE_OPENAI_DEPLOYMENT': 'deployment',
-            'AZURE_OPENAI_MODEL': 'model',
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                'AZURE_OPENAI_ENDPOINT': 'url',
+                'AZURE_OPENAI_API_KEY': 'key',
+                'API_VERSION': '2024-06-01',
+                'AZURE_OPENAI_DEPLOYMENT': 'deployment',
+                'AZURE_OPENAI_MODEL': 'model',
+            },
+        ):
             try:
                 pipeline.validate_env_variables()
             except ValueError:
@@ -25,8 +27,10 @@ class TestLLMPipeline(unittest.TestCase):
         with patch.dict(os.environ, {}, clear=True):
             with self.assertRaises(ValueError) as ctx:
                 pipeline.validate_env_variables()
-            self.assertIn('Missing required environment variables',
-                          str(ctx.exception))
+            self.assertIn(
+                'Missing required environment variables',
+                str(ctx.exception),
+            )
 
     @patch('src.logic.llm_podcast.AzureChatOpenAI')
     @patch('src.logic.llm_podcast.validate_env_variables')
@@ -37,7 +41,10 @@ class TestLLMPipeline(unittest.TestCase):
         self.assertTrue(mock_azure.called)
         self.assertIsNotNone(llm)
 
-    @patch('src.logic.llm_podcast.PROMPT_PATHS', {'plan': Path('fake_path.txt')})
+    @patch(
+        'src.logic.llm_podcast.PROMPT_PATHS',
+        {'plan': Path('fake_path.txt')},
+    )
     def test_load_prompt_template_file_not_found(self):
         with self.assertRaises(FileNotFoundError):
             pipeline.load_prompt_template('plan')
@@ -70,7 +77,11 @@ class TestLLMPipeline(unittest.TestCase):
         mock_prompt.return_value.format.return_value = 'user_prompt'
 
         result = pipeline.generate_podcast_text(
-            fake_llm, 'scientific', 'input', 'plan')
+            fake_llm,
+            'scientific',
+            'input',
+            'plan',
+        )
         self.assertIn('Podcast output', result)
 
     def test_generate_podcast_text_missing_input_or_plan(self):
@@ -98,16 +109,25 @@ class TestLLMPipeline(unittest.TestCase):
         mock_create_llm.assert_called_once()
 
     @patch('src.logic.llm_podcast.save_to_file')
-    @patch('src.logic.llm_podcast.generate_podcast_text', return_value='Podcast')
+    @patch(
+        'src.logic.llm_podcast.generate_podcast_text',
+        return_value='Podcast',
+    )
     @patch('src.logic.llm_podcast.generate_plan', return_value='Plan')
     @patch('src.logic.llm_podcast.create_llm')
     def test_llm_podcast_service_run_success(
-        self, mock_llm, mock_plan, mock_podcast, mock_save
+        self,
+        mock_llm,
+        mock_plan,
+        mock_podcast,
+        mock_save,
     ):
-        fake_input = Path('src/logic/llm_text_test_file.txt')
-        with patch.object(Path, 'exists', return_value=True), \
-                patch.object(Path, 'read_text', return_value='Input Text'):
-
+        Path('src/logic/llm_text_test_file.txt')
+        with patch.object(Path, 'exists', return_value=True), patch.object(
+            Path,
+            'read_text',
+            return_value='Input Text',
+        ):
             service = pipeline.LLMPodcastService()
             service.run()
 

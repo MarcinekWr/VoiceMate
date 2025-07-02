@@ -10,8 +10,9 @@ except Exception:
 
 LOGS_DIR = REL_PROJECT_ROOT / 'log_folder' / 'logs'
 
-IMAGE_DESCRIBER_PROMPT_PATH = REL_PROJECT_ROOT / \
-    'src' / 'prompts' / 'image_describer.txt'
+IMAGE_DESCRIBER_PROMPT_PATH = (
+    REL_PROJECT_ROOT / 'src' / 'prompts' / 'image_describer.txt'
+)
 
 try:
     os.makedirs(LOGS_DIR, exist_ok=True)

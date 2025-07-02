@@ -1,6 +1,5 @@
 from unittest import mock
 
-import pytest
 import streamlit as st
 
 from src.ui.steps import step0_homepage

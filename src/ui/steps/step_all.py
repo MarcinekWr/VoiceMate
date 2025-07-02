@@ -5,9 +5,11 @@ import streamlit as st
 
 from src.utils.blob_uploader import upload_to_blob
 from src.utils.content_safety import check_content_safety
-from src.workflow.generation import (generate_audio_from_json,
-                                     generate_plan_content,
-                                     generate_podcast_content)
+from src.workflow.generation import (
+    generate_audio_from_json,
+    generate_plan_content,
+    generate_podcast_content,
+)
 from src.workflow.process_file import process_uploaded_file, process_url_input
 from src.workflow.save import dialog_to_json, save_to_file
 
@@ -27,7 +29,8 @@ def render_auto_pipeline():
     if 'step' not in st.session_state:
         st.session_state.step = 6
 
-    st.markdown("""
+    st.markdown(
+        """
         <style>
         .centered-header {
             max-width: 900px;
@@ -35,17 +38,25 @@ def render_auto_pipeline():
             text-align: center;
         }
         </style>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
     st.markdown("<div class='centered-header'>", unsafe_allow_html=True)
-    st.header('⚡ Tryb Błyskawiczny: Wygeneruj cały podcast jednym kliknięciem')
+    st.header(
+        '⚡ Tryb Błyskawiczny: Wygeneruj cały podcast jednym kliknięciem',
+    )
     st.markdown('</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        with st.expander('ℹ️ Jak to działa? Kliknij, aby zobaczyć instrukcję', expanded=False):
-            st.markdown("""
+        with st.expander(
+            'ℹ️ Jak to działa? Kliknij, aby zobaczyć instrukcję',
+            expanded=False,
+        ):
+            st.markdown(
+                """
             W trybie **błyskawicznym** możesz w kilku krokach wygenerować kompletny podcast audio z dowolnej treści.
             Oto jak to działa:
 
@@ -71,31 +82,52 @@ def render_auto_pipeline():
                 - Plik audio do odsłuchu lub pobrania 🎧
 
             > 💡 Jeśli coś pójdzie nie tak – sprawdź, czy Twój plik/URL zawiera tekst możliwy do odczytu.
-            """)
+            """,
+            )
 
         st.subheader('📥 Źródło treści')
-        uploaded_file = st.file_uploader('Wybierz plik', type=[
-            'pdf', 'jpg', 'jpeg', 'png', 'bmp', 'tiff', 'gif',
-            'html', 'htm', 'md', 'markdown', 'pptx'
-        ])
+        uploaded_file = st.file_uploader(
+            'Wybierz plik',
+            type=[
+                'pdf',
+                'jpg',
+                'jpeg',
+                'png',
+                'bmp',
+                'tiff',
+                'gif',
+                'html',
+                'htm',
+                'md',
+                'markdown',
+                'pptx',
+            ],
+        )
         url_input = st.text_input(
-            'lub podaj URL', placeholder='https://example.com')
+            'lub podaj URL',
+            placeholder='https://example.com',
+        )
 
     with col2:
         st.subheader('🎨 Styl podcastu')
         style_labels = {
             '🔬 Styl naukowy': 'scientific',
-            '😊 Styl swobodny': 'casual'
+            '😊 Styl swobodny': 'casual',
         }
         selected_label = st.selectbox(
-            'Wybierz styl:', options=list(style_labels.keys()))
+            'Wybierz styl:',
+            options=list(style_labels.keys()),
+        )
         podcast_style = style_labels[selected_label]
 
         st.subheader('🎧 Silnik audio')
-        tts_option = st.radio('Wybierz silnik:', options=[
-            '🆓 Azure (Darmowy)',
-            '🎯 ElevenLabs (Premium)'
-        ])
+        tts_option = st.radio(
+            'Wybierz silnik:',
+            options=[
+                '🆓 Azure (Darmowy)',
+                '🎯 ElevenLabs (Premium)',
+            ],
+        )
         is_premium = 'Premium' in tts_option
 
         if st.button('⬅️ Wróć na stronę główną', type='secondary'):
@@ -106,20 +138,31 @@ def render_auto_pipeline():
     st.markdown("<div class='centered-header'>", unsafe_allow_html=True)
 
     can_process = uploaded_file or (
-        url_input.strip().startswith(('http://', 'https://')))
+        url_input.strip().startswith(('http://', 'https://'))
+    )
 
-    if st.button('🚀 Start – Wygeneruj podcast', type='primary', disabled=not can_process):
+    if st.button(
+        '🚀 Start – Wygeneruj podcast',
+        type='primary',
+        disabled=not can_process,
+    ):
         st.session_state.processing = True
         try:
             with st.spinner('📥 Przetwarzanie treści...'):
-                llm_content = process_uploaded_file(
-                    uploaded_file) if uploaded_file else process_url_input(url_input.strip())
+                llm_content = (
+                    process_uploaded_file(
+                        uploaded_file,
+                    )
+                    if uploaded_file
+                    else process_url_input(url_input.strip())
+                )
                 if not llm_content:
                     st.error('❌ Nie udało się przetworzyć treści.')
                     return
                 if not check_content_safety(llm_content):
                     st.error(
-                        '⚠️ Wykryto potencjalnie niebezpieczną treść. Generowanie podcastu zostało przerwane.')
+                        '⚠️ Wykryto potencjalnie niebezpieczną treść. Generowanie podcastu zostało przerwane.',
+                    )
                     return
 
             with st.spinner('📝 Generowanie planu...'):
@@ -130,25 +173,42 @@ def render_auto_pipeline():
 
             with st.spinner('🎙️ Generowanie treści podcastu...'):
                 podcast_text = generate_podcast_content(
-                    podcast_style, llm_content, plan_text)
+                    podcast_style,
+                    llm_content,
+                    plan_text,
+                )
                 if not podcast_text:
                     st.error('❌ Nie udało się wygenerować tekstu podcastu.')
                     return
 
             with st.spinner('🧩 Konwersja do JSON...'):
                 json_data = dialog_to_json(podcast_text, is_premium)
-                json_filename = 'podcast_premium.json' if is_premium else 'podcast_free.json'
-                save_to_file(json.dumps(
-                    json_data, ensure_ascii=False, indent=2), json_filename)
+                json_filename = (
+                    'podcast_premium.json'
+                    if is_premium
+                    else 'podcast_free.json'
+                )
+                save_to_file(
+                    json.dumps(
+                        json_data,
+                        ensure_ascii=False,
+                        indent=2,
+                    ),
+                    json_filename,
+                )
 
             with st.spinner('🔊 Generowanie audio...'):
                 audio_path = generate_audio_from_json(json_data, is_premium)
                 try:
-                    upload_to_blob('audio', audio_path,
-                                   os.path.basename(audio_path))
+                    upload_to_blob(
+                        'audio',
+                        audio_path,
+                        os.path.basename(audio_path),
+                    )
                 except Exception as upload_err:
                     st.warning(
-                        f'⚠️ Nie udało się wysłać audio do Azure Blob: {upload_err}')
+                        f'⚠️ Nie udało się wysłać audio do Azure Blob: {upload_err}',
+                    )
 
             st.session_state.step = 6
             st.session_state.podcast_text = podcast_text
@@ -156,14 +216,19 @@ def render_auto_pipeline():
             st.session_state.is_premium = is_premium
 
             st.success('✅ Podcast został w pełni wygenerowany!')
-            st.audio(audio_path, format='audio/mp3' if is_premium else 'audio/wav')
+            st.audio(
+                audio_path,
+                format='audio/mp3' if is_premium else 'audio/wav',
+            )
 
         finally:
             st.session_state.processing = False
 
     if (
-        'podcast_text' in st.session_state and st.session_state.podcast_text
-        and 'audio_path' in st.session_state and st.session_state.audio_path
+        'podcast_text' in st.session_state
+        and st.session_state.podcast_text
+        and 'audio_path' in st.session_state
+        and st.session_state.audio_path
     ):
         col_a, col_b = st.columns(2)
 
@@ -172,7 +237,7 @@ def render_auto_pipeline():
                 '📥 Pobierz tekst',
                 st.session_state.podcast_text,
                 file_name='podcast.txt',
-                mime='text/plain'
+                mime='text/plain',
             )
 
         with col_b:
@@ -181,7 +246,7 @@ def render_auto_pipeline():
                     '📥 Pobierz audio',
                     f.read(),
                     file_name=os.path.basename(st.session_state.audio_path),
-                    mime='audio/mpeg' if is_premium else 'audio/wav'
+                    mime='audio/mpeg' if is_premium else 'audio/wav',
                 )
 
         st.balloons()

@@ -7,7 +7,8 @@ from src.workflow.process_file import process_uploaded_file, process_url_input
 def render_step_1():
     """Render Step 1: File Upload"""
     st.header('📁 Wczytaj plik')
-    st.markdown("""
+    st.markdown(
+        """
     W tym kroku możesz:
 
     - 📎 **Przesłać plik** (np. PDF, obraz, prezentację lub dokument HTML/Markdown), **lub**
@@ -16,10 +17,12 @@ def render_step_1():
     📥 **Co się stanie?**
     Wybrany plik lub treść strony zostanie przetworzona i zinterpretowana przez nasze modele.
 
-    """)
+    """,
+    )
 
     with st.expander('ℹ️ Obsługiwane formaty', expanded=False):
-        st.markdown("""
+        st.markdown(
+            """
         **Pliki:**
         - 📄 **PDF** (.pdf)
         - 🖼️ **Obrazy** (.jpg, .jpeg, .png, .bmp, .tiff, .gif)
@@ -29,13 +32,26 @@ def render_step_1():
 
         **URL:**
         - Dowolna strona internetowa (http/https)
-        """)
+        """,
+        )
 
     uploaded_file = st.file_uploader(
         '🗂️ Wybierz plik',
-        type=['pdf', 'jpg', 'jpeg', 'png', 'bmp', 'tiff',
-              'gif', 'html', 'htm', 'md', 'markdown', 'pptx'],
-        help='Przeciągnij i upuść plik lub kliknij aby wybrać'
+        type=[
+            'pdf',
+            'jpg',
+            'jpeg',
+            'png',
+            'bmp',
+            'tiff',
+            'gif',
+            'html',
+            'htm',
+            'md',
+            'markdown',
+            'pptx',
+        ],
+        help='Przeciągnij i upuść plik lub kliknij aby wybrać',
     )
 
     st.markdown('**— lub —**')
@@ -43,13 +59,16 @@ def render_step_1():
     url_input = st.text_input(
         '🌐 Wprowadź URL strony internetowej',
         placeholder='https://example.com/article',
-        help='Wprowadź pełny URL wraz z protokołem (http/https)'
+        help='Wprowadź pełny URL wraz z protokołem (http/https)',
     )
 
     can_process = uploaded_file is not None or (
-        url_input.strip() and url_input.startswith(('http://', 'https://')))
+        url_input.strip() and url_input.startswith(('http://', 'https://'))
+    )
 
-    if url_input.strip() and not url_input.startswith(('http://', 'https://')):
+    if url_input.strip() and not url_input.startswith(
+        ('http://', 'https://'),
+    ):
         st.warning('⚠️ URL musi rozpoczynać się od http:// lub https://')
 
     col1, col2 = st.columns([1, 3])
@@ -59,7 +78,7 @@ def render_step_1():
             '🚀 Przetwórz',
             type='primary',
             disabled=not can_process or st.session_state.processing,
-            use_container_width=True
+            use_container_width=True,
         )
 
     with col2:
@@ -81,7 +100,8 @@ def render_step_1():
                 if not check_content_safety(llm_content):
                     st.session_state.processing = False
                     st.error(
-                        '⚠️ Wykryto potencjalnie niebezpieczną treść w pliku. Przetwarzanie zostało przerwane.')
+                        '⚠️ Wykryto potencjalnie niebezpieczną treść w pliku. Przetwarzanie zostało przerwane.',
+                    )
                     return
                 st.session_state.llm_content = llm_content
                 st.session_state.step = 2

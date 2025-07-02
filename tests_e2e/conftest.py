@@ -18,10 +18,20 @@ def start_streamlit_app():
     """
 
     env = os.environ.copy()
-    process = subprocess.Popen([
-        sys.executable, '-m', 'streamlit', 'run', 'app.py', '--server.port', str(
-            STREAMLIT_PORT)
-    ], env=env)
+    process = subprocess.Popen(
+        [
+            sys.executable,
+            '-m',
+            'streamlit',
+            'run',
+            'app.py',
+            '--server.port',
+            str(
+                STREAMLIT_PORT,
+            ),
+        ],
+        env=env,
+    )
 
     timeout = 60
     start = time.time()
@@ -50,19 +60,21 @@ def start_streamlit_app():
 def voicemate_page(page):
     """
     Fixture to create a VoiceMatePage instance for testing."""
+
     class VoiceMatePage:
         def __init__(self, page):
             self.page = page
 
         def wait_for_app_ready(self):
-
             self.page.goto('http://localhost:8501', timeout=30000)
 
             self.page.wait_for_selector(
-                'text=Rozpocznij krok po kroku', timeout=20000
+                'text=Rozpocznij krok po kroku',
+                timeout=20000,
             )
             self.page.wait_for_selector(
-                'text=Szybki podcast', timeout=20000
+                'text=Szybki podcast',
+                timeout=20000,
             )
 
     return VoiceMatePage(page)

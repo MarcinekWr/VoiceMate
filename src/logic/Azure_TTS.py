@@ -3,6 +3,7 @@ import os
 import tempfile
 import time
 import wave
+from typing import Optional
 
 import azure.cognitiveservices.speech as speechsdk
 
@@ -17,12 +18,20 @@ class AzureTTSPodcastGenerator:
 
         if not api_key or not region:
             raise ValueError(
-                'Brakuje AZURE_SPEECH_API_KEY lub AZURE_SPEECH_REGION w .env')
+                'Brakuje AZURE_SPEECH_API_KEY lub AZURE_SPEECH_REGION w .env',
+            )
 
         self.speech_config = speechsdk.SpeechConfig(
-            subscription=api_key, region=region)
+            subscription=api_key,
+            region=region,
+        )
 
-    def generate_podcast_azure(self, dialog_data: list, output_path: str = None, progress_callback=None) -> str:
+    def generate_podcast_azure(
+        self,
+        dialog_data: list,
+        output_path: Optional[str] = None,
+        progress_callback=None,
+    ) -> Optional[str]:
         if not dialog_data:
             self.logger.error('Nie przekazano danych dialogowych.')
             return None
@@ -45,40 +54,56 @@ class AzureTTSPodcastGenerator:
                 continue
 
             temp_file = tempfile.NamedTemporaryFile(
-                suffix=f'_chunk_{order:02d}.wav', delete=False)
+                suffix=f'_chunk_{order:02d}.wav',
+                delete=False,
+            )
             filename = temp_file.name
             temp_file.close()
             temp_files.append(filename)
 
             self.speech_config.speech_synthesis_voice_name = voice
-            audio_config = speechsdk.audio.AudioOutputConfig(filename=filename)
+            audio_config = speechsdk.audio.AudioOutputConfig(
+                filename=filename,
+            )
             synthesizer = speechsdk.SpeechSynthesizer(
-                self.speech_config, audio_config)
+                self.speech_config,
+                audio_config,
+            )
 
             try:
                 self.logger.info(f"{order:02d}: {part['speaker']} ({voice})")
 
                 if progress_callback:
                     progress_callback(
-                        i, total_segments, f"Generowanie segmentu {i+1}/{total_segments}: {part['speaker']}")
+                        i,
+                        total_segments,
+                        f"Generowanie segmentu {i+1}/{total_segments}: {part['speaker']}",
+                    )
 
                 result = synthesizer.speak_text_async(text).get()
 
-                if result.reason != speechsdk.ResultReason.SynthesizingAudioCompleted:
+                if (
+                    result.reason
+                    != speechsdk.ResultReason.SynthesizingAudioCompleted
+                ):
                     self.logger.error(f'Błąd syntezy dla segmentu {order}')
                 else:
                     self.logger.info(f'Segment {order:02d} wygenerowany')
 
             except Exception as e:
                 self.logger.exception(
-                    f'Wyjątek podczas generowania segmentu {order}: {e}')
+                    f'Wyjątek podczas generowania segmentu {order}: {e}',
+                )
             finally:
                 del synthesizer
                 time.sleep(0.2)
 
         if progress_callback:
-            progress_callback(total_segments, total_segments,
-                              'Łączenie segmentów...')
+            progress_callback(
+                total_segments,
+                total_segments,
+                'Łączenie segmentów...',
+            )
 
         return self._combine_segments(temp_files, output_path)
 
@@ -88,7 +113,8 @@ class AzureTTSPodcastGenerator:
         first_file = next((f for f in temp_files if os.path.exists(f)), None)
         if not first_file:
             self.logger.error(
-                'Brak plików do połączenia – nie wygenerowano żadnego segmentu.')
+                'Brak plików do połączenia – nie wygenerowano żadnego segmentu.',
+            )
             return None
 
         try:
@@ -103,16 +129,22 @@ class AzureTTSPodcastGenerator:
                             try:
                                 with wave.open(temp_file, 'rb') as temp_wave:
                                     output_wave.writeframes(
-                                        temp_wave.readframes(temp_wave.getnframes()))
+                                        temp_wave.readframes(
+                                            temp_wave.getnframes(),
+                                        ),
+                                    )
 
                                 silence_frames = int(params.framerate * 0.5)
-                                silence_data = b'\x00' * \
-                                    (silence_frames *
-                                     params.sampwidth * params.nchannels)
+                                silence_data = b'\x00' * (
+                                    silence_frames
+                                    * params.sampwidth
+                                    * params.nchannels
+                                )
                                 output_wave.writeframes(silence_data)
                             except Exception as e:
                                 self.logger.warning(
-                                    f'Problem z odczytem pliku {temp_file}: {e}')
+                                    f'Problem z odczytem pliku {temp_file}: {e}',
+                                )
 
         except Exception as e:
             self.logger.exception(f'Błąd podczas łączenia plików WAV: {e}')
@@ -128,14 +160,17 @@ class AzureTTSPodcastGenerator:
                     except PermissionError:
                         if attempt < max_retries - 1:
                             self.logger.warning(
-                                f'Plik {temp_file} zablokowany, próba {attempt + 1}/{max_retries}')
+                                f'Plik {temp_file} zablokowany, próba {attempt + 1}/{max_retries}',
+                            )
                             time.sleep(1)
                         else:
                             self.logger.warning(
-                                f'Nie można usunąć {temp_file} – pozostaw ręcznie')
+                                f'Nie można usunąć {temp_file} – pozostaw ręcznie',
+                            )
                     except Exception as e:
                         self.logger.error(
-                            f'Błąd usuwania pliku {temp_file}: {e}')
+                            f'Błąd usuwania pliku {temp_file}: {e}',
+                        )
                         break
 
         self.logger.info(f'Podcast zapisany jako {output_path}')

@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROMPT_PATHS = {
     'scientific': BASE_DIR / 'prompts' / 'scientific_style.txt',
-    'casual':     BASE_DIR / 'prompts' / 'casual_style.txt',
-    'plan':       BASE_DIR / 'prompts' / 'plan_prompt.txt',
+    'casual': BASE_DIR / 'prompts' / 'casual_style.txt',
+    'plan': BASE_DIR / 'prompts' / 'plan_prompt.txt',
 }
 
 
@@ -29,7 +29,8 @@ def validate_env_variables() -> None:
     missing_vars = [var for var in required_vars if not os.getenv(var)]
     if missing_vars:
         raise ValueError(
-            f'Missing required environment variables: {missing_vars}')
+            f'Missing required environment variables: {missing_vars}',
+        )
 
 
 def create_llm(ui_callback=None) -> AzureChatOpenAI:
@@ -76,9 +77,7 @@ def load_prompt_template(style: str, ui_callback=None) -> PromptTemplate:
             ui_callback(f"Ładuję szablon stylu '{style}'...")
 
         if style not in PROMPT_PATHS:
-            error_msg = (
-                f'Unknown style: {style}. Available styles: {list(PROMPT_PATHS.keys())}'
-            )
+            error_msg = f'Unknown style: {style}. Available styles: {list(PROMPT_PATHS.keys())}'
             logger.error(error_msg)
             if ui_callback:
                 ui_callback(error_msg, 'error')
@@ -90,7 +89,9 @@ def load_prompt_template(style: str, ui_callback=None) -> PromptTemplate:
             logger.error(error_msg)
             if ui_callback:
                 ui_callback(
-                    f'Nie znaleziono pliku szablonu: {prompt_path}', 'error')
+                    f'Nie znaleziono pliku szablonu: {prompt_path}',
+                    'error',
+                )
             raise FileNotFoundError(error_msg)
 
         prompt_text = prompt_path.read_text(encoding='utf-8')
@@ -108,7 +109,11 @@ def load_prompt_template(style: str, ui_callback=None) -> PromptTemplate:
         raise
 
 
-def generate_plan(llm: AzureChatOpenAI, input_text: str, ui_callback=None) -> str:
+def generate_plan(
+    llm: AzureChatOpenAI,
+    input_text: str,
+    ui_callback=None,
+) -> str:
     """Generate a plan for the podcast based on input text."""
     try:
         if not input_text or not input_text.strip():
@@ -139,7 +144,11 @@ def generate_plan(llm: AzureChatOpenAI, input_text: str, ui_callback=None) -> st
 
 
 def generate_podcast_text(
-    llm: AzureChatOpenAI, style: str, input_text: str, plan_text: str, ui_callback=None
+    llm: AzureChatOpenAI,
+    style: str,
+    input_text: str,
+    plan_text: str,
+    ui_callback=None,
 ) -> str:
     """Generate podcast text in specified style."""
     try:
@@ -158,7 +167,9 @@ def generate_podcast_text(
 
         prompt_template = load_prompt_template(style)
         user_prompt = prompt_template.format(
-            input_text=input_text, plan_text=plan_text)
+            input_text=input_text,
+            plan_text=plan_text,
+        )
 
         logger.info('Preparing system prompt')
         if ui_callback:
@@ -178,11 +189,11 @@ def generate_podcast_text(
             [
                 {'role': 'system', 'content': system_prompt},
                 {'role': 'user', 'content': user_prompt},
-            ]
+            ],
         )
 
         logger.info(
-            f'Podcast text generated successfully ({len(response.content)} characters)'
+            f'Podcast text generated successfully ({len(response.content)} characters)',
         )
         if ui_callback:
             ui_callback(
@@ -226,7 +237,11 @@ class LLMPodcastService:
         save_to_file(plan_text, 'output_plan.txt')
 
         output = generate_podcast_text(
-            self.llm, 'scientific', input_text, plan_text)
+            self.llm,
+            'scientific',
+            input_text,
+            plan_text,
+        )
         save_to_file(output, 'podcast.txt')
 
         logger.info('Podcast generation completed successfully!')

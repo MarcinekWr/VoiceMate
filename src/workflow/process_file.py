@@ -29,7 +29,10 @@ def process_url_input(url: str) -> Optional[str]:
 def process_uploaded_file(uploaded_file) -> Optional[str]:
     """Process uploaded file and extract LLM content using FileConverter"""
     try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=Path(uploaded_file.name).suffix) as tmp_file:
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=Path(uploaded_file.name).suffix,
+        ) as tmp_file:
             tmp_file.write(uploaded_file.getvalue())
             tmp_file_path = tmp_file.name
 
