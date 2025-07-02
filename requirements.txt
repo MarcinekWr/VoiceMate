@@ -179,3 +179,5 @@ zstandard==0.23.0
 azure-storage-blob==12.25.1
 elevenlabs==2.5.0
 azure-ai-contentsafety==1.0.0
+azure-keyvault-secrets==4.10.0
+
