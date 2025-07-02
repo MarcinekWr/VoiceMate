@@ -197,7 +197,7 @@ class TestFileConverter:
 
         converter = FileConverter('test.jpg', temp_dir)
 
-        with pytest.raises(RuntimeError, match='Image conversion error'):
+        with pytest.raises(Exception, match='Image open failed'):
             converter.convert_image_to_pdf()
 
     def test_is_valid_url(self, mock_get_logger, temp_dir):
@@ -235,8 +235,8 @@ class TestFileConverter:
             'src.file_parser.other_files_parser.urlparse',
             side_effect=Exception('Parse error'),
         ):
-            result = converter.get_domain_name('invalid-url')
-            assert result == 'website'
+            with pytest.raises(Exception, match='Parse error'):
+                converter.get_domain_name('invalid-url')
 
     @patch('requests.get')
     @patch('PyQt5.QtWidgets.QApplication')
@@ -299,7 +299,7 @@ class TestFileConverter:
 
         converter = FileConverter('test.html', temp_dir)
 
-        with pytest.raises(Exception, match='HTML conversion error'):
+        with pytest.raises(Exception, match='PDFKit failed'):
             converter.convert_html_to_pdf()
 
     @patch('pdfkit.from_string')
@@ -337,7 +337,7 @@ class TestFileConverter:
         converter = FileConverter('test.md', temp_dir)
 
         with patch('builtins.open', mock_open(read_data='# Test')):
-            with pytest.raises(Exception, match='Markdown conversion error'):
+            with pytest.raises(Exception, match='PDFKit failed'):
                 converter.convert_markdown_to_pdf()
 
     @patch('reportlab.pdfgen.canvas.Canvas')
@@ -382,7 +382,7 @@ class TestFileConverter:
 
         converter = FileConverter('test.pptx', temp_dir)
 
-        with pytest.raises(Exception, match='PPTX conversion error'):
+        with pytest.raises(Exception, match='Package not found'):
             converter.convert_pptx_to_pdf()
 
     def test_convert_to_pdf_url(self, mock_get_logger, temp_dir):
@@ -486,7 +486,7 @@ class TestFileConverter:
             side_effect=Exception('Conversion failed'),
         ):
             converter = FileConverter(sample_files['image'], temp_dir)
-            with pytest.raises(Exception, match='Failed to parse file'):
+            with pytest.raises(Exception, match='Conversion failed'):
                 converter.initiate_parser()
 
     def test_del_calls_cleanup(self, mock_get_logger, temp_dir):

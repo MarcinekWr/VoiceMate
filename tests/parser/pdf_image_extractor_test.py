@@ -68,8 +68,9 @@ class TestPDFImageExtractor(unittest.TestCase):
         self.mock_image_describer.describe_image.side_effect = Exception(
             'API Error',
         )
-        description = self.extractor._get_image_description('path', b'data')
-        self.assertEqual(description, 'Error generating description')
+        with self.assertRaises(Exception) as exc:
+            self.extractor._get_image_description('path', b'data')
+        self.assertIn('API Error', str(exc.exception))
 
     @patch('fitz.Pixmap')
     def test_extract_images_too_small(self, mock_pixmap):

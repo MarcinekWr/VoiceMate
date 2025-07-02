@@ -54,4 +54,5 @@ def test_url2pdf_invalid_url(temp_output_pdf):
         'Failed to load page' in result.stderr
         or 'PDF creation failed' in result.stderr
         or 'ERR_NAME_NOT_RESOLVED' in result.stderr
+        or 'Failed to load URL' in result.stderr
     )

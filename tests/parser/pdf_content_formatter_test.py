@@ -102,5 +102,6 @@ class TestPDFContentFormatter(unittest.TestCase):
             {'page': 1, 'text': 'Dirty text', 'images': []},
         ]
 
-        result = self.formatter.get_content_for_llm()
-        self.assertIn('Dirty text', result)
+        with self.assertRaises(Exception) as exc:
+            self.formatter.get_content_for_llm()
+        self.assertIn('Cleaning failed', str(exc.exception))
