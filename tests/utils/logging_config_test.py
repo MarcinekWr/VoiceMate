@@ -48,7 +48,8 @@ def test_request_id_filter():
     assert record._request_id == 'abc-123'
 
 
-def test_setup_logger_creates_handlers(tmp_path, monkeypatch):
+@mock.patch("src.utils.logging_config.get_secret_env_first", return_value=None)
+def test_setup_logger_creates_handlers(mock_secret, tmp_path, monkeypatch):
     log_file = tmp_path / 'test.log'
     monkeypatch.delenv('APPINSIGHTS_CONNECTION_STRING', raising=False)
 
