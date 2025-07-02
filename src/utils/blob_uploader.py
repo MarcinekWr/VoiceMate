@@ -2,12 +2,13 @@ import logging
 import os
 
 from azure.storage.blob import BlobServiceClient
+from src.utils.key_vault import get_secret_env_first
 
 logger = logging.getLogger(__name__)
 
 
 def upload_to_blob(container_name: str, file_path: str, blob_name: str = None):
-    connection_string = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+    connection_string = get_secret_env_first("AZURE_STORAGE_CONNECTION_STRING")
     if not connection_string:
         logger.error('❌ Brak AZURE_STORAGE_CONNECTION_STRING w .env')
         return

@@ -8,10 +8,11 @@ from azure.storage.blob import BlobServiceClient
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 
 from src.common.constants import LOGS_DIR
+from src.utils.key_vault import get_secret_env_first
 
 
 def get_blob_service_client() -> BlobServiceClient:
-    connection_string = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+    connection_string = get_secret_env_first("AZURE_STORAGE_CONNECTION_STRING")
     if not connection_string:
         raise ValueError('Brak AZURE_STORAGE_CONNECTION_STRING')
     return BlobServiceClient.from_connection_string(connection_string)
@@ -64,7 +65,7 @@ def setup_logger(log_file_path: str) -> logging.Logger:
     def is_valid_instrumentation_key(key):
         return bool(re.match(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$', key or ''))
 
-    connection_string = os.getenv('APPINSIGHTS_CONNECTION_STRING')
+    connection_string = get_secret_env_first("APPINSIGHTS_CONNECTION_STRING")
     if connection_string:
         match = re.search(
             r'InstrumentationKey=([0-9a-fA-F-]+)', connection_string)

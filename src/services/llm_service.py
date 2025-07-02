@@ -11,6 +11,9 @@ from typing import Optional
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
+import logging
+from src.utils.key_vault import get_secret_env_first
+
 
 
 class LLMService:
@@ -31,13 +34,11 @@ class LLMService:
         """
         try:
             llm = AzureChatOpenAI(
-                azure_deployment=os.getenv(
-                    'AZURE_OPENAI_DEPLOYMENT', 'gpt-4-vision'),
-                openai_api_version=os.getenv(
-                    'API_VERSION', '2024-02-15-preview'),
-                azure_endpoint=os.getenv('AZURE_OPENAI_ENDPOINT'),
-                api_key=os.getenv('AZURE_OPENAI_API_KEY'),
-                model=os.getenv('AZURE_OPENAI_MODEL', 'gpt-4-vision-preview'),
+                azure_deployment=get_secret_env_first("AZURE_OPENAI_DEPLOYMENT", "gpt-4-vision"),
+                openai_api_version=get_secret_env_first("API_VERSION", "2024-02-15-preview"),
+                azure_endpoint=get_secret_env_first("AZURE_OPENAI_ENDPOINT"),
+                api_key=get_secret_env_first("AZURE_OPENAI_API_KEY"),
+                model=get_secret_env_first("AZURE_OPENAI_MODEL", "gpt-4-vision-preview"),
                 max_tokens=4096,
             )
             return llm

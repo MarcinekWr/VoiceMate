@@ -4,8 +4,8 @@ import os
 import tempfile
 
 from elevenlabs.client import ElevenLabs
-
-from src.utils.logging_config import get_request_id
+from src.utils.logging_config import get_request_id 
+from src.utils.key_vault import get_secret_env_first
 
 
 class ElevenlabsTTSPodcastGenerator:
@@ -14,7 +14,7 @@ class ElevenlabsTTSPodcastGenerator:
         self.client = self._load_client()
 
     def _load_client(self) -> ElevenLabs:
-        api_key = os.getenv('ELEVENLABS_API_KEY')
+        api_key = get_secret_env_first("ELEVENLABS_API_KEY")
         if not api_key:
             self.logger.error('Brak ELEVENLABS_API_KEY w pliku .env')
             raise ValueError('Brak ELEVENLABS_API_KEY')

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
+from src.utils.key_vault import get_secret_env_first
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ def validate_env_variables() -> None:
         'AZURE_OPENAI_MODEL',
     ]
 
-    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    missing_vars = [var for var in required_vars if not get_secret_env_first(var)]
     if missing_vars:
         raise ValueError(
             f'Missing required environment variables: {missing_vars}')
@@ -46,11 +47,11 @@ def create_llm(ui_callback=None) -> AzureChatOpenAI:
             ui_callback('Tworzę połączenie z Azure OpenAI...')
 
         llm = AzureChatOpenAI(
-            azure_endpoint=os.getenv('AZURE_OPENAI_ENDPOINT'),
-            api_key=os.getenv('AZURE_OPENAI_API_KEY'),
-            api_version=os.getenv('API_VERSION'),
-            deployment_name=os.getenv('AZURE_OPENAI_DEPLOYMENT'),
-            model_name=os.getenv('AZURE_OPENAI_MODEL'),
+            azure_endpoint=get_secret_env_first("AZURE_OPENAI_ENDPOINT"),
+            api_key=get_secret_env_first("AZURE_OPENAI_API_KEY"),
+            api_version=get_secret_env_first("API_VERSION"),
+            deployment_name=get_secret_env_first("AZURE_OPENAI_DEPLOYMENT"),
+            model_name=get_secret_env_first("AZURE_OPENAI_MODEL"),
             temperature=0.7,
             max_tokens=16384,
         )

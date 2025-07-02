@@ -3,10 +3,11 @@ import os
 from azure.ai.contentsafety import ContentSafetyClient
 from azure.ai.contentsafety.models import AnalyzeTextOptions
 from azure.core.credentials import AzureKeyCredential
+from src.utils.key_vault import get_secret_env_first
 
 client = ContentSafetyClient(
-    endpoint=os.getenv('CONTENT_SAFETY_ENDPOINT'),
-    credential=AzureKeyCredential(os.getenv('CONTENT_SAFETY_KEY'))
+    endpoint=get_secret_env_first("CONTENT_SAFETY_ENDPOINT"),
+    credential=AzureKeyCredential(get_secret_env_first("CONTENT_SAFETY_KEY"))
 )
 
 
