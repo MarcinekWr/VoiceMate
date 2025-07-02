@@ -8,4 +8,4 @@ try:
     os.makedirs(LOGS_DIR, exist_ok=True)
     os.makedirs(os.path.dirname(IMAGE_DESCRIBER_PROMPT_PATH), exist_ok=True)
 except OSError as e:
-    print(f"Warning: Could not create directories: {e}")
+    print(f'Warning: Could not create directories: {e}')
