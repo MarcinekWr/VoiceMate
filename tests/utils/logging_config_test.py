@@ -18,10 +18,11 @@ def test_get_blob_service_client_success(monkeypatch):
         assert client is mock_client.return_value
 
 
-def test_get_blob_service_client_missing_env(monkeypatch):
-    monkeypatch.delenv('AZURE_STORAGE_CONNECTION_STRING', raising=False)
+@mock.patch('src.utils.logging_config.get_secret_env_first', return_value=None)
+def test_get_blob_service_client_missing_env(mock_get_secret):
     with pytest.raises(ValueError, match='Brak AZURE_STORAGE_CONNECTION_STRING'):
         logging_config.get_blob_service_client()
+
 
 
 def test_request_id_set_and_get():

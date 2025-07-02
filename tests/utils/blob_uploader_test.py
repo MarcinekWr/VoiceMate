@@ -6,12 +6,14 @@ import pytest
 from src.utils.blob_uploader import upload_to_blob
 
 
-@mock.patch.dict(os.environ, {}, clear=True)
-def test_upload_to_blob_missing_connection_string(caplog):
-    caplog.set_level('ERROR')
-    upload_to_blob('mycontainer', 'fake_path.txt')
-    assert any(
-        'Brak AZURE_STORAGE_CONNECTION_STRING' in r.message for r in caplog.records)
+@mock.patch('src.utils.blob_uploader.get_secret_env_first', return_value=None)
+def test_upload_to_blob_missing_connection_string(mock_get_secret, caplog):
+    caplog.set_level("ERROR")
+    upload_to_blob('container', 'file.txt')
+    
+    assert any("Brak AZURE_STORAGE_CONNECTION_STRING" in r.message for r in caplog.records)
+
+
 
 
 @mock.patch('builtins.open', new_callable=mock.mock_open, read_data=b'fake data')

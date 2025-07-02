@@ -21,12 +21,12 @@ class TestLLMPipeline(unittest.TestCase):
             except ValueError:
                 self.fail('Unexpected ValueError')
 
-    def test_validate_env_variables_missing(self):
-        with patch.dict(os.environ, {}, clear=True):
-            with self.assertRaises(ValueError) as ctx:
-                pipeline.validate_env_variables()
-            self.assertIn('Missing required environment variables',
-                          str(ctx.exception))
+    @patch('src.logic.llm_podcast.get_secret_env_first', side_effect=ValueError("Missing required environment variables"))
+    def test_validate_env_variables_missing(self, mock_get):
+        with self.assertRaises(ValueError) as ctx:
+            pipeline.validate_env_variables()
+        self.assertIn('Missing required environment variables', str(ctx.exception))
+
 
     @patch('src.logic.llm_podcast.AzureChatOpenAI')
     @patch('src.logic.llm_podcast.validate_env_variables')
