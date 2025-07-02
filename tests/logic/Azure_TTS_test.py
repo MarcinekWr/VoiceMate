@@ -674,10 +674,3 @@ class TestAzureTTSPodcastGeneratorIntegration(unittest.TestCase):
         # Sprawdź progress callback
         self.assertEqual(progress_callback.call_count, 3)  # 2 segmenty + łączenie
 
-
-if __name__ == "__main__":
-    # Konfiguracja loggera dla testów
-    logging.basicConfig(level=logging.DEBUG)
-
-    # Uruchomienie testów
-    unittest.main(verbosity=2)

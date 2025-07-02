@@ -2,7 +2,6 @@ import os
 import sys
 import tempfile
 import shutil
-from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock, mock_open
 import pytest
 from PIL import Image

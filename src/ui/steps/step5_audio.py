@@ -7,6 +7,8 @@ from src.utils.blob_uploader import upload_to_blob
 
 def render_step_5():
     """Render Step 5: Audio Generation"""
+    if "audio_generated_in_step5" not in st.session_state:
+        st.session_state.audio_generated_in_step5 = False
     st.header("🎵 Krok 4: Generuj audio")
 
     # Show JSON preview
@@ -51,6 +53,8 @@ def render_step_5():
 
             if audio_path:
                 st.session_state.audio_path = audio_path
+                st.session_state.audio_generated_in_step5 = True
+                st.session_state.processing = False
 
                 try:
                     blob_name = os.path.basename(audio_path)
@@ -66,7 +70,7 @@ def render_step_5():
                 )
                 st.balloons()
                 st.rerun()
-
+    st.session_state.processing = False
     # Show audio player if available
     if st.session_state.audio_path and os.path.exists(st.session_state.audio_path):
         st.markdown("---")

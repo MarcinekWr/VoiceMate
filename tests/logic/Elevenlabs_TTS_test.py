@@ -133,6 +133,3 @@ class TestElevenlabsTTSPodcastGenerator(unittest.TestCase):
 
         callback.assert_has_calls([call(0, 1, "Generowanie segmentu 1/1: A")])
 
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)

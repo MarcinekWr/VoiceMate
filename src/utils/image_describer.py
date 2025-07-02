@@ -1,9 +1,8 @@
 """Image description class using Azure OpenAI for describing images."""
 
 from __future__ import annotations
-
+import os
 import base64
-from pathlib import Path
 from typing import Optional
 from src.common.constants import IMAGE_DESCRIBER_PROMPT_PATH
 
@@ -42,9 +41,9 @@ class ImageDescriber:
     def _load_prompt_template(self) -> PromptTemplate:
         """Load the prompt template from file or use default."""
         try:
-            prompt_path = Path(self.prompt_path)
-            if prompt_path.is_file():
-                template = prompt_path.read_text(encoding="utf-8")
+            if os.path.isfile(self.prompt_path):
+                with open(self.prompt_path, encoding="utf-8") as f:
+                    template = f.read()
                 self.logger.info(f"Loaded custom prompt from {self.prompt_path}")
                 return PromptTemplate.from_template(template)
         except (OSError, UnicodeDecodeError) as e:

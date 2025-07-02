@@ -115,6 +115,3 @@ class TestPDFTableParser(unittest.TestCase):
         self.assertIn("TABLE 1", formatted_string)
         self.assertIn("Accuracy: 95.5%", formatted_string)
 
-
-if __name__ == "__main__":
-    unittest.main()

@@ -5,7 +5,6 @@ import mimetypes
 import os
 import sys
 import time
-from pathlib import Path
 from urllib.parse import urlparse
 
 import markdown
@@ -60,7 +59,7 @@ class FileConverter:
             self.logger.error(f"File does not exist: {self.file_path}")
             raise FileNotFoundError(f"File does not exist: {self.file_path}")
 
-        file_ext = Path(self.file_path).suffix.lower()
+        file_ext = os.path.splitext(self.file_path)[1].lower()
         self.logger.debug(f"Detected file extension: {file_ext}")
 
         for file_type, extensions in self.SUPPORTED_FORMATS.items():
@@ -98,7 +97,7 @@ class FileConverter:
     def convert_image_to_pdf(self) -> str:
         """Convert image file to PDF format."""
         self.logger.info(f"Converting image to PDF: {self.file_path}")
-        original_name = Path(self.file_path).stem
+        original_name = os.path.splitext(os.path.basename(self.file_path))[0]
         output_path = self._generate_unique_filename(original_name, ".pdf")
 
         try:
@@ -191,7 +190,7 @@ class FileConverter:
     def convert_html_to_pdf(self) -> str:
         """Convert HTML file to PDF format."""
         self.logger.info(f"Converting HTML to PDF: {self.file_path}")
-        original_name = Path(self.file_path).stem
+        original_name = os.path.splitext(os.path.basename(self.file_path))[0]
         output_path = self._generate_unique_filename(original_name, ".pdf")
 
         try:
@@ -209,7 +208,7 @@ class FileConverter:
     def convert_markdown_to_pdf(self) -> str:
         """Convert Markdown file to PDF format."""
         self.logger.info(f"Converting Markdown to PDF: {self.file_path}")
-        original_name = Path(self.file_path).stem
+        original_name = os.path.splitext(os.path.basename(self.file_path))[0]
         output_path = self._generate_unique_filename(original_name, ".pdf")
 
         try:
@@ -227,7 +226,7 @@ class FileConverter:
     def convert_pptx_to_pdf(self) -> str:
         """Convert PPTX file to PDF format."""
         self.logger.info(f"Converting PPTX to PDF: {self.file_path}")
-        original_name = Path(self.file_path).stem
+        original_name = os.path.splitext(os.path.basename(self.file_path))[0]
         output_path = self._generate_unique_filename(original_name, ".pdf")
 
         try:

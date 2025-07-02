@@ -1,7 +1,6 @@
 import os
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from pathlib import Path
 
 import src.logic.llm_podcast as pipeline
 
@@ -39,18 +38,23 @@ class TestLLMPipeline(unittest.TestCase):
         self.assertTrue(mock_azure.called)
         self.assertIsNotNone(llm)
 
-    @patch("src.logic.llm_podcast.PROMPT_PATHS", {"plan": Path("fake_path.txt")})
-    def test_load_prompt_template_file_not_found(self):
+
+
+    @patch("src.logic.llm_podcast.PROMPT_PATHS", {"plan": "fake_path.txt"})
+    @patch("os.path.isfile", return_value=False)
+    def test_load_prompt_template_file_not_found(self, mock_isfile):
         with self.assertRaises(FileNotFoundError):
             pipeline.load_prompt_template("plan")
 
-    @patch("src.logic.llm_podcast.PROMPT_PATHS", {"plan": Path("dummy.txt")})
-    @patch("pathlib.Path.exists", return_value=True)
-    @patch("pathlib.Path.read_text", return_value="Plan: {input_text}")
-    def test_load_prompt_template_success(self, mock_read, mock_exists):
+
+    @patch("src.logic.llm_podcast.PROMPT_PATHS", {"plan": "dummy.txt"})
+    @patch("os.path.isfile", return_value=True)
+    @patch("builtins.open", new_callable=mock_open, read_data="Plan: {input_text}")
+    def test_load_prompt_template_success(self, mock_file, mock_isfile):
         template = pipeline.load_prompt_template("plan")
         result = template.format(input_text="test")
         self.assertIn("test", result)
+
 
     @patch("src.logic.llm_podcast.load_prompt_template")
     def test_generate_plan_success(self, mock_prompt):
@@ -105,10 +109,10 @@ class TestLLMPipeline(unittest.TestCase):
     def test_llm_podcast_service_run_success(
         self, mock_llm, mock_plan, mock_podcast, mock_save
     ):
-        fake_input = Path("src/logic/llm_text_test_file.txt")
+        fake_input_path = "src/logic/llm_text_test_file.txt"
         with (
-            patch.object(Path, "exists", return_value=True),
-            patch.object(Path, "read_text", return_value="Input Text"),
+            patch("os.path.exists", return_value=True),
+            patch("builtins.open", mock_open(read_data="Input Text")),
         ):
 
             service = pipeline.LLMPodcastService()
@@ -117,7 +121,3 @@ class TestLLMPipeline(unittest.TestCase):
             mock_plan.assert_called_once()
             mock_podcast.assert_called_once()
             self.assertEqual(mock_save.call_count, 2)
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)

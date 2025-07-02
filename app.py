@@ -23,7 +23,7 @@ if "request_id" not in st.session_state:
 else:
     set_request_id(st.session_state.request_id)
 
-log_file_path = LOGS_DIR / f"{get_request_id()}.log"
+log_file_path = os.path.join(LOGS_DIR, f"{get_request_id()}.log")
 
 if "logger_initialized" not in st.session_state:
     logger = setup_logger(log_file_path)

@@ -64,6 +64,3 @@ class TestLLMService(unittest.TestCase):
             )
             self.assertEqual(result, "LLM service not available")
 
-
-if __name__ == "__main__":
-    unittest.main()
