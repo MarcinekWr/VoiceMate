@@ -9,9 +9,9 @@ import sys
 import time
 from urllib.parse import urlparse
 
-import markdown  # type: ignore
+import markdown
 import pdfkit
-import requests  # type: ignore
+import requests
 from PIL import Image
 from pptx import Presentation
 from reportlab.lib.pagesizes import letter

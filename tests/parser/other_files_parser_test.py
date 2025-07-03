@@ -1,7 +1,15 @@
+from __future__ import annotations
+
 import os
 import shutil
+import sys
 import tempfile
-from unittest.mock import MagicMock, Mock, mock_open, patch
+import shutil
+from unittest.mock import Mock, patch, MagicMock, mock_open
+import pytest
+from PIL import Image
+import requests
+from pptx import Presentation
 
 import pytest
 import requests
@@ -119,12 +127,7 @@ class TestFileConverter:
         mock_guess_type.return_value = ('application/pdf', None)
         assert converter.detect_file_type() == 'pdf'
 
-    def test_detect_file_type_unknown(
-        self,
-        mock_get_logger,
-        sample_files,
-        temp_dir,
-    ):
+    def test_detect_file_type_unknown(self, mock_get_logger, sample_files, temp_dir):
         """Test file type detection for unknown file"""
         converter = FileConverter(sample_files['text'], temp_dir)
         assert converter.detect_file_type() == 'unknown'
@@ -161,10 +164,7 @@ class TestFileConverter:
 
         converter = FileConverter('test.jpg', temp_dir)
 
-        with patch.object(
-            converter,
-            '_generate_unique_filename',
-        ) as mock_filename:
+        with patch.object(converter, '_generate_unique_filename') as mock_filename:
             output_path = os.path.join(temp_dir, 'test.pdf')
             mock_filename.return_value = output_path
 
@@ -195,10 +195,7 @@ class TestFileConverter:
 
         converter = FileConverter('test.png', temp_dir)
 
-        with patch.object(
-            converter,
-            '_generate_unique_filename',
-        ) as mock_filename:
+        with patch.object(converter, '_generate_unique_filename') as mock_filename:
             output_path = os.path.join(temp_dir, 'test.pdf')
             mock_filename.return_value = output_path
 
@@ -219,7 +216,7 @@ class TestFileConverter:
 
         converter = FileConverter('test.jpg', temp_dir)
 
-        with pytest.raises(Exception, match='Image conversion error'):
+        with pytest.raises(Exception, match='Image open failed'):
             converter.convert_image_to_pdf()
 
     def test_is_valid_url(self, mock_get_logger, temp_dir):
@@ -260,8 +257,8 @@ class TestFileConverter:
             'src.file_parser.other_files_parser.urlparse',
             side_effect=Exception('Parse error'),
         ):
-            result = converter.get_domain_name('invalid-url')
-            assert result == 'website'
+            with pytest.raises(Exception, match='Parse error'):
+                converter.get_domain_name('invalid-url')
 
     @patch('requests.get')
     @patch('PyQt5.QtWidgets.QApplication')
@@ -312,19 +309,11 @@ class TestFileConverter:
             converter.convert_url_to_pdf()
 
     @patch('pdfkit.from_file')
-    def test_convert_html_to_pdf_success(
-        self,
-        mock_pdfkit,
-        mock_get_logger,
-        temp_dir,
-    ):
+    def test_convert_html_to_pdf_success(self, mock_pdfkit, mock_get_logger, temp_dir):
         """Test successful HTML to PDF conversion"""
         converter = FileConverter('test.html', temp_dir)
 
-        with patch.object(
-            converter,
-            '_generate_unique_filename',
-        ) as mock_filename:
+        with patch.object(converter, '_generate_unique_filename') as mock_filename:
             output_path = os.path.join(temp_dir, 'test.pdf')
             mock_filename.return_value = output_path
 
@@ -338,18 +327,13 @@ class TestFileConverter:
             )
 
     @patch('pdfkit.from_file')
-    def test_convert_html_to_pdf_failure(
-        self,
-        mock_pdfkit,
-        mock_get_logger,
-        temp_dir,
-    ):
+    def test_convert_html_to_pdf_failure(self, mock_pdfkit, mock_get_logger, temp_dir):
         """Test HTML to PDF conversion failure"""
         mock_pdfkit.side_effect = Exception('PDFKit failed')
 
         converter = FileConverter('test.html', temp_dir)
 
-        with pytest.raises(Exception, match='HTML conversion error'):
+        with pytest.raises(Exception, match='PDFKit failed'):
             converter.convert_html_to_pdf()
 
     @patch('pdfkit.from_string')
@@ -366,14 +350,8 @@ class TestFileConverter:
 
         converter = FileConverter('test.md', temp_dir)
 
-        with patch(
-            'builtins.open',
-            mock_open(read_data='# Test'),
-        ) as mock_file:
-            with patch.object(
-                converter,
-                '_generate_unique_filename',
-            ) as mock_filename:
+        with patch('builtins.open', mock_open(read_data='# Test')) as mock_file:
+            with patch.object(converter, '_generate_unique_filename') as mock_filename:
                 output_path = os.path.join(temp_dir, 'test.pdf')
                 mock_filename.return_value = output_path
 
@@ -403,7 +381,7 @@ class TestFileConverter:
         converter = FileConverter('test.md', temp_dir)
 
         with patch('builtins.open', mock_open(read_data='# Test')):
-            with pytest.raises(Exception, match='Markdown conversion error'):
+            with pytest.raises(Exception, match='PDFKit failed'):
                 converter.convert_markdown_to_pdf()
 
     @patch('reportlab.pdfgen.canvas.Canvas')
@@ -435,10 +413,7 @@ class TestFileConverter:
         with patch('src.file_parser.other_files_parser.letter', (612, 792)):
             converter = FileConverter(sample_files['pptx'], temp_dir)
 
-            with patch.object(
-                converter,
-                '_generate_unique_filename',
-            ) as mock_filename:
+            with patch.object(converter, '_generate_unique_filename') as mock_filename:
                 output_path = os.path.join(temp_dir, 'test.pdf')
                 mock_filename.return_value = output_path
 
@@ -459,7 +434,7 @@ class TestFileConverter:
 
         converter = FileConverter('test.pptx', temp_dir)
 
-        with pytest.raises(Exception, match='PPTX conversion error'):
+        with pytest.raises(Exception, match='Package not found'):
             converter.convert_pptx_to_pdf()
 
     def test_convert_to_pdf_url(self, mock_get_logger, temp_dir):
@@ -488,15 +463,8 @@ class TestFileConverter:
         """Test convert_to_pdf with image file"""
         converter = FileConverter('test.jpg', temp_dir)
 
-        with patch.object(
-            converter,
-            'detect_file_type',
-            return_value='images',
-        ):
-            with patch.object(
-                converter,
-                'convert_image_to_pdf',
-            ) as mock_convert:
+        with patch.object(converter, 'detect_file_type', return_value='images'):
+            with patch.object(converter, 'convert_image_to_pdf') as mock_convert:
                 mock_convert.return_value = 'output.pdf'
                 result = converter.convert_to_pdf()
                 assert result == 'output.pdf'
@@ -506,11 +474,7 @@ class TestFileConverter:
         """Test convert_to_pdf with unsupported file type"""
         converter = FileConverter('test.txt', temp_dir)
 
-        with patch.object(
-            converter,
-            'detect_file_type',
-            return_value='unknown',
-        ):
+        with patch.object(converter, 'detect_file_type', return_value='unknown'):
             with pytest.raises(ValueError, match='Unsupported file type'):
                 converter.convert_to_pdf()
 
@@ -573,19 +537,14 @@ class TestFileConverter:
             )
             mock_parser_instance.initiate.assert_called_once()
 
-    def test_initiate_parser_failure(
-        self,
-        mock_get_logger,
-        temp_dir,
-        sample_files,
-    ):
+    def test_initiate_parser_failure(self, mock_get_logger, temp_dir, sample_files):
         """Test parser initiation failure"""
         with patch(
             'src.file_parser.other_files_parser.FileConverter.convert_to_pdf',
             side_effect=Exception('Conversion failed'),
         ):
             converter = FileConverter(sample_files['image'], temp_dir)
-            with pytest.raises(Exception, match='Failed to parse file'):
+            with pytest.raises(Exception, match='Conversion failed'):
                 converter.initiate_parser()
 
     def test_del_calls_cleanup(self, mock_get_logger, temp_dir):

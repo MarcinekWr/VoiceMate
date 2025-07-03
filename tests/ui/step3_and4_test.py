@@ -14,7 +14,7 @@ def test_render_step_3_and_4_generate_podcast(monkeypatch):
     monkeypatch.setattr(
         step3_and4,
         'generate_podcast_content',
-        lambda s, line, p: 'dummy podcast text',
+        lambda s, l, p: 'dummy podcast text',
     )
     monkeypatch.setattr(
         step3_and4,

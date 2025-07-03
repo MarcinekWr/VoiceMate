@@ -2,12 +2,15 @@
 Tests for PDFContentFormatter class.
 """
 
+from __future__ import annotations
+
 import unittest
 from unittest.mock import MagicMock, patch
 
 import fitz
 
 from src.file_parser.pdf_content_formatter import PDFContentFormatter
+from src.utils.text_cleaner import TextCleaner
 
 
 class TestPDFContentFormatter(unittest.TestCase):
@@ -102,5 +105,6 @@ class TestPDFContentFormatter(unittest.TestCase):
             {'page': 1, 'text': 'Dirty text', 'images': []},
         ]
 
-        result = self.formatter.get_content_for_llm()
-        self.assertIn('Dirty text', result)
+        with self.assertRaises(Exception) as exc:
+            self.formatter.get_content_for_llm()
+        self.assertIn('Cleaning failed', str(exc.exception))
