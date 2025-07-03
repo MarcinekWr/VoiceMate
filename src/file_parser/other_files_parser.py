@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import os
+
 import gc
 import logging
 import mimetypes
-import os
 import subprocess
 import sys
 import time
@@ -23,7 +24,6 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
 from src.file_parser import pdf_parser
-
 
 class FileConverter:
     SUPPORTED_FORMATS = {
