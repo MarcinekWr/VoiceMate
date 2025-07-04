@@ -9,7 +9,8 @@ from src.ui.steps import step3_and4
 
 
 def test_render_step_3_and_4_generate_podcast(monkeypatch):
-    monkeypatch.setattr("src.utils.key_vault.get_secret_env_first", lambda k: "dummy")
+    monkeypatch.setattr(step3_and4, "get_secret_env_first", lambda k: "dummy")
+
 
     st.session_state.clear()
     st.session_state.plan_text = 'dummy plan'

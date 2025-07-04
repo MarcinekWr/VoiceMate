@@ -27,6 +27,8 @@ jobs:
 
       AZURE_KEYVAULT_URL: "https://fake-vault.vault.azure.net"
 
+      ELEVENLABS_PASSWORD: "Fakepassword123"
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3

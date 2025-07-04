@@ -15,7 +15,8 @@ def clear_session_state():
     st.session_state.clear()
 
 def test_render_auto_pipeline_sets_defaults(monkeypatch):
-    monkeypatch.setattr("src.utils.key_vault.get_secret_env_first", lambda k: "dummy")
+    monkeypatch.setattr(step_all, "get_secret_env_first", lambda k: "dummy")
+
 
     st.session_state.clear_state_on_enter = True
     with (
@@ -35,7 +36,7 @@ def test_render_auto_pipeline_sets_defaults(monkeypatch):
 
 
 def test_render_auto_pipeline_generates_podcast(monkeypatch):
-    monkeypatch.setattr("src.utils.key_vault.get_secret_env_first", lambda k: "dummy")
+    monkeypatch.setattr(step_all, "get_secret_env_first", lambda k: "dummy")
 
     monkeypatch.setattr(step_all, 'check_content_safety', lambda x: True)  # ✅ dodane
     monkeypatch.setattr(step_all, 'process_uploaded_file', lambda x: 'dummy content')
