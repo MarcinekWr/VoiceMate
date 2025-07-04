@@ -14,8 +14,9 @@ def clear_session_state():
     yield
     st.session_state.clear()
 
-
 def test_render_auto_pipeline_sets_defaults(monkeypatch):
+    monkeypatch.setattr("src.utils.key_vault.get_secret_env_first", lambda k: "dummy")
+
     st.session_state.clear_state_on_enter = True
     with (
         mock.patch('streamlit.markdown'),
@@ -34,6 +35,8 @@ def test_render_auto_pipeline_sets_defaults(monkeypatch):
 
 
 def test_render_auto_pipeline_generates_podcast(monkeypatch):
+    monkeypatch.setattr("src.utils.key_vault.get_secret_env_first", lambda k: "dummy")
+
     monkeypatch.setattr(step_all, 'check_content_safety', lambda x: True)  # ✅ dodane
     monkeypatch.setattr(step_all, 'process_uploaded_file', lambda x: 'dummy content')
     monkeypatch.setattr(step_all, 'generate_plan_content', lambda x: 'dummy plan')
