@@ -34,26 +34,13 @@ def test_render_auto_pipeline_sets_defaults(monkeypatch):
 
 
 def test_render_auto_pipeline_generates_podcast(monkeypatch):
-    monkeypatch.setattr(
-        step_all, 'process_uploaded_file',
-        lambda x: 'dummy content',
-    )
-    monkeypatch.setattr(
-        step_all, 'generate_plan_content',
-        lambda x: 'dummy plan',
-    )
-    monkeypatch.setattr(
-        step_all, 'generate_podcast_content', lambda s, l, p: 'dummy podcast',
-    )
-    monkeypatch.setattr(
-        step_all, 'dialog_to_json',
-        lambda t, p: {'dialog': []},
-    )
+    monkeypatch.setattr(step_all, 'check_content_safety', lambda x: True)  # ✅ dodane
+    monkeypatch.setattr(step_all, 'process_uploaded_file', lambda x: 'dummy content')
+    monkeypatch.setattr(step_all, 'generate_plan_content', lambda x: 'dummy plan')
+    monkeypatch.setattr(step_all, 'generate_podcast_content', lambda s, l, p: 'dummy podcast')
+    monkeypatch.setattr(step_all, 'dialog_to_json', lambda t, p: {'dialog': []})
     monkeypatch.setattr(step_all, 'save_to_file', lambda d, f: None)
-    monkeypatch.setattr(
-        step_all, 'generate_audio_from_json',
-        lambda j, p: 'dummy.wav',
-    )
+    monkeypatch.setattr(step_all, 'generate_audio_from_json', lambda j, p: 'dummy.wav')
     monkeypatch.setattr(step_all, 'upload_to_blob', lambda c, p, n: None)
 
     st.session_state.processing = False
@@ -70,9 +57,7 @@ def test_render_auto_pipeline_generates_podcast(monkeypatch):
         mock.patch('streamlit.audio'),
         mock.patch('streamlit.warning'),
         mock.patch('streamlit.error'),
-        mock.patch(
-            'streamlit.columns', return_value=(mock.MagicMock(), mock.MagicMock()),
-        ),
+        mock.patch('streamlit.columns', return_value=(mock.MagicMock(), mock.MagicMock())),
         mock.patch('streamlit.markdown'),
         mock.patch('streamlit.download_button'),
         mock.patch('streamlit.balloons'),

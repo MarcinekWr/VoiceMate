@@ -6,9 +6,12 @@ import os
 import streamlit as st
 
 from src.utils.blob_uploader import upload_to_blob
-from src.workflow.generation import (generate_audio_from_json,
-                                     generate_plan_content,
-                                     generate_podcast_content)
+from src.utils.content_safety import check_content_safety
+from src.workflow.generation import (
+    generate_audio_from_json,
+    generate_plan_content,
+    generate_podcast_content,
+)
 from src.workflow.process_file import process_uploaded_file, process_url_input
 from src.workflow.save import dialog_to_json, save_to_file
 
@@ -42,7 +45,9 @@ def render_auto_pipeline():
     )
 
     st.markdown("<div class='centered-header'>", unsafe_allow_html=True)
-    st.header('⚡ Tryb Błyskawiczny: Wygeneruj cały podcast jednym kliknięciem')
+    st.header(
+        '⚡ Tryb Błyskawiczny: Wygeneruj cały podcast jednym kliknięciem',
+    )
     st.markdown('</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns([1, 1])
@@ -100,7 +105,8 @@ def render_auto_pipeline():
             ],
         )
         url_input = st.text_input(
-            'lub podaj URL', placeholder='https://example.com',
+            'lub podaj URL',
+            placeholder='https://example.com',
         )
 
     with col2:
@@ -110,13 +116,18 @@ def render_auto_pipeline():
             '😊 Styl swobodny': 'casual',
         }
         selected_label = st.selectbox(
-            'Wybierz styl:', options=list(style_labels.keys()),
+            'Wybierz styl:',
+            options=list(style_labels.keys()),
         )
         podcast_style = style_labels[selected_label]
 
         st.subheader('🎧 Silnik audio')
         tts_option = st.radio(
-            'Wybierz silnik:', options=['🆓 Azure (Darmowy)', '🎯 ElevenLabs (Premium)'],
+            'Wybierz silnik:',
+            options=[
+                '🆓 Azure (Darmowy)',
+                '🎯 ElevenLabs (Premium)',
+            ],
         )
         is_premium = 'Premium' in tts_option
 
@@ -132,18 +143,27 @@ def render_auto_pipeline():
     )
 
     if st.button(
-        '🚀 Start – Wygeneruj podcast', type='primary', disabled=not can_process,
+        '🚀 Start – Wygeneruj podcast',
+        type='primary',
+        disabled=not can_process,
     ):
         st.session_state.processing = True
         try:
             with st.spinner('📥 Przetwarzanie treści...'):
                 llm_content = (
-                    process_uploaded_file(uploaded_file)
+                    process_uploaded_file(
+                        uploaded_file,
+                    )
                     if uploaded_file
                     else process_url_input(url_input.strip())
                 )
                 if not llm_content:
                     st.error('❌ Nie udało się przetworzyć treści.')
+                    return
+                if not check_content_safety(llm_content):
+                    st.error(
+                        '⚠️ Wykryto potencjalnie niebezpieczną treść. Generowanie podcastu zostało przerwane.',
+                    )
                     return
 
             with st.spinner('📝 Generowanie planu...'):
@@ -154,7 +174,9 @@ def render_auto_pipeline():
 
             with st.spinner('🎙️ Generowanie treści podcastu...'):
                 podcast_text = generate_podcast_content(
-                    podcast_style, llm_content, plan_text,
+                    podcast_style,
+                    llm_content,
+                    plan_text,
                 )
                 if not podcast_text:
                     st.error('❌ Nie udało się wygenerować tekstu podcastu.')
@@ -190,7 +212,10 @@ def render_auto_pipeline():
             st.session_state.is_premium = is_premium
 
             st.success('✅ Podcast został w pełni wygenerowany!')
-            st.audio(audio_path, format='audio/mp3' if is_premium else 'audio/wav')
+            st.audio(
+                audio_path,
+                format='audio/mp3' if is_premium else 'audio/wav',
+            )
 
         finally:
             st.session_state.processing = False

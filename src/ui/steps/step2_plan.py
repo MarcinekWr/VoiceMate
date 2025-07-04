@@ -27,8 +27,8 @@ def render_step_2():
         preview_text = st.session_state.llm_content
         if len(preview_text) > 2000:
             preview_text = (
-                preview_text[:2000] +
-                '\n\n... (treść została skrócona dla podglądu)'
+                preview_text[:2000]
+                + '\n\n... (treść została skrócona dla podglądu)'
             )
 
         st.text_area(

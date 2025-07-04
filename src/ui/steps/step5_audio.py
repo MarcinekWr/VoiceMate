@@ -112,7 +112,9 @@ def render_step_5():
             st.download_button(
                 label='📥 Pobierz JSON',
                 data=json.dumps(
-                    st.session_state.json_data, ensure_ascii=False, indent=2,
+                    st.session_state.json_data,
+                    ensure_ascii=False,
+                    indent=2,
                 ),
                 file_name=f"podcast_{'premium' if st.session_state.is_premium else 'free'}.json",
                 mime='application/json',
@@ -131,4 +133,6 @@ def render_step_5():
 
         st.markdown('---')
         st.success('🎉 **Proces zakończony pomyślnie!**')
-        st.info('💡 Twój podcast został w pełni wygenerowany i jest gotowy do użycia!')
+        st.info(
+            '💡 Twój podcast został w pełni wygenerowany i jest gotowy do użycia!',
+        )

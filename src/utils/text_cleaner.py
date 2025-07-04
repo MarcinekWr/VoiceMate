@@ -29,7 +29,9 @@ class TextCleaner:
         self.text = re.sub(r'Page\s*\d+', '', self.text, flags=re.IGNORECASE)
         self.text = re.sub(
             r'^\s*[\u2022•\-–—]+\s*$',
-            '', self.text, flags=re.MULTILINE,
+            '',
+            self.text,
+            flags=re.MULTILINE,
         )
         self.text = re.sub(
             r'CONFIDENTIAL|DRAFT|WATERMARK',
@@ -38,8 +40,10 @@ class TextCleaner:
             flags=re.IGNORECASE,
         )
         self.text = re.sub(
-            r'\d+\s+of\s+\d+', '',
-            self.text, flags=re.IGNORECASE,
+            r'\d+\s+of\s+\d+',
+            '',
+            self.text,
+            flags=re.IGNORECASE,
         )
         self.text = re.sub(
             r'^\s*[A-Za-z\s]+\|\s*\d+\s*$',
@@ -91,3 +95,23 @@ class TextCleaner:
         special_chars = r"[.\/&*+=#@$%^(){}\[\]|\\:;<>?~`\"]"
         pattern = f'({special_chars}){{3,}}'
         self.text = re.sub(pattern, r'\1\1', self.text)
+
+    URL_PATTERN = re.compile(
+        r'(https?://\S+|www\.\S+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:/\S*)?)',
+    )
+
+    def remove_page_numbers(self):
+        """Remove page numbers from the text."""
+        self.text = re.sub(
+            r'\bPage \d+\b|\bStrona \d+\b|\bSeite \d+\b|\bPágina \d+\b|\bPagina \d+\b|\bP\.? ?\d+\b',
+            '',
+            self.text,
+        )
+
+    def remove_emails(self):
+        """Remove email addresses from the text."""
+        self.text = re.sub(
+            r'([\w\.-]+)@([\w\.-]+)\.(\w+)',
+            '[email]',
+            self.text,
+        )

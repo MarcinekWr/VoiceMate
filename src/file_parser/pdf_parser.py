@@ -46,7 +46,7 @@ class PdfParser:
         if self.describe_images:
             self.image_describer = image_describer or ImageDescriber()
         else:
-            self.image_describer = None
+            self.image_describer: ImageDescriber | None = None
 
         self.table_parser = PDFTableParser(self.file_path)
         self.image_extractor = PDFImageExtractor(
@@ -69,7 +69,8 @@ class PdfParser:
 
     def parse_all(self) -> dict[str, Any]:
         """
-        Parse all content from the PDF including text, images, tables, and metadata.
+        Parse all content from the PDF
+        including text, images, tables, and metadata.
         """
         try:
             doc = fitz.open(self.file_path)
@@ -280,7 +281,8 @@ class PdfParser:
         return report_path
 
     def initiate(self) -> str:
-        """Initiate the parsing process and return content formatted for LLM processing."""
+        """Initiate the parsing process
+        and return content formatted for LLM processing."""
         self.parse_all()
         self.save_summary_report()
         self.save_metadata_json()

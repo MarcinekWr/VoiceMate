@@ -5,6 +5,7 @@ import os
 import tempfile
 import time
 import wave
+from typing import Optional
 
 import azure.cognitiveservices.speech as speechsdk
 

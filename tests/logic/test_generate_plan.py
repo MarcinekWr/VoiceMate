@@ -23,7 +23,8 @@ def test_generate_plan_success():
     llm_mock.invoke.return_value.content = 'plan'
 
     result = generate_plan(
-        llm=llm_mock, input_text='Jak działa turbina wiatrowa?',
+        llm=llm_mock,
+        input_text='Jak działa turbina wiatrowa?',
     )
     assert 'plan' in result
     llm_mock.invoke.assert_called_once()

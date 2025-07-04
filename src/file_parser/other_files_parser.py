@@ -30,7 +30,8 @@ class FileConverter:
     }
 
     def __init__(self, file_path: str, output_dir: str = 'assets'):
-        """Initialize the FileConverter with a file path and output directory."""
+        """Initialize the FileConverter
+        with a file path and output directory."""
         self.file_path = file_path
         self.output_dir = output_dir
         self.temp_files: list[str] = []
@@ -56,7 +57,7 @@ class FileConverter:
             raise FileNotFoundError(f'File does not exist: {self.file_path}')
 
         file_ext = os.path.splitext(self.file_path)[1].lower()
-        self.logger.debug(f"Detected file extension: {file_ext}")
+        self.logger.debug(f'Detected file extension: {file_ext}')
 
         for file_type, extensions in self.SUPPORTED_FORMATS.items():
             if file_ext in extensions:
@@ -76,7 +77,11 @@ class FileConverter:
         self.logger.warning(f'Unknown file type for: {self.file_path}')
         return 'unknown'
 
-    def _generate_unique_filename(self, base_name: str, extension: str) -> str:
+    def _generate_unique_filename(
+        self,
+        base_name: str,
+        extension: str,
+    ) -> str:
         """Generate a unique filename in the output directory."""
         output_path = os.path.join(self.output_dir, f'{base_name}{extension}')
 
@@ -175,8 +180,13 @@ class FileConverter:
 
         script_path = os.path.join(os.path.dirname(__file__), 'url2pdf.py')
         try:
-            result = subprocess.run(
-                [sys.executable, script_path, self.file_path, output_path],
+            subprocess.run(
+                [
+                    sys.executable,
+                    script_path,
+                    self.file_path,
+                    output_path,
+                ],
                 check=True,
                 capture_output=True,
                 text=True,
@@ -191,9 +201,9 @@ class FileConverter:
 
     def convert_html_to_pdf(self) -> str:
         """Convert HTML file to PDF format."""
-        self.logger.info(f"Converting HTML to PDF: {self.file_path}")
+        self.logger.info(f'Converting HTML to PDF: {self.file_path}')
         original_name = os.path.splitext(os.path.basename(self.file_path))[0]
-        output_path = self._generate_unique_filename(original_name, ".pdf")
+        output_path = self._generate_unique_filename(original_name, '.pdf')
 
         try:
             pdfkit.from_file(
@@ -211,9 +221,9 @@ class FileConverter:
 
     def convert_markdown_to_pdf(self) -> str:
         """Convert Markdown file to PDF format."""
-        self.logger.info(f"Converting Markdown to PDF: {self.file_path}")
+        self.logger.info(f'Converting Markdown to PDF: {self.file_path}')
         original_name = os.path.splitext(os.path.basename(self.file_path))[0]
-        output_path = self._generate_unique_filename(original_name, ".pdf")
+        output_path = self._generate_unique_filename(original_name, '.pdf')
 
         try:
             with open(self.file_path, encoding='utf-8') as f:
@@ -229,9 +239,9 @@ class FileConverter:
 
     def convert_pptx_to_pdf(self) -> str:
         """Convert PPTX file to PDF format."""
-        self.logger.info(f"Converting PPTX to PDF: {self.file_path}")
+        self.logger.info(f'Converting PPTX to PDF: {self.file_path}')
         original_name = os.path.splitext(os.path.basename(self.file_path))[0]
-        output_path = self._generate_unique_filename(original_name, ".pdf")
+        output_path = self._generate_unique_filename(original_name, '.pdf')
 
         try:
             prs = Presentation(self.file_path)

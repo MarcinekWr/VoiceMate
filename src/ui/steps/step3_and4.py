@@ -82,12 +82,16 @@ def render_step_3_and_4():
         )
     with col2:
         if st.session_state.processing:
-            st.info('🔄 Generowanie tekstu podcastu... To może potrwać kilka minut.')
+            st.info(
+                '🔄 Generowanie tekstu podcastu... To może potrwać kilka minut.',
+            )
 
     # Logika przycisku
     if generate_podcast_button:
         st.session_state.processing = True
-        with st.spinner(f'🎙️ Tworzę tekst podcastu w stylu {podcast_style}...'):
+        with st.spinner(
+            f'🎙️ Tworzę tekst podcastu w stylu {podcast_style}...',
+        ):
             try:
                 podcast_text = generate_podcast_content(
                     podcast_style,
@@ -99,7 +103,8 @@ def render_step_3_and_4():
 
                     # Automatyczna konwersja do JSON
                     json_data = dialog_to_json(
-                        podcast_text, st.session_state.is_premium,
+                        podcast_text,
+                        st.session_state.is_premium,
                     )
                     st.session_state.json_data = json_data
 
@@ -110,7 +115,11 @@ def render_step_3_and_4():
                         else 'podcast_free.json'
                     )
                     save_to_file(
-                        json.dumps(json_data, ensure_ascii=False, indent=2),
+                        json.dumps(
+                            json_data,
+                            ensure_ascii=False,
+                            indent=2,
+                        ),
                         json_filename,
                     )
 

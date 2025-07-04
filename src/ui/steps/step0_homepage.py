@@ -52,7 +52,9 @@ def render_home_page():
         )
 
         if st.button(
-            '🚀 Rozpocznij krok po kroku', key='step_by_step', use_container_width=True,
+            '🚀 Rozpocznij krok po kroku',
+            key='step_by_step',
+            use_container_width=True,
         ):
             st.session_state.step = 1
             st.rerun()
@@ -74,7 +76,11 @@ def render_home_page():
             unsafe_allow_html=True,
         )
 
-        if st.button('⚡ Szybki podcast', key='auto_mode', use_container_width=True):
+        if st.button(
+            '⚡ Szybki podcast',
+            key='auto_mode',
+            use_container_width=True,
+        ):
             st.session_state.step = 6
             st.rerun()
 

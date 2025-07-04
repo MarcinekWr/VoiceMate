@@ -8,7 +8,6 @@ import src.logic.llm_podcast as pipeline
 
 
 class TestLLMPipeline(unittest.TestCase):
-
     def test_validate_env_variables_all_set(self):
         with patch.dict(
             os.environ,

@@ -3,6 +3,8 @@ Tests for PDFContentFormatter class.
 """
 from __future__ import annotations
 
+from __future__ import annotations
+
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -30,7 +32,9 @@ class TestPDFContentFormatter(unittest.TestCase):
         ]
         self.mock_tables = [{'page': 1, 'json': '{"key": "value"}'}]
         self.formatter = PDFContentFormatter(
-            self.mock_metadata, self.mock_images, self.mock_tables,
+            self.mock_metadata,
+            self.mock_images,
+            self.mock_tables,
         )
 
     @patch('fitz.open')

@@ -78,7 +78,10 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
                 str(context.exception),
             )
 
-    @patch('src.utils.logging_config.get_request_id', return_value='test_request_123')
+    @patch(
+        'src.utils.logging_config.get_request_id',
+        return_value='test_request_123',
+    )
     @patch('tempfile.mkdtemp', return_value='/tmp/podcast_test')
     def test_generate_podcast_empty_dialog_data(
         self, mock_mkdtemp, mock_get_request_id,
@@ -94,7 +97,10 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
             )
             self.assertIsNone(result)
 
-    @patch('src.utils.logging_config.get_request_id', return_value='test_request_123')
+    @patch(
+        'src.utils.logging_config.get_request_id',
+        return_value='test_request_123',
+    )
     @patch('tempfile.mkdtemp', return_value='/tmp/podcast_test')
     @patch('tempfile.NamedTemporaryFile')
     @patch('azure.cognitiveservices.speech.audio.AudioOutputConfig')
@@ -139,7 +145,9 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
         mock_synthesizer = Mock()
         mock_result = Mock()
         mock_result.reason = speechsdk.ResultReason.SynthesizingAudioCompleted
-        mock_synthesizer.speak_text_async.return_value.get.return_value = mock_result
+        mock_synthesizer.speak_text_async.return_value.get.return_value = (
+            mock_result
+        )
         mock_synthesizer_class.return_value = mock_synthesizer
 
         # Mock combine_segments
@@ -195,7 +203,10 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
     @patch('azure.cognitiveservices.speech.audio.AudioOutputConfig')
     @patch('azure.cognitiveservices.speech.SpeechSynthesizer')
     def test_generate_podcast_synthesis_error(
-        self, mock_synthesizer_class, mock_audio_config, mock_temp_file,
+        self,
+        mock_synthesizer_class,
+        mock_audio_config,
+        mock_temp_file,
     ):
         """Test obsługi błędów syntezy"""
         generator = AzureTTSPodcastGenerator()
@@ -218,12 +229,16 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
         mock_synthesizer = Mock()
         mock_result = Mock()
         mock_result.reason = speechsdk.ResultReason.Canceled  # Błąd syntezy
-        mock_synthesizer.speak_text_async.return_value.get.return_value = mock_result
+        mock_synthesizer.speak_text_async.return_value.get.return_value = (
+            mock_result
+        )
         mock_synthesizer_class.return_value = mock_synthesizer
 
         with patch.object(generator.logger, 'error') as mock_logger_error:
             with patch.object(
-                generator, '_combine_segments', return_value='output.wav',
+                generator,
+                '_combine_segments',
+                return_value='output.wav',
             ):
                 result = generator.generate_podcast_azure(dialog_data)
 
@@ -235,7 +250,10 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
     @patch('azure.cognitiveservices.speech.audio.AudioOutputConfig')
     @patch('azure.cognitiveservices.speech.SpeechSynthesizer')
     def test_generate_podcast_exception_handling(
-        self, mock_synthesizer_class, mock_audio_config, mock_temp_file,
+        self,
+        mock_synthesizer_class,
+        mock_audio_config,
+        mock_temp_file,
     ):
         """Test obsługi wyjątków podczas generowania"""
         generator = AzureTTSPodcastGenerator()
@@ -362,7 +380,11 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
 
     @patch('wave.open')
     @patch('os.path.exists', return_value=True)
-    def test_combine_segments_wave_exception(self, mock_exists, mock_wave_open):
+    def test_combine_segments_wave_exception(
+        self,
+        mock_exists,
+        mock_wave_open,
+    ):
         """Test obsługi wyjątku podczas łączenia plików WAV"""
         generator = AzureTTSPodcastGenerator()
 
@@ -475,7 +497,11 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
 
     @patch('wave.open')
     @patch('os.path.exists')
-    def test_combine_segments_mixed_file_existence(self, mock_exists, mock_wave_open):
+    def test_combine_segments_mixed_file_existence(
+        self,
+        mock_exists,
+        mock_wave_open,
+    ):
         """Test łączenia segmentów z mieszanką istniejących i nieistniejących plików"""
         generator = AzureTTSPodcastGenerator()
 
@@ -498,7 +524,11 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
 
     @patch('wave.open')
     @patch('os.path.exists', return_value=True)
-    def test_combine_segments_temp_wave_exception(self, mock_exists, mock_wave_open):
+    def test_combine_segments_temp_wave_exception(
+        self,
+        mock_exists,
+        mock_wave_open,
+    ):
         """Test obsługi wyjątku podczas odczytu pliku tymczasowego"""
         generator = AzureTTSPodcastGenerator()
 
@@ -595,7 +625,10 @@ class TestAzureTTSPodcastGeneratorIntegration(unittest.TestCase):
         self.speech_config_patcher.stop()
 
     @patch('tempfile.mkdtemp', return_value='/tmp/podcast_integration')
-    @patch('src.utils.logging_config.get_request_id', return_value='integration_test')
+    @patch(
+        'src.utils.logging_config.get_request_id',
+        return_value='integration_test',
+    )
     @patch('tempfile.NamedTemporaryFile')
     @patch('azure.cognitiveservices.speech.audio.AudioOutputConfig')
     @patch('azure.cognitiveservices.speech.SpeechSynthesizer')
@@ -619,7 +652,9 @@ class TestAzureTTSPodcastGeneratorIntegration(unittest.TestCase):
         generator = AzureTTSPodcastGenerator()
 
         # Mock os.path.join to return expected path
-        expected_output = '/tmp/podcast_integration/podcast_integration_test.wav'
+        expected_output = (
+            '/tmp/podcast_integration/podcast_integration_test.wav'
+        )
         mock_join.return_value = expected_output
 
         dialog_data = [
@@ -646,7 +681,9 @@ class TestAzureTTSPodcastGeneratorIntegration(unittest.TestCase):
         mock_synthesizer = Mock()
         mock_result = Mock()
         mock_result.reason = speechsdk.ResultReason.SynthesizingAudioCompleted
-        mock_synthesizer.speak_text_async.return_value.get.return_value = mock_result
+        mock_synthesizer.speak_text_async.return_value.get.return_value = (
+            mock_result
+        )
         mock_synthesizer_class.return_value = mock_synthesizer
 
         # Mock wave operations

@@ -40,8 +40,8 @@ Struktura odpowiedzi musi być w formacie dialogu dwóch osób z wyraźnym podzi
 Utrzymuj ten format przez całą długość rozmowy.
 
 ### STYL
-Styl swobodny, przyjacielski – jak rozmowa dwóch znajomych, którzy gadają o interesującym temacie. Ton powinien być luźny, naturalny, z miejscem na humor, ale też merytoryczny gdy trzeba. Pozwól sobie na słownictwo potoczne, wtrącenia typu "no właśnie", "słuchaj", "wiesz co" itp.
+Styl swobodny, przyjacielski – jak rozmowa dwóch znajomych, którzy rozmawiają o interesującym temacie. Ton powinien być luźny, naturalny, z miejscem na humor, ale też merytoryczny gdy trzeba. Pozwól sobie na słownictwo potoczne, wtrącenia typu "no właśnie", "słuchaj", "wiesz co" itp.
 
 ---
 
-Twój cel: Wygeneruj możliwie długą, swobodną i angażującą rozmowę dwóch znajomych na podstawie tekstu źródłowego oraz przekazanego planu. Nie kończ rozmowy przedwcześnie. Gadajcie, aż wszystkie zagadnienia z planu zostaną poruszone w naturalny sposób.
+Twój cel: Wygeneruj możliwie długą, swobodną i angażującą rozmowę dwóch znajomych na podstawie tekstu źródłowego oraz przekazanego planu. Nie kończ rozmowy przedwcześnie. Rozmawiajcie, aż wszystkie zagadnienia z planu zostaną poruszone w naturalny sposób.

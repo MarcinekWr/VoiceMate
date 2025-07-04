@@ -16,6 +16,7 @@ def test_render_step_1_process_uploaded_file(monkeypatch):
         step1_upload, 'process_uploaded_file', lambda f: 'dummy_content',
     )
     monkeypatch.setattr(step1_upload, 'process_url_input', lambda u: None)
+    monkeypatch.setattr(step1_upload, 'check_content_safety', lambda x: True)
 
     with mock.patch.object(st, 'file_uploader', return_value=mock.Mock()):
         with mock.patch.object(st, 'text_input', return_value=''):

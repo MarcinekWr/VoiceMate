@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 REL_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 LOGS_DIR = os.path.join(REL_PROJECT_ROOT, "log_folder", "logs")

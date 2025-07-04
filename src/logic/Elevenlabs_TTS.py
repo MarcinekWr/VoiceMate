@@ -84,7 +84,10 @@ class ElevenlabsTTSPodcastGenerator:
                         f'Generowanie segmentu {i+1}/{total_segments}: {speaker}',
                     )
 
-                chunk = self.generate_audio_chunk(text=text, voice_id=voice_id)
+                chunk = self.generate_audio_chunk(
+                    text=text,
+                    voice_id=voice_id,
+                )
                 audio_chunks.append(chunk)
 
             except Exception:

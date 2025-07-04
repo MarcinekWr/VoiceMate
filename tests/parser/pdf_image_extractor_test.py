@@ -39,7 +39,9 @@ class TestPDFImageExtractor(unittest.TestCase):
         mock_pix.tobytes.return_value = b'image_data'
         mock_pixmap.return_value = mock_pix
 
-        self.mock_image_describer.describe_image.return_value = 'A nice image.'
+        self.mock_image_describer.describe_image.return_value = (
+            'A nice image.'
+        )
 
         images = self.extractor.extract_images(mock_doc)
 

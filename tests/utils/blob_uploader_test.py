@@ -33,7 +33,9 @@ def test_upload_to_blob_success(mock_blob_service, mock_open_file, caplog):
     upload_to_blob('audio', 'path/to/file.mp3', 'uploaded.mp3')
 
     mock_container_client.upload_blob.assert_called_once_with(
-        name='uploaded.mp3', data=mock.ANY, overwrite=True,
+        name='uploaded.mp3',
+        data=mock.ANY,
+        overwrite=True,
     )
     assert any(
         "Plik 'path/to/file.mp3' wysłany do kontenera 'audio'" in r.message
@@ -53,7 +55,9 @@ def test_upload_to_blob_default_blob_name(mock_blob_service, mock_open_file):
     upload_to_blob('logs', 'dir/logfile.log', blob_name=None)
 
     mock_container.upload_blob.assert_called_once_with(
-        name='logfile.log', data=mock.ANY, overwrite=True,
+        name='logfile.log',
+        data=mock.ANY,
+        overwrite=True,
     )
 
 

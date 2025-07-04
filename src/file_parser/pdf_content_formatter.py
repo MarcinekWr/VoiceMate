@@ -1,5 +1,7 @@
 """
-This module contains the PDFContentFormatter class for formatting extracted PDF content.
+This module
+contains the PDFContentFormatter
+class for formatting extracted PDF content.
 """
 from __future__ import annotations
 
@@ -31,9 +33,15 @@ class PDFContentFormatter:
         self.structured_content: list[dict[str, Any]] = []
         self.logger = logging.getLogger(__name__)
 
-    def create_structured_content(self, doc: fitz.Document) -> list[dict[str, Any]]:
+    def create_structured_content(
+        self,
+        doc: fitz.Document,
+    ) -> list[dict[str, Any]]:
         """Create a structured representation of all content by page."""
         try:
+            if not isinstance(self.structured_content, list):
+                self.structured_content = []
+
             for page_num in range(len(doc)):
                 page_content = {
                     'page': page_num + 1,

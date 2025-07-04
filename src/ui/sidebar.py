@@ -8,9 +8,10 @@ from src.workflow.session import reset_workflow
 def render_sidebar():
     """Render sidebar with progress and controls"""
     with st.sidebar:
-
         if st.button(
-            '⬅️ Wróć na stronę główną', type='secondary', use_container_width=True,
+            '⬅️ Wróć na stronę główną',
+            type='secondary',
+            use_container_width=True,
         ):
             st.session_state.step = 0
             st.rerun()
@@ -35,7 +36,9 @@ def render_sidebar():
         st.markdown('---')
 
         if st.button(
-            '🔄 Rozpocznij od nowa', type='secondary', use_container_width=True,
+            '🔄 Rozpocznij od nowa',
+            type='secondary',
+            use_container_width=True,
         ):
             reset_workflow()
             st.rerun()

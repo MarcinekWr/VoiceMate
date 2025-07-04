@@ -1,14 +1,17 @@
-from __future__ import annotations
-
 import logging
 import os
+from typing import Optional
 
 from azure.storage.blob import BlobServiceClient
 
 logger = logging.getLogger(__name__)
 
 
-def upload_to_blob(container_name: str, file_path: str, blob_name: str = None):
+def upload_to_blob(
+    container_name: str,
+    file_path: str,
+    blob_name: Optional[str] = None,
+):
     connection_string = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
     if not connection_string:
         logger.error('❌ Brak AZURE_STORAGE_CONNECTION_STRING w .env')
@@ -27,7 +30,9 @@ def upload_to_blob(container_name: str, file_path: str, blob_name: str = None):
 
         with open(file_path, 'rb') as data:
             container_client.upload_blob(
-                name=blob_name, data=data, overwrite=True,
+                name=blob_name,
+                data=data,
+                overwrite=True,
             )
 
         logger.info(

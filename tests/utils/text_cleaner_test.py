@@ -9,10 +9,23 @@ def test_clean_text_empty():
     assert TextCleaner('').clean_text() == ''
     assert TextCleaner(None).clean_text() == ''
 
+    def test_clean_text_empty(self):
+        """Test clean_text with empty input."""
+        assert TextCleaner('').clean_text() == ''
+        assert TextCleaner(None).clean_text() == ''
 
 def test_clean_text_no_change():
     assert TextCleaner('This is clean.').clean_text() == 'This is clean.'
 
+    def test_remove_pdf_artifacts(self):
+        """Test PDF artifact removal."""
+        input_text = 'Page 1\nCONFIDENTIAL\nThis is a test\nPage 2'
+        cleaner = TextCleaner(input_text)
+        cleaner.remove_pdf_artifacts()
+        result = cleaner.text
+        assert 'Page 1' not in result
+        assert 'CONFIDENTIAL' not in result
+        assert 'This is a test' in result
 
 def test_clean_text_comprehensive():
     text = (

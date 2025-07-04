@@ -71,27 +71,48 @@ def create_llm(ui_callback=None) -> AzureChatOpenAI:
 
 
 def load_prompt_template(style: str, ui_callback=None) -> PromptTemplate:
-    prompt_path = PROMPT_PATHS[style]
+    try:
+        if style not in PROMPT_PATHS:
+            error_msg = f'Unknown style: {style}. Available styles: {list(PROMPT_PATHS.keys())}'
+            logger.error(error_msg)
+            if ui_callback:
+                ui_callback(error_msg, 'error')
+            raise ValueError(error_msg)
 
-    if not os.path.isfile(prompt_path):
-        error_msg = f"Prompt file not found: {prompt_path}"
-        logger.error(error_msg)
+        prompt_path = PROMPT_PATHS[style]
+
+        if not os.path.isfile(prompt_path):
+            error_msg = f"Prompt file not found: {prompt_path}"
+            logger.error(error_msg)
+            if ui_callback:
+                ui_callback(f"Nie znaleziono pliku szablonu: {prompt_path}", "error")
+            raise FileNotFoundError(error_msg)
+
+        with open(prompt_path, encoding="utf-8") as f:
+            prompt_text = f.read()
+
+        template = PromptTemplate.from_template(prompt_text)
+
+        logger.info("Prompt template loaded successfully")
         if ui_callback:
-            ui_callback(f"Nie znaleziono pliku szablonu: {prompt_path}", "error")
-        raise FileNotFoundError(error_msg)
+            ui_callback("Szablon załadowany pomyślnie!")
 
-    with open(prompt_path, encoding="utf-8") as f:
-        prompt_text = f.read()
+        return template
 
-    template = PromptTemplate.from_template(prompt_text)
+    except Exception as e:
+        logger.error(f"Error loading prompt template: {e}") 
+        if ui_callback:
+            ui_callback(f"Błąd ładowania szablonu: {e}", "error")
+        raise
 
-    logger.info("Prompt template loaded successfully")
-    if ui_callback:
-        ui_callback("Szablon załadowany pomyślnie!")
 
-    return template
 
-def generate_plan(llm: AzureChatOpenAI, input_text: str, ui_callback=None) -> str:
+
+def generate_plan(
+    llm: AzureChatOpenAI,
+    input_text: str,
+    ui_callback=None,
+) -> str:
     """Generate a plan for the podcast based on input text."""
     try:
         if not input_text or not input_text.strip():
@@ -115,14 +136,19 @@ def generate_plan(llm: AzureChatOpenAI, input_text: str, ui_callback=None) -> st
 
         return response.content
     except Exception as e:
-        logger.error(f'Error generating plan: {e}')
+        logger.error(f"Error loading prompt template: {e}")
         if ui_callback:
-            ui_callback(f'Błąd: {e}', 'error')
+            ui_callback(f"Błąd ładowania szablonu: {e}", "error")
         raise
 
 
+
 def generate_podcast_text(
-    llm: AzureChatOpenAI, style: str, input_text: str, plan_text: str, ui_callback=None,
+    llm: AzureChatOpenAI,
+    style: str,
+    input_text: str,
+    plan_text: str,
+    ui_callback=None,
 ) -> str:
     """Generate podcast text in specified style."""
     try:
@@ -141,7 +167,8 @@ def generate_podcast_text(
 
         prompt_template = load_prompt_template(style)
         user_prompt = prompt_template.format(
-            input_text=input_text, plan_text=plan_text,
+            input_text=input_text,
+            plan_text=plan_text,
         )
 
         logger.info('Preparing system prompt')
@@ -212,7 +239,10 @@ class LLMPodcastService:
         save_to_file(plan_text, 'output_plan.txt')
 
         output = generate_podcast_text(
-            self.llm, 'scientific', input_text, plan_text,
+            self.llm,
+            'scientific',
+            input_text,
+            plan_text,
         )
         save_to_file(output, 'podcast.txt')
 

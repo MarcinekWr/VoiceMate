@@ -1,5 +1,6 @@
 """
-This module contains the PDFImageExtractor class for extracting images from PDF files.
+This module contains the PDFImageExtractor
+class for extracting images from PDF files.
 """
 from __future__ import annotations
 
@@ -32,8 +33,12 @@ class PDFImageExtractor:
         self.describe_images = describe_images
         self.logger = logging.getLogger(__name__)
 
-    def extract_images(self, doc: fitz.Document) -> list[dict[str, Any]]:
-        """Extract images using PyMuPDF and describe them using ImageDescriber."""
+    def extract_images(
+        self,
+        doc: fitz.Document,
+    ) -> list[dict[str, Any]]:
+        """Extract images
+        using PyMuPDF and describe them using ImageDescriber."""
         images_data: list[dict[str, Any]] = []
 
         try:
@@ -43,7 +48,9 @@ class PDFImageExtractor:
                     image_list = page.get_images(full=True)
                 except RuntimeError as e:
                     self.logger.warning(
-                        'Error loading page %s: %s', page_num, e,
+                        'Error loading page %s: %s',
+                        page_num,
+                        e,
                     )
                     continue
 

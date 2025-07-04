@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from src.utils.content_safety import check_content_safety
 from src.workflow.process_file import process_uploaded_file, process_url_input
 
 
@@ -67,7 +68,9 @@ def render_step_1():
         url_input.strip() and url_input.startswith(('http://', 'https://'))
     )
 
-    if url_input.strip() and not url_input.startswith(('http://', 'https://')):
+    if url_input.strip() and not url_input.startswith(
+        ('http://', 'https://'),
+    ):
         st.warning('⚠️ URL musi rozpoczynać się od http:// lub https://')
 
     col1, col2 = st.columns([1, 3])
@@ -96,6 +99,12 @@ def render_step_1():
                 llm_content = process_url_input(url_input.strip())
 
             if llm_content:
+                if not check_content_safety(llm_content):
+                    st.session_state.processing = False
+                    st.error(
+                        '⚠️ Wykryto potencjalnie niebezpieczną treść w pliku. Przetwarzanie zostało przerwane.',
+                    )
+                    return
                 st.session_state.llm_content = llm_content
                 st.session_state.step = 2
                 st.session_state.processing = False
