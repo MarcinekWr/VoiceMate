@@ -9,6 +9,7 @@ Tests included:
 - test_generate_plan_error_handling:
     Ensures that generate_plan properly propagates exceptions from the LLM invocation.
 """
+from __future__ import annotations
 
 from unittest.mock import MagicMock
 

@@ -30,7 +30,7 @@ if 'request_id' not in st.session_state:
 else:
     set_request_id(st.session_state.request_id)
 
-log_file_path = LOGS_DIR / f'{get_request_id()}.log'
+log_file_path = os.path.join(LOGS_DIR, f"{get_request_id()}.log")
 
 if 'logger_initialized' not in st.session_state:
     logger = setup_logger(log_file_path)
@@ -47,10 +47,6 @@ def main():
         layout='wide',
         initial_sidebar_state='expanded',
     )
-
-    # st.title("🎙️ VoiceMate Generator Podcastów AI")
-    # st.markdown("**Przekształć dowolną treść w podcast audio za pomocą AI**")
-    # st.markdown("---")
 
     initialize_session_state()
 

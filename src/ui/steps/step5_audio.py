@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 
@@ -9,7 +11,9 @@ from src.workflow.generation import generate_audio_from_json
 
 def render_step_5():
     """Render Step 5: Audio Generation"""
-    st.header('🎵 Krok 4: Generuj audio')
+    if "audio_generated_in_step5" not in st.session_state:
+        st.session_state.audio_generated_in_step5 = False
+    st.header("🎵 Krok 4: Generuj audio")
 
     # Show JSON preview
     with st.expander('📋 Podgląd JSON', expanded=False):
@@ -48,12 +52,13 @@ def render_step_5():
 
         with st.spinner(f'🎵 Generuję audio za pomocą {engine_name}...'):
             audio_path = generate_audio_from_json(
-                st.session_state.json_data,
-                st.session_state.is_premium,
+                st.session_state.json_data, st.session_state.is_premium,
             )
 
             if audio_path:
                 st.session_state.audio_path = audio_path
+                st.session_state.audio_generated_in_step5 = True
+                st.session_state.processing = False
 
                 try:
                     blob_name = os.path.basename(audio_path)
@@ -69,11 +74,9 @@ def render_step_5():
                 )
                 st.balloons()
                 st.rerun()
-
+    st.session_state.processing = False
     # Show audio player if available
-    if st.session_state.audio_path and os.path.exists(
-        st.session_state.audio_path,
-    ):
+    if st.session_state.audio_path and os.path.exists(st.session_state.audio_path):
         st.markdown('---')
         st.subheader('🎧 Wygenerowane audio')
 

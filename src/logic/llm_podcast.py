@@ -1,6 +1,8 @@
+from __future__ import annotations
+
+from langchain_openai import AzureChatOpenAI
 import logging
 import os
-from pathlib import Path
 
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
@@ -8,11 +10,11 @@ from langchain_openai import AzureChatOpenAI
 logger = logging.getLogger(__name__)
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 PROMPT_PATHS = {
-    'scientific': BASE_DIR / 'prompts' / 'scientific_style.txt',
-    'casual': BASE_DIR / 'prompts' / 'casual_style.txt',
-    'plan': BASE_DIR / 'prompts' / 'plan_prompt.txt',
+    "scientific": os.path.join(BASE_DIR, "prompts", "scientific_style.txt"),
+    "casual": os.path.join(BASE_DIR, "prompts", "casual_style.txt"),
+    "plan": os.path.join(BASE_DIR, "prompts", "plan_prompt.txt"),
 }
 
 
@@ -69,13 +71,7 @@ def create_llm(ui_callback=None) -> AzureChatOpenAI:
 
 
 def load_prompt_template(style: str, ui_callback=None) -> PromptTemplate:
-    """Load prompt template from file with error handling."""
-    prompt_path = None
     try:
-        logger.info(f'Loading prompt template for style: {style}')
-        if ui_callback:
-            ui_callback(f"Ładuję szablon stylu '{style}'...")
-
         if style not in PROMPT_PATHS:
             error_msg = f'Unknown style: {style}. Available styles: {list(PROMPT_PATHS.keys())}'
             logger.error(error_msg)
@@ -84,28 +80,29 @@ def load_prompt_template(style: str, ui_callback=None) -> PromptTemplate:
             raise ValueError(error_msg)
 
         prompt_path = PROMPT_PATHS[style]
-        if not prompt_path.exists():
-            error_msg = f'Prompt file not found: {prompt_path}'
+
+        if not os.path.isfile(prompt_path):
+            error_msg = f"Prompt file not found: {prompt_path}"
             logger.error(error_msg)
             if ui_callback:
-                ui_callback(
-                    f'Nie znaleziono pliku szablonu: {prompt_path}',
-                    'error',
-                )
+                ui_callback(f"Nie znaleziono pliku szablonu: {prompt_path}", "error")
             raise FileNotFoundError(error_msg)
 
-        prompt_text = prompt_path.read_text(encoding='utf-8')
+        with open(prompt_path, encoding="utf-8") as f:
+            prompt_text = f.read()
+
         template = PromptTemplate.from_template(prompt_text)
 
-        logger.info('Prompt template loaded successfully')
+        logger.info("Prompt template loaded successfully")
         if ui_callback:
-            ui_callback('Szablon załadowany pomyślnie!')
+            ui_callback("Szablon załadowany pomyślnie!")
 
         return template
+
     except Exception as e:
-        logger.error(f'Error loading prompt template from {prompt_path}: {e}')
+        logger.error(f"Error loading prompt template from {prompt_path}: {e}")
         if ui_callback:
-            ui_callback(f'Błąd ładowania szablonu: {e}', 'error')
+            ui_callback(f"Błąd ładowania szablonu: {e}", "error")
         raise
 
 
@@ -226,12 +223,14 @@ class LLMPodcastService:
 
     def run(self):
         """Main logic for generating the podcast."""
-        input_file = Path('src/logic/llm_text_test_file.txt')
-        if not input_file.exists():
-            raise FileNotFoundError(f'Input file not found: {input_file}')
+        input_file = os.path.join("src", "logic", "llm_text_test_file.txt")
+        if not os.path.exists(input_file):
+            raise FileNotFoundError(f"Input file not found: {input_file}")
 
-        input_text = input_file.read_text(encoding='utf-8')
-        logger.info(f'Loaded input text ({len(input_text)} characters)')
+        with open(input_file, encoding="utf-8") as f:
+            input_text = f.read()
+
+        logger.info(f"Loaded input text ({len(input_text)} characters)")
 
         plan_text = generate_plan(self.llm, input_text)
         save_to_file(plan_text, 'output_plan.txt')

@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from unittest import mock
 
+import pytest
 import streamlit as st
 
 from src.ui.steps import step1_upload
@@ -10,9 +13,7 @@ def test_render_step_1_process_uploaded_file(monkeypatch):
     st.session_state.processing = False
 
     monkeypatch.setattr(
-        step1_upload,
-        'process_uploaded_file',
-        lambda f: 'dummy_content',
+        step1_upload, 'process_uploaded_file', lambda f: 'dummy_content',
     )
     monkeypatch.setattr(step1_upload, 'process_url_input', lambda u: None)
     monkeypatch.setattr(step1_upload, 'check_content_safety', lambda x: True)

@@ -1,5 +1,4 @@
 """Image description class using Azure OpenAI for describing images."""
-
 from __future__ import annotations
 import os
 import base64

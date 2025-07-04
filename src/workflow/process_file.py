@@ -1,15 +1,17 @@
 import os
 import tempfile
 import traceback
-from pathlib import Path
 from typing import Optional
+from pathlib import Path
+
+import streamlit as st
 
 import streamlit as st
 
 from src.file_parser.other_files_parser import FileConverter
 
 
-def process_url_input(url: str) -> Optional[str]:
+def process_url_input(url: str) -> str | None:
     """Process URL and extract LLM content using FileConverter"""
     try:
         st.info(f'🌐 Przetwarzam URL: {url}')

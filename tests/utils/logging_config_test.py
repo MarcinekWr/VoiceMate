@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import logging
+import os
 import uuid
 from unittest import mock
 
@@ -23,10 +26,7 @@ def test_get_blob_service_client_success(monkeypatch):
 
 def test_get_blob_service_client_missing_env(monkeypatch):
     monkeypatch.delenv('AZURE_STORAGE_CONNECTION_STRING', raising=False)
-    with pytest.raises(
-        ValueError,
-        match='Brak AZURE_STORAGE_CONNECTION_STRING',
-    ):
+    with pytest.raises(ValueError, match='Brak AZURE_STORAGE_CONNECTION_STRING'):
         logging_config.get_blob_service_client()
 
 
@@ -71,6 +71,5 @@ def test_setup_logger_creates_handlers(tmp_path, monkeypatch):
 
     for handler in logger.handlers:
         assert any(
-            isinstance(f, logging_config.RequestIdFilter)
-            for f in handler.filters
+            isinstance(f, logging_config.RequestIdFilter) for f in handler.filters
         )

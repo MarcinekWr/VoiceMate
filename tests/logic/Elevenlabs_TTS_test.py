@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import unittest
 from unittest.mock import MagicMock, call, mock_open, patch
@@ -9,8 +11,7 @@ class TestElevenlabsTTSPodcastGenerator(unittest.TestCase):
     def setUp(self):
         self.api_key = 'test_key'
         self.env_patcher = patch.dict(
-            os.environ,
-            {'ELEVENLABS_API_KEY': self.api_key},
+            os.environ, {'ELEVENLABS_API_KEY': self.api_key},
         )
         self.env_patcher.start()
 
@@ -31,9 +32,7 @@ class TestElevenlabsTTSPodcastGenerator(unittest.TestCase):
     def test_generate_audio_chunk_success(self, mock_client):
         generator = ElevenlabsTTSPodcastGenerator()
         mock_response = [b'audio1', b'audio2']
-        mock_client.return_value.text_to_speech.convert.return_value = (
-            mock_response
-        )
+        mock_client.return_value.text_to_speech.convert.return_value = mock_response
 
         result = generator.generate_audio_chunk('test', 'voice123')
         self.assertEqual(result, b'audio1audio2')
@@ -41,10 +40,8 @@ class TestElevenlabsTTSPodcastGenerator(unittest.TestCase):
     @patch('src.logic.Elevenlabs_TTS.ElevenLabs')
     def test_generate_audio_chunk_exception(self, mock_client):
         generator = ElevenlabsTTSPodcastGenerator()
-        mock_client.return_value.text_to_speech.convert.side_effect = (
-            Exception(
-                'conversion error',
-            )
+        mock_client.return_value.text_to_speech.convert.side_effect = Exception(
+            'conversion error',
         )
 
         with self.assertRaises(Exception):
@@ -62,16 +59,10 @@ class TestElevenlabsTTSPodcastGenerator(unittest.TestCase):
     @patch('builtins.open', new_callable=mock_open)
     @patch('tempfile.mkdtemp', return_value='/tmp/testpodcast')
     @patch.object(
-        ElevenlabsTTSPodcastGenerator,
-        'generate_audio_chunk',
-        return_value=b'abc',
+        ElevenlabsTTSPodcastGenerator, 'generate_audio_chunk', return_value=b'abc',
     )
     def test_generate_podcast_success(
-        self,
-        mock_chunk,
-        mock_tmp,
-        mock_open_file,
-        mock_rid,
+        self, mock_chunk, mock_tmp, mock_open_file, mock_rid,
     ):
         generator = ElevenlabsTTSPodcastGenerator()
         dialog = [
@@ -82,10 +73,7 @@ class TestElevenlabsTTSPodcastGenerator(unittest.TestCase):
         result = generator.generate_podcast_elevenlabs(dialog)
 
         expected_path = os.path.normpath(
-            os.path.join(
-                '/tmp/testpodcast',
-                'podcast_abc123.wav',
-            ),
+            os.path.join('/tmp/testpodcast', 'podcast_el_abc123.wav'),
         )
 
         self.assertEqual(os.path.normpath(result), expected_path)
@@ -102,11 +90,7 @@ class TestElevenlabsTTSPodcastGenerator(unittest.TestCase):
 
     @patch('src.logic.Elevenlabs_TTS.get_request_id', return_value='abc123')
     @patch.object(ElevenlabsTTSPodcastGenerator, 'generate_audio_chunk')
-    def test_generate_podcast_skips_incomplete_segments(
-        self,
-        mock_chunk,
-        mock_rid,
-    ):
+    def test_generate_podcast_skips_incomplete_segments(self, mock_chunk, mock_rid):
         generator = ElevenlabsTTSPodcastGenerator()
         dialog = [
             {'voice_id': '', 'text': 'missing', 'order': 1, 'speaker': 'A'},
@@ -115,33 +99,25 @@ class TestElevenlabsTTSPodcastGenerator(unittest.TestCase):
         ]
         mock_chunk.return_value = b'valid'
 
-        with patch('builtins.open', mock_open()) as m, patch(
-            'tempfile.mkdtemp',
-            return_value='/tmp/testpodcast',
+        with (
+            patch('builtins.open', mock_open()) as m,
+            patch('tempfile.mkdtemp', return_value='/tmp/testpodcast'),
         ):
             result = generator.generate_podcast_elevenlabs(dialog)
-            self.assertIn('podcast_abc123.wav', result)
+            self.assertIn('podcast_el_abc123.wav', result)
             self.assertEqual(mock_chunk.call_count, 1)
 
     @patch('src.logic.Elevenlabs_TTS.get_request_id', return_value='abc123')
     @patch('tempfile.mkdtemp', return_value='/tmp/testpodcast')
     @patch.object(
-        ElevenlabsTTSPodcastGenerator,
-        'generate_audio_chunk',
-        return_value=b'abc',
+        ElevenlabsTTSPodcastGenerator, 'generate_audio_chunk', return_value=b'abc',
     )
     @patch('builtins.open', side_effect=Exception('write error'))
     def test_generate_podcast_write_error(
-        self,
-        mock_open_file,
-        mock_chunk,
-        mock_tmp,
-        mock_rid,
+        self, mock_open_file, mock_chunk, mock_tmp, mock_rid,
     ):
         generator = ElevenlabsTTSPodcastGenerator()
-        dialog = [
-            {'voice_id': 'id', 'text': 'test', 'order': 1, 'speaker': 'A'},
-        ]
+        dialog = [{'voice_id': 'id', 'text': 'test', 'order': 1, 'speaker': 'A'}]
 
         result = generator.generate_podcast_elevenlabs(dialog)
         self.assertIsNone(result)
@@ -150,34 +126,18 @@ class TestElevenlabsTTSPodcastGenerator(unittest.TestCase):
     @patch('tempfile.mkdtemp', return_value='/tmp/testpodcast')
     @patch('builtins.open', new_callable=mock_open)
     @patch.object(
-        ElevenlabsTTSPodcastGenerator,
-        'generate_audio_chunk',
-        return_value=b'chunk',
+        ElevenlabsTTSPodcastGenerator, 'generate_audio_chunk', return_value=b'chunk',
     )
     def test_generate_podcast_progress_callback(
-        self,
-        mock_chunk,
-        mock_open_file,
-        mock_tmp,
-        mock_rid,
+        self, mock_chunk, mock_open_file, mock_tmp, mock_rid,
     ):
         generator = ElevenlabsTTSPodcastGenerator()
-        dialog = [
-            {'voice_id': 'id', 'text': 'test', 'order': 1, 'speaker': 'A'},
-        ]
+        dialog = [{'voice_id': 'id', 'text': 'test', 'order': 1, 'speaker': 'A'}]
         callback = MagicMock()
 
         generator.generate_podcast_elevenlabs(
-            dialog,
-            progress_callback=callback,
+            dialog, progress_callback=callback,
         )
 
-        callback.assert_has_calls(
-            [
-                call(0, 1, 'Generowanie segmentu 1/1: A'),
-            ],
-        )
+        callback.assert_has_calls([call(0, 1, 'Generowanie segmentu 1/1: A')])
 
-
-if __name__ == '__main__':
-    unittest.main(verbosity=2)

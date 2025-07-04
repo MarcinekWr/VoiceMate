@@ -97,9 +97,9 @@ class FileConverter:
 
     def convert_image_to_pdf(self) -> str:
         """Convert image file to PDF format."""
-        self.logger.info(f'Converting image to PDF: {self.file_path}')
+        self.logger.info(f"Converting image to PDF: {self.file_path}")
         original_name = os.path.splitext(os.path.basename(self.file_path))[0]
-        output_path = self._generate_unique_filename(original_name, '.pdf')
+        output_path = self._generate_unique_filename(original_name, ".pdf")
 
         try:
             with Image.open(self.file_path) as img:

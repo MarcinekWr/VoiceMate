@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import subprocess
 import sys
@@ -6,10 +8,7 @@ import tempfile
 import pytest
 
 SCRIPT_PATH = os.path.join(
-    os.path.dirname(
-        __file__,
-    ),
-    '../../src/file_parser/url2pdf.py',
+    os.path.dirname(__file__), '../../src/file_parser/url2pdf.py',
 )
 SCRIPT_PATH = os.path.abspath(SCRIPT_PATH)
 
@@ -29,12 +28,7 @@ def test_url2pdf_success(temp_output_pdf):
     # Używamy prostego, publicznego URL (np. strona główna Google)
     url = 'https://www.example.com/'
     result = subprocess.run(
-        [
-            sys.executable,
-            SCRIPT_PATH,
-            url,
-            temp_output_pdf,
-        ],
+        [sys.executable, SCRIPT_PATH, url, temp_output_pdf],
         capture_output=True,
         text=True,
     )
@@ -50,12 +44,7 @@ def test_url2pdf_success(temp_output_pdf):
 def test_url2pdf_invalid_url(temp_output_pdf):
     url = 'http://nonexistent.domain.abc/'
     result = subprocess.run(
-        [
-            sys.executable,
-            SCRIPT_PATH,
-            url,
-            temp_output_pdf,
-        ],
+        [sys.executable, SCRIPT_PATH, url, temp_output_pdf],
         capture_output=True,
         text=True,
     )
@@ -65,4 +54,5 @@ def test_url2pdf_invalid_url(temp_output_pdf):
         'Failed to load page' in result.stderr
         or 'PDF creation failed' in result.stderr
         or 'ERR_NAME_NOT_RESOLVED' in result.stderr
+        or 'Failed to load URL' in result.stderr
     )

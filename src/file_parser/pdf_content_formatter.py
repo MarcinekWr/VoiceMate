@@ -3,7 +3,6 @@ This module
 contains the PDFContentFormatter
 class for formatting extracted PDF content.
 """
-
 from __future__ import annotations
 
 import logging
@@ -55,9 +54,7 @@ class PDFContentFormatter:
                     page_content['text'] = page.get_text()
                 except RuntimeError as e:
                     self.logger.warning(
-                        'Error getting text from page %s: %s',
-                        page_num,
-                        e,
+                        'Error getting text from page %s: %s', page_num, e,
                     )
                     page_content['text'] = ''
 
@@ -69,8 +66,7 @@ class PDFContentFormatter:
 
         except (OSError, ValueError) as e:
             self.logger.error(
-                'Unexpected error creating structured content: %s',
-                e,
+                'Unexpected error creating structured content: %s', e,
             )
 
         return self.structured_content
@@ -109,9 +105,7 @@ class PDFContentFormatter:
                     page_text += f'\nTEXT CONTENT:\n{cleaned_text}\n'
                 except (OSError, ValueError) as e:
                     self.logger.warning(
-                        'Error cleaning text for page %s: %s',
-                        page['page'],
-                        e,
+                        'Error cleaning text for page %s: %s', page['page'], e,
                     )
                     page_text += f"\nTEXT CONTENT:\n{page['text']}\n"
 
@@ -123,15 +117,11 @@ class PDFContentFormatter:
                         f"({image['width']}x{image['height']}, {image['size_kb']}KB)\n"
                     )
                     if image.get('description'):
-                        page_text += (
-                            f"  Description: {image['description']}\n"
-                        )
+                        page_text += f"  Description: {image['description']}\n"
 
             if self.tables:
                 page_tables = [
-                    table
-                    for table in self.tables
-                    if table['page'] == page['page']
+                    table for table in self.tables if table['page'] == page['page']
                 ]
                 if page_tables:
                     page_text += '\nTABLES ON THIS PAGE:\n'

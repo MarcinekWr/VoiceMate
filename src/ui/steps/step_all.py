@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 
@@ -52,8 +54,7 @@ def render_auto_pipeline():
 
     with col1:
         with st.expander(
-            'ℹ️ Jak to działa? Kliknij, aby zobaczyć instrukcję',
-            expanded=False,
+            'ℹ️ Jak to działa? Kliknij, aby zobaczyć instrukcję', expanded=False,
         ):
             st.markdown(
                 """
@@ -184,25 +185,20 @@ def render_auto_pipeline():
             with st.spinner('🧩 Konwersja do JSON...'):
                 json_data = dialog_to_json(podcast_text, is_premium)
                 json_filename = (
-                    'podcast_premium.json'
-                    if is_premium
-                    else 'podcast_free.json'
+                    'podcast_premium.json' if is_premium else 'podcast_free.json'
                 )
                 save_to_file(
                     json.dumps(
-                        json_data,
-                        ensure_ascii=False,
+                        json_data, ensure_ascii=False,
                         indent=2,
-                    ),
-                    json_filename,
+                    ), json_filename,
                 )
 
             with st.spinner('🔊 Generowanie audio...'):
                 audio_path = generate_audio_from_json(json_data, is_premium)
                 try:
                     upload_to_blob(
-                        'audio',
-                        audio_path,
+                        'audio', audio_path,
                         os.path.basename(audio_path),
                     )
                 except Exception as upload_err:

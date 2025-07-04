@@ -7,6 +7,7 @@ Test included:
     Ensures that generate_podcast_text correctly returns the expected content
     when the LLM invocation is successful and the input parameters are valid.
 """
+from __future__ import annotations
 
 from unittest.mock import MagicMock
 

@@ -1,6 +1,7 @@
 """
 Tests for LLMService.
 """
+from __future__ import annotations
 
 import unittest
 from unittest.mock import MagicMock, patch
@@ -65,12 +66,7 @@ class TestLLMService(unittest.TestCase):
                 'Describe this {topic}.',
             )
             result = service.generate_description(
-                'base64_string',
-                prompt_template,
-                'weather',
+                'base64_string', prompt_template, 'weather',
             )
             self.assertEqual(result, 'LLM service not available')
 
-
-if __name__ == '__main__':
-    unittest.main()

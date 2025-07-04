@@ -1,6 +1,5 @@
 """PDF Parser class to parse PDF files and extract text,
 images, and metadata with image descriptions."""
-
 from __future__ import annotations
 
 import json
@@ -88,8 +87,7 @@ class PdfParser:
             self.structured_content = formatter.create_structured_content(doc)
 
             self.logger.info(
-                'Successfully parsed all content from: %s',
-                self.file_path,
+                'Successfully parsed all content from: %s', self.file_path,
             )
 
             return {
@@ -108,9 +106,7 @@ class PdfParser:
             return {}
         except Exception as e:
             self.logger.error(
-                'Unexpected error parsing PDF %s: %s',
-                self.file_path,
-                e,
+                'Unexpected error parsing PDF %s: %s', self.file_path, e,
             )
             return {}
         finally:
@@ -125,8 +121,7 @@ class PdfParser:
             file_stats = os.stat(self.file_path)
             metadata['filename'] = os.path.basename(self.file_path)
             metadata['file_size_mb'] = round(
-                file_stats.st_size / (1024 * 1024),
-                2,
+                file_stats.st_size / (1024 * 1024), 2,
             )
             metadata['modified_time'] = datetime.fromtimestamp(
                 file_stats.st_mtime,
@@ -134,9 +129,7 @@ class PdfParser:
 
         except OSError as e:
             self.logger.error(
-                'Error accessing file stats for %s: %s',
-                self.file_path,
-                e,
+                'Error accessing file stats for %s: %s', self.file_path, e,
             )
             metadata['error'] = f'Failed to get file stats: {str(e)}'
             return metadata
@@ -152,10 +145,7 @@ class PdfParser:
             self.logger.info('Successfully extracted metadata')
 
         except RuntimeError as e:
-            self.logger.error(
-                'PDF file data error extracting metadata: %s',
-                e,
-            )
+            self.logger.error('PDF file data error extracting metadata: %s', e)
             metadata['error'] = f'Invalid PDF file: {str(e)}'
         except Exception as e:
             self.logger.error('Unexpected error extracting metadata: %s', e)
@@ -244,7 +234,7 @@ class PdfParser:
                             )
                             if image.get('description'):
                                 file.write(
-                                    f"Description: {image['description'][:100]}...\n",
+                                    f"      Description: {image['description'][:100]}...\n",
                                 )
                     file.write('\n')
 

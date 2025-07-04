@@ -2,7 +2,6 @@
 This module contains the PDFImageExtractor
 class for extracting images from PDF files.
 """
-
 from __future__ import annotations
 
 import base64
@@ -65,9 +64,7 @@ class PDFImageExtractor:
                             continue
 
                         image_data = pix.tobytes('png')
-                        img_filename = (
-                            f'image_p{page_num + 1}_{img_index + 1}.png'
-                        )
+                        img_filename = f'image_p{page_num + 1}_{img_index + 1}.png'
                         img_path = os.path.join(self.output_dir, img_filename)
                         image_data_base64 = base64.b64encode(
                             image_data,
@@ -78,17 +75,14 @@ class PDFImageExtractor:
                                 file.write(image_data)
                         except OSError as e:
                             self.logger.warning(
-                                'Failed to save image %s: %s',
-                                img_filename,
-                                e,
+                                'Failed to save image %s: %s', img_filename, e,
                             )
                             pix = None
                             continue
 
                         # Get image description
                         description = self._get_image_description(
-                            img_path,
-                            image_data,
+                            img_path, image_data,
                         )
 
                         # Store image data
@@ -115,7 +109,7 @@ class PDFImageExtractor:
                             e,
                         )
                         continue
-                    except Exception as e:
+                    except (OSError, ValueError) as e:
                         self.logger.warning(
                             'Unexpected error processing image %s on page %s: %s',
                             img_index,
@@ -126,10 +120,9 @@ class PDFImageExtractor:
 
             self.logger.info('Extracted %s images', len(images_data))
 
-        except Exception as e:
+        except (OSError, ValueError) as e:
             self.logger.error(
-                'Unexpected error during image extraction: %s',
-                e,
+                'Unexpected error during image extraction: %s', e,
             )
 
         return images_data
@@ -158,6 +151,6 @@ class PDFImageExtractor:
 
             return description
 
-        except Exception as e:
+        except (OSError, AttributeError, ValueError) as e:
             self.logger.error('Error getting image description: %s', e)
             return 'Error generating description'

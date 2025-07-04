@@ -18,7 +18,7 @@ Test cases:
 - test_load_prompt_template_missing_file:
     Simulates a missing template file scenario and checks that a FileNotFoundError is raised.
 """
-
+from __future__ import annotations
 
 import pytest
 
