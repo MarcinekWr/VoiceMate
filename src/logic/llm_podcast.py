@@ -100,10 +100,12 @@ def load_prompt_template(style: str, ui_callback=None) -> PromptTemplate:
         return template
 
     except Exception as e:
-        logger.error(f"Error loading prompt template from {prompt_path}: {e}")
+        logger.error(f"Error loading prompt template: {e}") 
         if ui_callback:
             ui_callback(f"Błąd ładowania szablonu: {e}", "error")
         raise
+
+
 
 
 def generate_plan(
@@ -134,10 +136,11 @@ def generate_plan(
 
         return response.content
     except Exception as e:
-        logger.error(f'Error generating plan: {e}')
+        logger.error(f"Error loading prompt template: {e}")
         if ui_callback:
-            ui_callback(f'Błąd: {e}', 'error')
+            ui_callback(f"Błąd ładowania szablonu: {e}", "error")
         raise
+
 
 
 def generate_podcast_text(

@@ -1,11 +1,16 @@
-import streamlit as st
 import traceback
 from typing import Optional
 
-from src.logic.llm_podcast import generate_plan, generate_podcast_text, create_llm
+import streamlit as st
+
 from src.logic.Azure_TTS import AzureTTSPodcastGenerator
 from src.logic.Elevenlabs_TTS import ElevenlabsTTSPodcastGenerator
-from src.workflow.save import save_to_file  
+from src.logic.llm_podcast import (
+    create_llm,
+    generate_plan,
+    generate_podcast_text,
+)
+from src.workflow.save import save_to_file
 
 
 def generate_plan_content(llm_content: str) -> str | None:
@@ -28,18 +33,28 @@ def generate_plan_content(llm_content: str) -> str | None:
             st.error(traceback.format_exc())
         return None
 
-def generate_podcast_content(style: str, llm_content: str, plan_text: str) -> Optional[str]:
+
+def generate_podcast_content(
+    style: str,
+    llm_content: str,
+    plan_text: str,
+) -> Optional[str]:
     """Generate podcast text from plan and content"""
     try:
         st.info('🧠 Tworzę LLM...')
         llm = create_llm()
-        
-        st.info(f"🎙️ Generuję tekst podcastu w stylu: {style}...")
-        podcast_text = generate_podcast_text(llm, style, llm_content, plan_text)
-        
-        podcast_file_path = save_to_file(podcast_text, "podcast.txt")
-        st.success(f"💾 Podcast zapisany do: {podcast_file_path}")
-        
+
+        st.info(f'🎙️ Generuję tekst podcastu w stylu: {style}...')
+        podcast_text = generate_podcast_text(
+            llm,
+            style,
+            llm_content,
+            plan_text,
+        )
+
+        podcast_file_path = save_to_file(podcast_text, 'podcast.txt')
+        st.success(f'💾 Podcast zapisany do: {podcast_file_path}')
+
         return podcast_text
 
     except Exception as e:
@@ -48,7 +63,11 @@ def generate_podcast_content(style: str, llm_content: str, plan_text: str) -> Op
             st.error(traceback.format_exc())
         return None
 
-def generate_audio_from_json(json_data: list, is_premium: bool) -> Optional[str]:
+
+def generate_audio_from_json(
+    json_data: list,
+    is_premium: bool,
+) -> Optional[str]:
     """Generate audio from JSON data using appropriate TTS engine"""
     try:
         if is_premium:
@@ -61,7 +80,7 @@ def generate_audio_from_json(json_data: list, is_premium: bool) -> Optional[str]
             progress_bar = st.progress(0)
             output_path = tts.generate_podcast_elevenlabs(
                 dialog_data=json_data,
-                progress_callback=progress_callback
+                progress_callback=progress_callback,
             )
             progress_bar.empty()
 
@@ -75,7 +94,7 @@ def generate_audio_from_json(json_data: list, is_premium: bool) -> Optional[str]
             progress_bar = st.progress(0)
             output_path = tts.generate_podcast_azure(
                 dialog_data=json_data,
-                progress_callback=progress_callback
+                progress_callback=progress_callback,
             )
             progress_bar.empty()
 
