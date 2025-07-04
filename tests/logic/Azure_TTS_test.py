@@ -1,9 +1,9 @@
+from __future__ import annotations
+
 import logging
 import os
-import tempfile
 import unittest
-import wave
-from unittest.mock import MagicMock, Mock, call, mock_open, patch
+from unittest.mock import MagicMock, Mock, call, patch
 
 import azure.cognitiveservices.speech as speechsdk
 
@@ -19,16 +19,21 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
         self.region = 'test_region'
 
         # Mock zmiennych środowiskowych
-        self.env_patcher = patch.dict(os.environ, {
-            'AZURE_SPEECH_API_KEY': self.api_key,
-            'AZURE_SPEECH_REGION': self.region
-        })
+        self.env_patcher = patch.dict(
+            os.environ,
+            {
+                'AZURE_SPEECH_API_KEY': self.api_key,
+                'AZURE_SPEECH_REGION': self.region,
+            },
+        )
         self.env_patcher.start()
 
         # Mock speechsdk.SpeechConfig
         self.speech_config_mock = Mock()
-        self.speech_config_patcher = patch('azure.cognitiveservices.speech.SpeechConfig',
-                                           return_value=self.speech_config_mock)
+        self.speech_config_patcher = patch(
+            'azure.cognitiveservices.speech.SpeechConfig',
+            return_value=self.speech_config_mock,
+        )
         self.speech_config_patcher.start()
 
     def tearDown(self):
@@ -76,9 +81,14 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
             self.assertIn('Brakuje AZURE_SPEECH_API_KEY', str(context.exception))
 
 
-    @patch('src.utils.logging_config.get_request_id', return_value='test_request_123')
+    @patch(
+        'src.utils.logging_config.get_request_id',
+        return_value='test_request_123',
+    )
     @patch('tempfile.mkdtemp', return_value='/tmp/podcast_test')
-    def test_generate_podcast_empty_dialog_data(self, mock_mkdtemp, mock_get_request_id):
+    def test_generate_podcast_empty_dialog_data(
+        self, mock_mkdtemp, mock_get_request_id,
+    ):
         """Test generowania podcastu z pustymi danymi"""
         generator = AzureTTSPodcastGenerator()
 
@@ -86,18 +96,30 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
             result = generator.generate_podcast_azure([])
 
             mock_logger_error.assert_called_once_with(
-                'Nie przekazano danych dialogowych.')
+                'No dialog data provided.',
+            )
             self.assertIsNone(result)
 
-    @patch('src.utils.logging_config.get_request_id', return_value='test_request_123')
+    @patch(
+        'src.utils.logging_config.get_request_id',
+        return_value='test_request_123',
+    )
     @patch('tempfile.mkdtemp', return_value='/tmp/podcast_test')
     @patch('tempfile.NamedTemporaryFile')
     @patch('azure.cognitiveservices.speech.audio.AudioOutputConfig')
     @patch('azure.cognitiveservices.speech.SpeechSynthesizer')
-    @patch('os.path.join', return_value='/tmp/podcast_test/podcast_test_request_123.wav')
-    def test_generate_podcast_success(self, mock_join, mock_synthesizer_class,
-                                      mock_audio_config, mock_temp_file,
-                                      mock_mkdtemp, mock_get_request_id):
+    @patch(
+        'os.path.join', return_value='/tmp/podcast_test/podcast_test_request_123.wav',
+    )
+    def test_generate_podcast_success(
+        self,
+        mock_join,
+        mock_synthesizer_class,
+        mock_audio_config,
+        mock_temp_file,
+        mock_mkdtemp,
+        mock_get_request_id,
+    ):
         """Test pomyślnego generowania podcastu"""
         generator = AzureTTSPodcastGenerator()
 
@@ -107,14 +129,14 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
                 'voice_id': 'pl-PL-MarekNeural',
                 'text': 'Witamy w naszym podcaście',
                 'order': 1,
-                'speaker': 'Marek'
+                'speaker': 'Marek',
             },
             {
                 'voice_id': 'pl-PL-ZofiaNeural',
                 'text': 'Dzisiaj porozmawiamy o testowaniu',
                 'order': 2,
-                'speaker': 'Zofia'
-            }
+                'speaker': 'Zofia',
+            },
         ]
 
         # Mock temp file
@@ -126,12 +148,16 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
         mock_synthesizer = Mock()
         mock_result = Mock()
         mock_result.reason = speechsdk.ResultReason.SynthesizingAudioCompleted
-        mock_synthesizer.speak_text_async.return_value.get.return_value = mock_result
+        mock_synthesizer.speak_text_async.return_value.get.return_value = (
+            mock_result
+        )
         mock_synthesizer_class.return_value = mock_synthesizer
 
         # Mock combine_segments
         expected_output = '/tmp/podcast_test/podcast_test_request_123.wav'
-        with patch.object(generator, '_combine_segments', return_value=expected_output) as mock_combine:
+        with patch.object(
+            generator, '_combine_segments', return_value=expected_output,
+        ) as mock_combine:
             result = generator.generate_podcast_azure(dialog_data)
 
             self.assertEqual(result, expected_output)
@@ -140,8 +166,9 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
     @patch('tempfile.NamedTemporaryFile')
     @patch('azure.cognitiveservices.speech.audio.AudioOutputConfig')
     @patch('azure.cognitiveservices.speech.SpeechSynthesizer')
-    def test_generate_podcast_incomplete_segment(self, mock_synthesizer_class,
-                                                 mock_audio_config, mock_temp_file):
+    def test_generate_podcast_incomplete_segment(
+        self, mock_synthesizer_class, mock_audio_config, mock_temp_file,
+    ):
         """Test obsługi niepełnych segmentów"""
         generator = AzureTTSPodcastGenerator()
 
@@ -150,24 +177,26 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
                 'voice_id': 'pl-PL-MarekNeural',
                 'text': 'Kompletny segment',
                 'order': 1,
-                'speaker': 'Marek'
+                'speaker': 'Marek',
             },
             {
                 'voice_id': '',  # Brakujący voice_id
                 'text': 'Niepełny segment',
                 'order': 2,
-                'speaker': 'Zofia'
+                'speaker': 'Zofia',
             },
             {
                 'voice_id': 'pl-PL-ZofiaNeural',
                 # Brakujący text
                 'order': 3,
-                'speaker': 'Zofia'
-            }
+                'speaker': 'Zofia',
+            },
         ]
 
         with patch.object(generator.logger, 'warning') as mock_logger_warning:
-            with patch.object(generator, '_combine_segments', return_value='output.wav'):
+            with patch.object(
+                generator, '_combine_segments', return_value='output.wav',
+            ):
                 result = generator.generate_podcast_azure(dialog_data)
 
                 # Sprawdź czy niepełne segmenty zostały pominięte
@@ -176,8 +205,12 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
     @patch('tempfile.NamedTemporaryFile')
     @patch('azure.cognitiveservices.speech.audio.AudioOutputConfig')
     @patch('azure.cognitiveservices.speech.SpeechSynthesizer')
-    def test_generate_podcast_synthesis_error(self, mock_synthesizer_class,
-                                              mock_audio_config, mock_temp_file):
+    def test_generate_podcast_synthesis_error(
+        self,
+        mock_synthesizer_class,
+        mock_audio_config,
+        mock_temp_file,
+    ):
         """Test obsługi błędów syntezy"""
         generator = AzureTTSPodcastGenerator()
 
@@ -186,8 +219,8 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
                 'voice_id': 'pl-PL-MarekNeural',
                 'text': 'Test segment',
                 'order': 1,
-                'speaker': 'Marek'
-            }
+                'speaker': 'Marek',
+            },
         ]
 
         # Mock temp file
@@ -199,21 +232,32 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
         mock_synthesizer = Mock()
         mock_result = Mock()
         mock_result.reason = speechsdk.ResultReason.Canceled  # Błąd syntezy
-        mock_synthesizer.speak_text_async.return_value.get.return_value = mock_result
+        mock_synthesizer.speak_text_async.return_value.get.return_value = (
+            mock_result
+        )
         mock_synthesizer_class.return_value = mock_synthesizer
 
         with patch.object(generator.logger, 'error') as mock_logger_error:
-            with patch.object(generator, '_combine_segments', return_value='output.wav'):
+            with patch.object(
+                generator,
+                '_combine_segments',
+                return_value='output.wav',
+            ):
                 result = generator.generate_podcast_azure(dialog_data)
 
                 mock_logger_error.assert_called_with(
-                    'Błąd syntezy dla segmentu 1')
+                    'Synthesis error for segment 1',
+                )
 
     @patch('tempfile.NamedTemporaryFile')
     @patch('azure.cognitiveservices.speech.audio.AudioOutputConfig')
     @patch('azure.cognitiveservices.speech.SpeechSynthesizer')
-    def test_generate_podcast_exception_handling(self, mock_synthesizer_class,
-                                                 mock_audio_config, mock_temp_file):
+    def test_generate_podcast_exception_handling(
+        self,
+        mock_synthesizer_class,
+        mock_audio_config,
+        mock_temp_file,
+    ):
         """Test obsługi wyjątków podczas generowania"""
         generator = AzureTTSPodcastGenerator()
 
@@ -222,8 +266,8 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
                 'voice_id': 'pl-PL-MarekNeural',
                 'text': 'Test segment',
                 'order': 1,
-                'speaker': 'Marek'
-            }
+                'speaker': 'Marek',
+            },
         ]
 
         # Mock temp file
@@ -234,11 +278,14 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
         # Mock synthesizer rzucający wyjątek
         mock_synthesizer = Mock()
         mock_synthesizer.speak_text_async.side_effect = Exception(
-            'Test exception')
+            'Test exception',
+        )
         mock_synthesizer_class.return_value = mock_synthesizer
 
         with patch.object(generator.logger, 'exception') as mock_logger_exception:
-            with patch.object(generator, '_combine_segments', return_value='output.wav'):
+            with patch.object(
+                generator, '_combine_segments', return_value='output.wav',
+            ):
                 result = generator.generate_podcast_azure(dialog_data)
 
                 mock_logger_exception.assert_called_once()
@@ -252,8 +299,8 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
                 'voice_id': 'pl-PL-MarekNeural',
                 'text': 'Test segment',
                 'order': 1,
-                'speaker': 'Marek'
-            }
+                'speaker': 'Marek',
+            },
         ]
 
         progress_callback = Mock()
@@ -261,14 +308,17 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
         with patch('tempfile.NamedTemporaryFile'):
             with patch('azure.cognitiveservices.speech.audio.AudioOutputConfig'):
                 with patch('azure.cognitiveservices.speech.SpeechSynthesizer'):
-                    with patch.object(generator, '_combine_segments', return_value='output.wav'):
+                    with patch.object(
+                        generator, '_combine_segments', return_value='output.wav',
+                    ):
                         generator.generate_podcast_azure(
-                            dialog_data, progress_callback=progress_callback)
+                            dialog_data, progress_callback=progress_callback,
+                        )
 
                         # Sprawdź wywołania progress callback
                         expected_calls = [
                             call(0, 1, 'Generowanie segmentu 1/1: Marek'),
-                            call(1, 1, 'Łączenie segmentów...')
+                            call(1, 1, 'Łączenie segmentów...'),
                         ]
                         progress_callback.assert_has_calls(expected_calls)
 
@@ -304,9 +354,11 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
                 return mock_output_wave
 
         mock_wave_open.return_value.__enter__ = lambda x: wave_open_side_effect(
-            None, None)
+            None, None,
+        )
         mock_wave_open.side_effect = lambda file, mode: MagicMock(
-            __enter__=lambda x: wave_open_side_effect(file, mode))
+            __enter__=lambda x: wave_open_side_effect(file, mode),
+        )
 
         with patch('os.remove') as mock_remove:
             result = generator._combine_segments(temp_files, output_path)
@@ -326,12 +378,16 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
 
             self.assertIsNone(result)
             mock_logger_error.assert_called_with(
-                'Brak plików do połączenia – nie wygenerowano żadnego segmentu.'
+                'No files to merge - no segments were generated.',
             )
 
     @patch('wave.open')
     @patch('os.path.exists', return_value=True)
-    def test_combine_segments_wave_exception(self, mock_exists, mock_wave_open):
+    def test_combine_segments_wave_exception(
+        self,
+        mock_exists,
+        mock_wave_open,
+    ):
         """Test obsługi wyjątku podczas łączenia plików WAV"""
         generator = AzureTTSPodcastGenerator()
 
@@ -339,7 +395,7 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
         output_path = '/tmp/output.wav'
 
         # Mock rzucający wyjątek
-        mock_wave_open.side_effect = Exception('Wave error')
+        mock_wave_open.side_effect = OSError('Wave error')
 
         with patch.object(generator.logger, 'exception') as mock_logger_exception:
             result = generator._combine_segments(temp_files, output_path)
@@ -350,7 +406,9 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
     @patch('wave.open')
     @patch('os.path.exists', return_value=True)
     @patch('os.remove')
-    def test_combine_segments_file_removal_success(self, mock_remove, mock_exists, mock_wave_open):
+    def test_combine_segments_file_removal_success(
+        self, mock_remove, mock_exists, mock_wave_open,
+    ):
         """Test pomyślnego usuwania plików tymczasowych"""
         generator = AzureTTSPodcastGenerator()
 
@@ -368,8 +426,9 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
     @patch('os.path.exists', return_value=True)
     @patch('os.remove')
     @patch('time.sleep')
-    def test_combine_segments_permission_error_retry(self, mock_sleep, mock_remove,
-                                                     mock_exists, mock_wave_open):
+    def test_combine_segments_permission_error_retry(
+        self, mock_sleep, mock_remove, mock_exists, mock_wave_open,
+    ):
         """Test ponawiania usuwania pliku przy błędzie uprawnień"""
         generator = AzureTTSPodcastGenerator()
 
@@ -392,8 +451,9 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
     @patch('wave.open')
     @patch('os.path.exists', return_value=True)
     @patch('os.remove')
-    def test_combine_segments_permission_error_max_retries(self, mock_remove,
-                                                           mock_exists, mock_wave_open):
+    def test_combine_segments_permission_error_max_retries(
+        self, mock_remove, mock_exists, mock_wave_open,
+    ):
         """Test maksymalnej liczby prób przy błędzie uprawnień"""
         generator = AzureTTSPodcastGenerator()
 
@@ -411,13 +471,16 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
                 generator._combine_segments(temp_files, output_path)
 
                 self.assertEqual(mock_remove.call_count, 3)  # 3 próby
-                # 2 retry warnings + 1 final warning
-                self.assertEqual(mock_logger_warning.call_count, 3)
+                self.assertEqual(
+                    mock_logger_warning.call_count, 3,
+                )  # 2 retry warnings + 1 final warning
 
     @patch('wave.open')
     @patch('os.path.exists', return_value=True)
     @patch('os.remove')
-    def test_combine_segments_other_remove_exception(self, mock_remove, mock_exists, mock_wave_open):
+    def test_combine_segments_other_remove_exception(
+        self, mock_remove, mock_exists, mock_wave_open,
+    ):
         """Test obsługi innych wyjątków podczas usuwania plików"""
         generator = AzureTTSPodcastGenerator()
 
@@ -437,12 +500,18 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
 
     @patch('wave.open')
     @patch('os.path.exists')
-    def test_combine_segments_mixed_file_existence(self, mock_exists, mock_wave_open):
+    def test_combine_segments_mixed_file_existence(
+        self,
+        mock_exists,
+        mock_wave_open,
+    ):
         """Test łączenia segmentów z mieszanką istniejących i nieistniejących plików"""
         generator = AzureTTSPodcastGenerator()
 
-        temp_files = ['/tmp/chunk1.wav',
-                      '/tmp/nonexistent.wav', '/tmp/chunk2.wav']
+        temp_files = [
+            '/tmp/chunk1.wav',
+            '/tmp/nonexistent.wav', '/tmp/chunk2.wav',
+        ]
         output_path = '/tmp/output.wav'
 
         # Mock exists - pierwszy i trzeci plik istnieją
@@ -458,7 +527,11 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
 
     @patch('wave.open')
     @patch('os.path.exists', return_value=True)
-    def test_combine_segments_temp_wave_exception(self, mock_exists, mock_wave_open):
+    def test_combine_segments_temp_wave_exception(
+        self,
+        mock_exists,
+        mock_wave_open,
+    ):
         """Test obsługi wyjątku podczas odczytu pliku tymczasowego"""
         generator = AzureTTSPodcastGenerator()
 
@@ -477,7 +550,7 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
 
         # Mock temp wave context manager rzucający wyjątek
         mock_temp_wave = MagicMock()
-        mock_temp_wave.__enter__.side_effect = Exception('Temp wave error')
+        mock_temp_wave.__enter__.side_effect = OSError('Temp wave error')
 
         call_count = 0
 
@@ -535,14 +608,18 @@ class TestAzureTTSPodcastGeneratorIntegration(unittest.TestCase):
 
     def setUp(self):
         """Przygotowanie środowiska testowego"""
-        self.env_patcher = patch.dict(os.environ, {
-            'AZURE_SPEECH_API_KEY': 'test_key',
-            'AZURE_SPEECH_REGION': 'test_region'
-        })
+        self.env_patcher = patch.dict(
+            os.environ,
+            {
+                'AZURE_SPEECH_API_KEY': 'test_key',
+                'AZURE_SPEECH_REGION': 'test_region',
+            },
+        )
         self.env_patcher.start()
 
         self.speech_config_patcher = patch(
-            'azure.cognitiveservices.speech.SpeechConfig')
+            'azure.cognitiveservices.speech.SpeechConfig',
+        )
         self.speech_config_patcher.start()
 
     def tearDown(self):
@@ -551,7 +628,10 @@ class TestAzureTTSPodcastGeneratorIntegration(unittest.TestCase):
         self.speech_config_patcher.stop()
 
     @patch('tempfile.mkdtemp', return_value='/tmp/podcast_integration')
-    @patch('src.utils.logging_config.get_request_id', return_value='integration_test')
+    @patch(
+        'src.utils.logging_config.get_request_id',
+        return_value='integration_test',
+    )
     @patch('tempfile.NamedTemporaryFile')
     @patch('azure.cognitiveservices.speech.audio.AudioOutputConfig')
     @patch('azure.cognitiveservices.speech.SpeechSynthesizer')
@@ -559,14 +639,25 @@ class TestAzureTTSPodcastGeneratorIntegration(unittest.TestCase):
     @patch('os.path.exists', return_value=True)
     @patch('os.remove')
     @patch('os.path.join')
-    def test_full_podcast_generation_flow(self, mock_join, mock_remove, mock_exists, mock_wave_open,
-                                          mock_synthesizer_class, mock_audio_config,
-                                          mock_temp_file, mock_get_request_id, mock_mkdtemp):
+    def test_full_podcast_generation_flow(
+        self,
+        mock_join,
+        mock_remove,
+        mock_exists,
+        mock_wave_open,
+        mock_synthesizer_class,
+        mock_audio_config,
+        mock_temp_file,
+        mock_get_request_id,
+        mock_mkdtemp,
+    ):
         """Test pełnego przepływu generowania podcastu"""
         generator = AzureTTSPodcastGenerator()
 
         # Mock os.path.join to return expected path
-        expected_output = '/tmp/podcast_integration/podcast_integration_test.wav'
+        expected_output = (
+            '/tmp/podcast_integration/podcast_integration_test.wav'
+        )
         mock_join.return_value = expected_output
 
         dialog_data = [
@@ -574,14 +665,14 @@ class TestAzureTTSPodcastGeneratorIntegration(unittest.TestCase):
                 'voice_id': 'pl-PL-MarekNeural',
                 'text': 'Witamy w naszym podcaście o testowaniu',
                 'order': 1,
-                'speaker': 'Marek'
+                'speaker': 'Marek',
             },
             {
                 'voice_id': 'pl-PL-ZofiaNeural',
                 'text': 'Dzisiaj porozmawiamy o pokryciu kodu testami',
                 'order': 2,
-                'speaker': 'Zofia'
-            }
+                'speaker': 'Zofia',
+            },
         ]
 
         # Mock temp files
@@ -593,7 +684,9 @@ class TestAzureTTSPodcastGeneratorIntegration(unittest.TestCase):
         mock_synthesizer = Mock()
         mock_result = Mock()
         mock_result.reason = speechsdk.ResultReason.SynthesizingAudioCompleted
-        mock_synthesizer.speak_text_async.return_value.get.return_value = mock_result
+        mock_synthesizer.speak_text_async.return_value.get.return_value = (
+            mock_result
+        )
         mock_synthesizer_class.return_value = mock_synthesizer
 
         # Mock wave operations
@@ -628,7 +721,8 @@ class TestAzureTTSPodcastGeneratorIntegration(unittest.TestCase):
         progress_callback = Mock()
 
         result = generator.generate_podcast_azure(
-            dialog_data, progress_callback=progress_callback)
+            dialog_data, progress_callback=progress_callback,
+        )
 
         # Sprawdzenia
         self.assertEqual(result, expected_output)
@@ -637,13 +731,8 @@ class TestAzureTTSPodcastGeneratorIntegration(unittest.TestCase):
         self.assertEqual(mock_synthesizer.speak_text_async.call_count, 2)
 
         # Sprawdź progress callback
-        self.assertEqual(progress_callback.call_count,
-                         3)  # 2 segmenty + łączenie
+        self.assertEqual(
+            progress_callback.call_count,
+            3,
+        )  # 2 segmenty + łączenie
 
-
-if __name__ == '__main__':
-    # Konfiguracja loggera dla testów
-    logging.basicConfig(level=logging.DEBUG)
-
-    # Uruchomienie testów
-    unittest.main(verbosity=2)

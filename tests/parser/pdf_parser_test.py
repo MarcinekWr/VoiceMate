@@ -1,5 +1,4 @@
 """Tests for PdfParser class - Updated to match actual implementation."""
-
 from __future__ import annotations
 
 import json
@@ -30,14 +29,16 @@ class TestPdfParser(unittest.TestCase):
             'PDFImageExtractor': patch('src.file_parser.pdf_parser.PDFImageExtractor'),
             'PDFTableParser': patch('src.file_parser.pdf_parser.PDFTableParser'),
             'PDFContentFormatter': patch(
-                'src.file_parser.pdf_parser.PDFContentFormatter'
+                'src.file_parser.pdf_parser.PDFContentFormatter',
             ),
             'os.makedirs': patch('os.makedirs'),
             'os.stat': patch('os.stat'),
         }
 
-        self.mocks = {name: patcher.start()
-                      for name, patcher in self.patchers.items()}
+        self.mocks = {
+            name: patcher.start()
+            for name, patcher in self.patchers.items()
+        }
 
         self.mocks['os.stat'].return_value.st_size = 1024 * 1024
         self.mocks['os.stat'].return_value.st_mtime = 1622548800

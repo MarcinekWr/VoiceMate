@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import streamlit as st
 
 from src.workflow.generation import generate_plan_content
@@ -7,7 +9,8 @@ def render_step_2():
     """Render Step 2: Plan Generation"""
     st.header('📝 Krok 2: Generuj plan podcastu')
 
-    st.markdown("""
+    st.markdown(
+        """
     🔧 Na podstawie przetworzonej treści z pliku/strony internetowej, w tym kroku zostanie wygenerowany **szczegółowy plan podcastu**.
 
     📋 **Co zawiera plan?**
@@ -16,21 +19,24 @@ def render_step_2():
     - Kolejność omawiania treści
 
     ✨ Ten plan zostanie użyty w kolejnym kroku do wygenerowania właściwego tekstu podcastu.
-    """)
+    """,
+    )
 
     # Show extracted content preview
     with st.expander('👁️ Podgląd wydobytej treści', expanded=False):
         preview_text = st.session_state.llm_content
         if len(preview_text) > 2000:
-            preview_text = preview_text[:2000] + \
-                '\n\n... (treść została skrócona dla podglądu)'
+            preview_text = (
+                preview_text[:2000]
+                + '\n\n... (treść została skrócona dla podglądu)'
+            )
 
         st.text_area(
             'Wydobyta treść',
             value=preview_text,
             height=300,
             disabled=True,
-            help='To jest treść wydobyta z Twojego pliku, która zostanie użyta do generowania planu podcastu'
+            help='To jest treść wydobyta z Twojego pliku, która zostanie użyta do generowania planu podcastu',
         )
 
     st.markdown('---')
@@ -42,7 +48,7 @@ def render_step_2():
             '📝 Generuj plan',
             type='primary',
             disabled=st.session_state.processing,
-            use_container_width=True
+            use_container_width=True,
         )
 
     with col2:

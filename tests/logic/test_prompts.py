@@ -18,7 +18,7 @@ Test cases:
 - test_load_prompt_template_missing_file:
     Simulates a missing template file scenario and checks that a FileNotFoundError is raised.
 """
-
+from __future__ import annotations
 
 import pytest
 
@@ -48,8 +48,12 @@ def test_load_prompt_template_invalid_style():
 
 
 def test_load_prompt_template_missing_file(tmp_path, monkeypatch):
-
+    original_path = PROMPT_PATHS['plan']
     monkeypatch.setitem(PROMPT_PATHS, 'plan', tmp_path / 'missing.txt')
 
-    with pytest.raises(FileNotFoundError):
-        load_prompt_template('plan')
+    try:
+        with pytest.raises(FileNotFoundError):
+            load_prompt_template('plan')
+    finally:
+        PROMPT_PATHS['plan'] = original_path
+

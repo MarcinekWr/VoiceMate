@@ -1,12 +1,10 @@
 """
 This module contains the LLMService class for interacting with Language Models.
 """
-
 from __future__ import annotations
 
 import logging
 import os
-from typing import Optional
 
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
@@ -71,7 +69,7 @@ class LLMService:
                             'url': f'data:image/png;base64,{base64_image}',
                         },
                     },
-                ]
+                ],
             )
 
             response = self.llm.invoke([message])

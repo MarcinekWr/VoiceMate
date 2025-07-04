@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 import re
@@ -7,16 +9,22 @@ logger = logging.getLogger(__name__)
 
 def dialog_to_json(raw_text: str, is_premium: bool = True) -> list:
     """Convert dialog text to JSON format"""
-    speaker_map = {
-        'P': 'o2xdfKUpc1Bwq7RchZuW',
-        'S': 'CLuTGacrAhcIhaJslbXt',
-    } if is_premium else {
-        'P': 'pl-PL-MarekNeural',
-        'S': 'pl-PL-ZofiaNeural'
-    }
+    speaker_map = (
+        {
+            'P': 'o2xdfKUpc1Bwq7RchZuW',
+            'S': 'CLuTGacrAhcIhaJslbXt',
+        }
+        if is_premium
+        else {
+            'P': 'pl-PL-MarekNeural',
+            'S': 'pl-PL-ZofiaNeural',
+        }
+    )
 
     pattern = re.compile(
-        r'^\[(P|S)\]:\s*(.+?)(?=^\[P\]:|^\[S\]:|\Z)', re.MULTILINE | re.DOTALL)
+        r'^\[(P|S)\]:\s*(.+?)(?=^\[P\]:|^\[S\]:|\Z)',
+        re.MULTILINE | re.DOTALL,
+    )
     matches = pattern.findall(raw_text)
 
     if not matches:
@@ -31,7 +39,7 @@ def dialog_to_json(raw_text: str, is_premium: bool = True) -> list:
             'order': i,
             'speaker': 'professor' if role == 'P' else 'student',
             'voice_id': speaker_map[role],
-            'text': text.strip().replace('\n', ' ')
+            'text': text.strip().replace('\n', ' '),
         }
         logger.debug(f'Wypowiedź {i}: {entry}')
         result.append(entry)
@@ -39,7 +47,11 @@ def dialog_to_json(raw_text: str, is_premium: bool = True) -> list:
     return result
 
 
-def save_to_file(content: str, filename: str, output_dir: str = 'output') -> str:
+def save_to_file(
+    content: str,
+    filename: str,
+    output_dir: str = 'output',
+) -> str:
     """Save content to file and return the path"""
     os.makedirs(output_dir, exist_ok=True)
     file_path = os.path.join(output_dir, filename)

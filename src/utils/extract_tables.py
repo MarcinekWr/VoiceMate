@@ -1,12 +1,11 @@
 """
 PDF Table Parser class to extract tables from PDF files.
 """
-
 from __future__ import annotations
 
 import json
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import camelot
 import pandas as pd
@@ -63,7 +62,10 @@ class PDFTableParser:
                         'content_ratio': round(content_ratio, 2),
                         'shape': df.shape,
                         'data': df.to_dict('records'),
-                        'json': df.to_json(orient='records', force_ascii=False),
+                        'json': df.to_json(
+                            orient='records',
+                            force_ascii=False,
+                        ),
                     }
                     extracted_tables.append(table_data)
 
@@ -143,7 +145,9 @@ class PDFTableParser:
                 f"Size: {table['shape'][0]} rows × {table['shape'][1]} columns",
             )
             formatted_output.append(f"Accuracy: {table['accuracy']}%")
-            formatted_output.append(f"Content Ratio: {table['content_ratio']}")
+            formatted_output.append(
+                f"Content Ratio: {table['content_ratio']}",
+            )
 
             formatted_output.append('\nTable Data (JSON):')
             try:

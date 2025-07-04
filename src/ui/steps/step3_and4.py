@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 
 import streamlit as st
@@ -20,7 +22,7 @@ def render_step_3_and_4():
             value=st.session_state.plan_text,
             height=200,
             disabled=True,
-            help='Ten plan będzie użyty do wygenerowania tekstu podcastu'
+            help='Ten plan będzie użyty do wygenerowania tekstu podcastu',
         )
 
     st.subheader('🎨 Ustawienia stylu i głosu')
@@ -32,14 +34,14 @@ def render_step_3_and_4():
         with col1:
             style_labels = {
                 '🔬 Styl naukowy': 'scientific',
-                '😊 Styl swobodny': 'casual'
+                '😊 Styl swobodny': 'casual',
             }
             label_to_value = list(style_labels.keys())
             selected_label = st.selectbox(
                 'Styl tekstu',
                 options=label_to_value,
                 index=0,
-                help='Wybierz styl, w jakim ma być napisany podcast'
+                help='Wybierz styl, w jakim ma być napisany podcast',
             )
             podcast_style = style_labels[selected_label]
 
@@ -49,7 +51,7 @@ def render_step_3_and_4():
                 'Silnik audio',
                 options=['🆓 Azure (Darmowy)', '🎯 ElevenLabs (Premium)'],
                 index=0,
-                help='Wybierz silnik do generowania audio'
+                help='Wybierz silnik do generowania audio',
             )
             is_premium = False
             if tts_option == "🎯 ElevenLabs (Premium)":
@@ -72,17 +74,19 @@ def render_step_3_and_4():
     # Opis wybranego stylu
     style_descriptions = {
         'scientific': '🔬 *Styl naukowy* – precyzyjny, oparty na faktach',
-        'casual': '😊 *Styl swobodny* – przyjazny, nieformalny ton'
+        'casual': '😊 *Styl swobodny* – przyjazny, nieformalny ton',
     }
     st.caption(style_descriptions[podcast_style])
 
     # Opis wybranego silnika TTS
     if st.session_state.is_premium:
         st.caption(
-            '🎯 *ElevenLabs (Premium)* – najwyższa jakość audio, MP3\nGłosy: Profesor (`o2xdfKUpc1...`), Student (`CLuTGacrAh...`)')
+            '🎯 *ElevenLabs (Premium)* – najwyższa jakość audio, MP3\nGłosy: Profesor (`o2xdfKUpc1...`), Student (`CLuTGacrAh...`)',
+        )
     else:
         st.caption(
-            '🆓 *Azure (Darmowy)* – dobra jakość audio, WAV\nGłosy: pl-PL-MarekNeural, pl-PL-ZofiaNeural')
+            '🆓 *Azure (Darmowy)* – dobra jakość audio, WAV\nGłosy: pl-PL-MarekNeural, pl-PL-ZofiaNeural',
+        )
 
     st.markdown('---')
 
@@ -93,39 +97,56 @@ def render_step_3_and_4():
             '🎙️ Generuj podcast',
             type='primary',
             disabled=st.session_state.processing,
-            use_container_width=True
+            use_container_width=True,
         )
     with col2:
         if st.session_state.processing:
-            st.info('🔄 Generowanie tekstu podcastu... To może potrwać kilka minut.')
+            st.info(
+                '🔄 Generowanie tekstu podcastu... To może potrwać kilka minut.',
+            )
 
     # Logika przycisku
     if generate_podcast_button:
         st.session_state.processing = True
-        with st.spinner(f'🎙️ Tworzę tekst podcastu w stylu {podcast_style}...'):
+        with st.spinner(
+            f'🎙️ Tworzę tekst podcastu w stylu {podcast_style}...',
+        ):
             try:
                 podcast_text = generate_podcast_content(
                     podcast_style,
                     st.session_state.llm_content,
-                    st.session_state.plan_text
+                    st.session_state.plan_text,
                 )
                 if podcast_text:
                     st.session_state.podcast_text = podcast_text
 
                     # Automatyczna konwersja do JSON
                     json_data = dialog_to_json(
-                        podcast_text, st.session_state.is_premium)
+                        podcast_text,
+                        st.session_state.is_premium,
+                    )
                     st.session_state.json_data = json_data
 
                     # Zapis do pliku
-                    json_filename = 'podcast_premium.json' if st.session_state.is_premium else 'podcast_free.json'
-                    json_file_path = save_to_file(json.dumps(
-                        json_data, ensure_ascii=False, indent=2), json_filename)
+                    json_filename = (
+                        'podcast_premium.json'
+                        if st.session_state.is_premium
+                        else 'podcast_free.json'
+                    )
+                    save_to_file(
+                        json.dumps(
+                            json_data,
+                            ensure_ascii=False,
+                            indent=2,
+                        ),
+                        json_filename,
+                    )
 
                     st.session_state.step = 5
                     st.session_state.processing = False
                     st.success(
-                        '✅ Podcast został wygenerowany i przygotowany do konwersji audio!')
+                        '✅ Podcast został wygenerowany i przygotowany do konwersji audio!',
+                    )
                     st.balloons()
                     st.rerun()
                 else:

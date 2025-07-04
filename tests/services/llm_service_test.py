@@ -42,9 +42,14 @@ class TestLLMService(unittest.TestCase):
         mock_azure_llm.return_value = mock_llm_instance
 
         service = LLMService()
-        prompt_template = PromptTemplate.from_template('Describe this {topic}.')
-
-        result = service.generate_description('base64_string', prompt_template, 'weather')
+        prompt_template = PromptTemplate.from_template(
+            'Describe this {topic}.',
+        )
+        result = service.generate_description(
+            'base64_string',
+            prompt_template,
+            'weather',
+        )
 
         self.assertEqual(result, 'A beautiful sunny day.')
         mock_llm_instance.invoke.assert_called_once()
@@ -53,10 +58,11 @@ class TestLLMService(unittest.TestCase):
         """Test description generation when the service is not available."""
         with patch.object(LLMService, '_initialize_llm', return_value=None):
             service = LLMService()
-            prompt_template = PromptTemplate.from_template('Describe this {topic}.')
-            result = service.generate_description('base64_string', prompt_template, 'weather')
+            prompt_template = PromptTemplate.from_template(
+                'Describe this {topic}.',
+            )
+            result = service.generate_description(
+                'base64_string', prompt_template, 'weather',
+            )
             self.assertEqual(result, 'LLM service not available')
 
-
-if __name__ == '__main__':
-    unittest.main()

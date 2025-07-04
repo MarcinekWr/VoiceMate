@@ -1,6 +1,7 @@
 """
 Tests for PDFImageExtractor class.
 """
+from __future__ import annotations
 
 import unittest
 from unittest.mock import MagicMock, mock_open, patch
@@ -38,7 +39,9 @@ class TestPDFImageExtractor(unittest.TestCase):
         mock_pix.tobytes.return_value = b'image_data'
         mock_pixmap.return_value = mock_pix
 
-        self.mock_image_describer.describe_image.return_value = 'A nice image.'
+        self.mock_image_describer.describe_image.return_value = (
+            'A nice image.'
+        )
 
         images = self.extractor.extract_images(mock_doc)
 
@@ -65,9 +68,11 @@ class TestPDFImageExtractor(unittest.TestCase):
     def test_get_image_description_exception(self):
         """Test exception handling during image description."""
         self.mock_image_describer.describe_image.side_effect = Exception(
-            'API Error')
-        description = self.extractor._get_image_description('path', b'data')
-        self.assertEqual(description, 'Error generating description')
+            'API Error',
+        )
+        with self.assertRaises(Exception) as exc:
+            self.extractor._get_image_description('path', b'data')
+        self.assertIn('API Error', str(exc.exception))
 
     @patch('fitz.Pixmap')
     def test_extract_images_too_small(self, mock_pixmap):

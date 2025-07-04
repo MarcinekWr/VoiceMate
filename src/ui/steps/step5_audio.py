@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 
@@ -9,14 +11,20 @@ from src.workflow.generation import generate_audio_from_json
 
 def render_step_5():
     """Render Step 5: Audio Generation"""
-    st.header('🎵 Krok 4: Generuj audio')
+    if "audio_generated_in_step5" not in st.session_state:
+        st.session_state.audio_generated_in_step5 = False
+    st.header("🎵 Krok 4: Generuj audio")
 
     # Show JSON preview
     with st.expander('📋 Podgląd JSON', expanded=False):
         st.json(st.session_state.json_data)
 
     # Engine info
-    engine_name = 'głosu Elevenlabs (Premium)' if st.session_state.is_premium else 'głosu azure (Darmowy)'
+    engine_name = (
+        'głosu Elevenlabs (Premium)'
+        if st.session_state.is_premium
+        else 'głosu azure (Darmowy)'
+    )
     audio_format = 'MP3' if st.session_state.is_premium else 'WAV'
 
     st.info(f'🎯 **Wybrany silnik:** {engine_name}')
@@ -32,7 +40,7 @@ def render_step_5():
             '🎵 Generuj audio',
             type='primary',
             disabled=st.session_state.processing,
-            use_container_width=True
+            use_container_width=True,
         )
 
     with col2:
@@ -44,24 +52,29 @@ def render_step_5():
 
         with st.spinner(f'🎵 Generuję audio za pomocą {engine_name}...'):
             audio_path = generate_audio_from_json(
-                st.session_state.json_data, st.session_state.is_premium)
+                st.session_state.json_data, st.session_state.is_premium,
+            )
 
             if audio_path:
                 st.session_state.audio_path = audio_path
+                st.session_state.audio_generated_in_step5 = True
+                st.session_state.processing = False
 
                 try:
                     blob_name = os.path.basename(audio_path)
                     upload_to_blob('audio', audio_path, blob_name)
                 except Exception as upload_error:
                     st.warning(
-                        f'⚠️ Błąd przy wysyłaniu audio do Azure Blob: {upload_error}')
+                        f'⚠️ Błąd przy wysyłaniu audio do Azure Blob: {upload_error}',
+                    )
 
                 st.session_state.processing = False
                 st.success(
-                    f'✅ Audio zostało pomyślnie wygenerowane! Zapisano jako: {audio_path}')
+                    f'✅ Audio zostało pomyślnie wygenerowane! Zapisano jako: {audio_path}',
+                )
                 st.balloons()
                 st.rerun()
-
+    st.session_state.processing = False
     # Show audio player if available
     if st.session_state.audio_path and os.path.exists(st.session_state.audio_path):
         st.markdown('---')
@@ -83,7 +96,7 @@ def render_step_5():
                 data=st.session_state.plan_text,
                 file_name='plan_podcastu.txt',
                 mime='text/plain',
-                help='Pobierz plan podcastu jako plik tekstowy'
+                help='Pobierz plan podcastu jako plik tekstowy',
             )
 
         with col2:
@@ -92,17 +105,20 @@ def render_step_5():
                 data=st.session_state.podcast_text,
                 file_name='tekst_podcastu.txt',
                 mime='text/plain',
-                help='Pobierz tekst podcastu jako plik tekstowy'
+                help='Pobierz tekst podcastu jako plik tekstowy',
             )
 
         with col3:
             st.download_button(
                 label='📥 Pobierz JSON',
-                data=json.dumps(st.session_state.json_data,
-                                ensure_ascii=False, indent=2),
+                data=json.dumps(
+                    st.session_state.json_data,
+                    ensure_ascii=False,
+                    indent=2,
+                ),
                 file_name=f"podcast_{'premium' if st.session_state.is_premium else 'free'}.json",
                 mime='application/json',
-                help='Pobierz dane JSON dla TTS'
+                help='Pobierz dane JSON dla TTS',
             )
 
         with col4:
@@ -112,9 +128,11 @@ def render_step_5():
                     data=audio_file.read(),
                     file_name=f'podcast.{audio_format.lower()}',
                     mime=f'audio/{audio_format.lower()}',
-                    help=f'Pobierz wygenerowane audio ({audio_format})'
+                    help=f'Pobierz wygenerowane audio ({audio_format})',
                 )
 
         st.markdown('---')
         st.success('🎉 **Proces zakończony pomyślnie!**')
-        st.info('💡 Twój podcast został w pełni wygenerowany i jest gotowy do użycia!')
+        st.info(
+            '💡 Twój podcast został w pełni wygenerowany i jest gotowy do użycia!',
+        )

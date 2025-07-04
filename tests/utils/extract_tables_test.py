@@ -4,7 +4,6 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-import pytest
 
 from src.utils.extract_tables import PDFTableParser
 
@@ -29,7 +28,7 @@ class TestPDFTableParser(unittest.TestCase):
         # Arrange
         mock_table = MagicMock()
         mock_table.df = pd.DataFrame(
-            {'col1': ['data1', 'data2'], 'col2': ['data3', 'data4']}
+            {'col1': ['data1', 'data2'], 'col2': ['data3', 'data4']},
         )
         mock_table.parsing_report = {
             'accuracy': 99.0,
@@ -70,7 +69,7 @@ class TestPDFTableParser(unittest.TestCase):
                 'A': ['  value1 ', '', ' value3 '],
                 'B': ['', '', ''],
                 'C': [' value2 ', '', ''],
-            }
+            },
         )
         parser = PDFTableParser('dummy.pdf')
 
@@ -104,7 +103,7 @@ class TestPDFTableParser(unittest.TestCase):
                 'accuracy': 95.5,
                 'content_ratio': 0.8,
                 'json': '[{"col1": "a", "col2": "b"}]',
-            }
+            },
         ]
         parser = PDFTableParser('dummy.pdf')
 
@@ -115,6 +114,3 @@ class TestPDFTableParser(unittest.TestCase):
         self.assertIn('TABLE 1', formatted_string)
         self.assertIn('Accuracy: 95.5%', formatted_string)
 
-
-if __name__ == '__main__':
-    unittest.main()

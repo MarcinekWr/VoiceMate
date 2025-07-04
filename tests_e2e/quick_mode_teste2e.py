@@ -48,12 +48,14 @@ class TestVoiceMateQuickMode:
             "input[type='file']",
         ).set_input_files(str(sample_pdf_file))
         generate_btn = voicemate_page.page.get_by_text(
-            '🚀 Start – Wygeneruj podcast', exact=True,
+            '🚀 Start – Wygeneruj podcast',
+            exact=True,
         )
         expect(generate_btn).to_be_enabled()
         generate_btn.click()
         self.wait_for_spinner_to_disappear(
-            voicemate_page.page, [
+            voicemate_page.page,
+            [
                 '📥 Przetwarzanie treści...',
                 '📝 Generowanie planu...',
                 '🎙️ Generowanie treści podcastu...',
@@ -62,7 +64,8 @@ class TestVoiceMateQuickMode:
         )
         expect(
             voicemate_page.page.get_by_text(
-                'w pełni wygenerowany', exact=False,
+                'w pełni wygenerowany',
+                exact=False,
             ),
         ).to_be_visible(timeout=120000)
         audio_count = voicemate_page.page.locator('audio').count()
@@ -70,19 +73,28 @@ class TestVoiceMateQuickMode:
         voicemate_page.page.wait_for_selector('audio', timeout=10000)
         expect(
             voicemate_page.page.get_by_role(
-                'button', name='📥 Pobierz tekst',
+                'button',
+                name='📥 Pobierz tekst',
             ),
         ).to_be_visible()
         expect(
             voicemate_page.page.get_by_role(
-                'button', name='📥 Pobierz audio',
+                'button',
+                name='📥 Pobierz audio',
             ),
         ).to_be_visible()
 
-    def test_quick_mode_pdf_upload(self, voicemate_page: Any, sample_pdf_file: str | Path) -> None:
+    def test_quick_mode_pdf_upload(
+        self,
+        voicemate_page: Any,
+        sample_pdf_file: str | Path,
+    ) -> None:
         """Test the quick mode with PDF file upload."""
         voicemate_page.wait_for_app_ready()
-        voicemate_page.page.get_by_text('⚡ Szybki podcast', exact=True).click()
+        voicemate_page.page.get_by_text(
+            '⚡ Szybki podcast',
+            exact=True,
+        ).click()
         expect(
             voicemate_page.page.get_by_role(
                 'heading',
@@ -94,11 +106,16 @@ class TestVoiceMateQuickMode:
             "input[type='file']",
         ).set_input_files(str(sample_pdf_file))
         generate_btn = voicemate_page.page.get_by_text(
-            '🚀 Start – Wygeneruj podcast', exact=True,
+            '🚀 Start – Wygeneruj podcast',
+            exact=True,
         )
         expect(generate_btn).to_be_enabled()
 
-    def test_quick_mode_url_upload(self, voicemate_page: Any, sample_url: str) -> None:
+    def test_quick_mode_url_upload(
+        self,
+        voicemate_page: Any,
+        sample_url: str,
+    ) -> None:
         """Test the quick mode with URL input."""
         """This test simulates the process of entering a URL."""
         voicemate_page.wait_for_app_ready()
@@ -112,7 +129,8 @@ class TestVoiceMateQuickMode:
         url_input.fill(sample_url)
         url_input.press('Enter')
         generate_btn = voicemate_page.page.get_by_text(
-            '🚀 Start – Wygeneruj podcast', exact=True,
+            '🚀 Start – Wygeneruj podcast',
+            exact=True,
         )
         expect(generate_btn).to_be_enabled()
 
@@ -121,12 +139,14 @@ class TestVoiceMateQuickMode:
         voicemate_page.wait_for_app_ready()
         expect(
             voicemate_page.page.get_by_text(
-                '🚀 Rozpocznij krok po kroku', exact=True,
+                '🚀 Rozpocznij krok po kroku',
+                exact=True,
             ),
         ).to_be_visible()
         expect(
             voicemate_page.page.get_by_text(
-                '⚡ Szybki podcast', exact=True,
+                '⚡ Szybki podcast',
+                exact=True,
             ),
         ).to_be_visible()
 
@@ -176,11 +196,13 @@ class TestVoiceMateQuickMode:
             "input[type='file']",
         ).set_input_files(str(sample_pdf_file))
         voicemate_page.page.get_by_text(
-            '🚀 Start – Wygeneruj podcast', exact=True,
+            '🚀 Start – Wygeneruj podcast',
+            exact=True,
         ).click()
         expect(
             voicemate_page.page.get_by_text(
-                'w pełni wygenerowany', exact=False,
+                'w pełni wygenerowany',
+                exact=False,
             ),
         ).to_be_visible(timeout=120000)
         expect(voicemate_page.page.locator('audio')).to_be_visible()

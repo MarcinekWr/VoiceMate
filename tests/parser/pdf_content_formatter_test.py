@@ -1,6 +1,9 @@
 """
 Tests for PDFContentFormatter class.
 """
+from __future__ import annotations
+
+from __future__ import annotations
 
 import unittest
 from unittest.mock import MagicMock, patch
@@ -25,11 +28,13 @@ class TestPDFContentFormatter(unittest.TestCase):
                 'height': 100,
                 'size_kb': 50,
                 'description': 'An image.',
-            }
+            },
         ]
         self.mock_tables = [{'page': 1, 'json': '{"key": "value"}'}]
         self.formatter = PDFContentFormatter(
-            self.mock_metadata, self.mock_images, self.mock_tables
+            self.mock_metadata,
+            self.mock_images,
+            self.mock_tables,
         )
 
     @patch('fitz.open')
@@ -79,7 +84,7 @@ class TestPDFContentFormatter(unittest.TestCase):
                 'page': 1,
                 'text': 'Page text',
                 'images': self.mock_images,
-            }
+            },
         ]
 
         result = self.formatter.get_content_for_llm()
@@ -98,8 +103,9 @@ class TestPDFContentFormatter(unittest.TestCase):
         """Test LLM content generation with a text cleaning error."""
         mock_clean_text.side_effect = Exception('Cleaning failed')
         self.formatter.structured_content = [
-            {'page': 1, 'text': 'Dirty text', 'images': []}
+            {'page': 1, 'text': 'Dirty text', 'images': []},
         ]
 
-        result = self.formatter.get_content_for_llm()
-        self.assertIn('Dirty text', result)
+        with self.assertRaises(Exception) as exc:
+            self.formatter.get_content_for_llm()
+        self.assertIn('Cleaning failed', str(exc.exception))

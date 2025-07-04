@@ -1,15 +1,19 @@
 """Image description class using Azure OpenAI for describing images."""
-
 from __future__ import annotations
-
+import os
 import base64
-import logging
-from pathlib import Path
 from typing import Optional
+from src.common.constants import IMAGE_DESCRIBER_PROMPT_PATH
+
 
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
+from src.services.llm_service import LLMService
 from PIL import Image
+import logging
+from pathlib import Path
+
+from langchain_core.prompts import PromptTemplate
 
 from src.common.constants import IMAGE_DESCRIBER_PROMPT_PATH
 from src.services.llm_service import LLMService
@@ -42,15 +46,15 @@ class ImageDescriber:
     def _load_prompt_template(self) -> PromptTemplate:
         """Load the prompt template from file or use default."""
         try:
-            prompt_path = Path(self.prompt_path)
-            if prompt_path.is_file():
-                template = prompt_path.read_text(encoding='utf-8')
-                self.logger.info(
-                    f'Loaded custom prompt from {self.prompt_path}')
+            if os.path.isfile(self.prompt_path):
+                with open(self.prompt_path, encoding='utf-8') as f:
+                    template = f.read()
+                self.logger.info(f'Loaded custom prompt from {self.prompt_path}')
                 return PromptTemplate.from_template(template)
         except (OSError, UnicodeDecodeError) as e:
             self.logger.error(
-                f'Error reading prompt file {self.prompt_path}: {e}')
+                f'Error reading prompt file {self.prompt_path}: {e}',
+            )
         self.logger.info('Using default image description prompt.')
         return self._use_default_prompt()
 
@@ -74,7 +78,9 @@ class ImageDescriber:
         try:
             base64_image = self._image_to_base64(image_path)
             return self.llm_service.generate_description(
-                base64_image, self.prompt_template, topic
+                base64_image,
+                self.prompt_template,
+                topic,
             )
         except FileNotFoundError:
             self.logger.error(f'File not found: {image_path}')
@@ -84,7 +90,9 @@ class ImageDescriber:
             return f'Error generating description: {e}'
 
     def describe_image_from_bytes(
-        self, image_bytes: bytes, topic: str = 'general'
+        self,
+        image_bytes: bytes,
+        topic: str = 'general',
     ) -> str:
         """
         Describe an image from bytes.
@@ -95,7 +103,9 @@ class ImageDescriber:
         try:
             base64_image = base64.b64encode(image_bytes).decode('utf-8')
             return self.llm_service.generate_description(
-                base64_image, self.prompt_template, topic
+                base64_image,
+                self.prompt_template,
+                topic,
             )
         except Exception as e:
             self.logger.error(f'Error describing image from bytes: {e}')

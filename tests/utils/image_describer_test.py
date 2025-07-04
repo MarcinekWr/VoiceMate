@@ -1,6 +1,9 @@
 """
 Tests for ImageDescriber class.
 """
+from __future__ import annotations
+
+import os
 
 import unittest
 from unittest.mock import MagicMock, mock_open, patch
@@ -69,6 +72,3 @@ class TestImageDescriber(unittest.TestCase):
         result = ImageDescriber._image_to_base64('anypath')
         self.assertEqual(result, 'aW1hZ2VkYXRh')
 
-
-if __name__ == '__main__':
-    unittest.main()
