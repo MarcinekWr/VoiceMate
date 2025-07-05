@@ -7,8 +7,7 @@ import os
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
 from src.utils.key_vault import get_secret_env_first
-
-logger = logging.getLogger(__name__)
+from src.utils.logging_config import get_request_id, get_session_logger
 
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -18,6 +17,8 @@ PROMPT_PATHS = {
     "plan": os.path.join(BASE_DIR, "prompts", "plan_prompt.txt"),
 }
 
+request_id = get_request_id()              
+logger = get_session_logger(request_id)
 
 def validate_env_variables() -> None:
     """Validate that all required environment variables are set."""

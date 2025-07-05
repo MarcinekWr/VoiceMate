@@ -5,13 +5,14 @@ import os
 import tempfile
 
 from elevenlabs.client import ElevenLabs
-from src.utils.logging_config import get_request_id 
+from src.utils.logging_config import get_request_id, get_session_logger
 from src.utils.key_vault import get_secret_env_first
 
 
 class ElevenlabsTTSPodcastGenerator:
-    def __init__(self):
-        self.logger = logging.getLogger(__name__)
+    def __init__(self, request_id: str = None):
+        self.request_id = request_id or get_request_id()
+        self.logger = get_session_logger(self.request_id)
         self.client = self._load_client()
         self.dir_prefix = 'podcast_el_'
 
@@ -57,9 +58,8 @@ class ElevenlabsTTSPodcastGenerator:
 
         if output_path is None:
             temp_dir = tempfile.mkdtemp(prefix=self.dir_prefix)
-            request_id = get_request_id()
             output_path = os.path.join(
-                temp_dir, f'{self.dir_prefix}{request_id}.wav',
+                temp_dir, f'{self.dir_prefix}{self.request_id}.wav',
             )
 
         total_segments = len(dialog_data)

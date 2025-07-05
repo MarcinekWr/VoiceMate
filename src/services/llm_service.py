@@ -11,7 +11,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
 import logging
 from src.utils.key_vault import get_secret_env_first
-
+from src.utils.logging_config import get_request_id, get_session_logger
 
 
 class LLMService:
@@ -19,8 +19,9 @@ class LLMService:
     A service class to manage interactions with the Language Model.
     """
 
-    def __init__(self):
-        self.logger = logging.getLogger(__name__)
+    def __init__(self, request_id = None):
+        self.request_id = request_id or get_request_id()
+        self.logger = get_session_logger(self.request_id)
         self.llm = self._initialize_llm()
         self.is_available = self.llm is not None
         if self.is_available:
@@ -32,11 +33,11 @@ class LLMService:
         """
         try:
             llm = AzureChatOpenAI(
-                azure_deployment=get_secret_env_first("AZURE_OPENAI_DEPLOYMENT", "gpt-4-vision"),
-                openai_api_version=get_secret_env_first("API_VERSION", "2024-02-15-preview"),
+                azure_deployment="gpt-4-vision",
+                openai_api_version="2024-02-15-preview",
                 azure_endpoint=get_secret_env_first("AZURE_OPENAI_ENDPOINT"),
                 api_key=get_secret_env_first("AZURE_OPENAI_API_KEY"),
-                model=get_secret_env_first("AZURE_OPENAI_MODEL", "gpt-4-vision-preview"),
+                model = "gpt-4-vision-preview",
                 max_tokens=4096,
             )
             return llm

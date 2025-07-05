@@ -4,16 +4,16 @@ from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 
-# Initialize logger
-logger = logging.getLogger(__name__)
-load_dotenv()
-
 def get_secret_env_first(env_key: str) -> str:
+    import logging
+    logger = logging.getLogger("fallback")
     """
     Retrieve a secret from environment variables first.
     If not found, fallback to Azure Key Vault.
     Includes detailed logging for debugging purposes.
-    """
+    # """
+    # request_id = get_request_id()
+    # logger = get_session_logger(request_id)
     value = os.getenv(env_key)
     if value:
         logger.debug(f"🔍 Loaded environment variable '{env_key}' from .env or system environment.")

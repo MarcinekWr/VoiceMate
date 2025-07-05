@@ -11,13 +11,12 @@ from langchain_core.prompts import PromptTemplate
 from src.services.llm_service import LLMService
 from PIL import Image
 import logging
-from pathlib import Path
 
 from langchain_core.prompts import PromptTemplate
 
 from src.common.constants import IMAGE_DESCRIBER_PROMPT_PATH
 from src.services.llm_service import LLMService
-
+from src.utils.logging_config import get_request_id, get_session_logger
 
 class ImageDescriber:
     """
@@ -30,11 +29,14 @@ class ImageDescriber:
         self,
         prompt_path: str = IMAGE_DESCRIBER_PROMPT_PATH,
         llm_service: LLMService | None = None,
+        request_id: Optional[str] = None,
+
     ):
         """
         Initialize the ImageDescriber.
         """
-        self.logger = logging.getLogger(__name__)
+        self.request_id = request_id or get_request_id()
+        self.logger = get_session_logger(self.request_id)
         self.prompt_path = prompt_path
         self.llm_service = llm_service or LLMService()
         self.prompt_template: PromptTemplate | None = None

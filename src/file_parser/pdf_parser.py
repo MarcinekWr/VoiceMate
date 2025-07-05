@@ -15,7 +15,7 @@ from src.file_parser.pdf_content_formatter import PDFContentFormatter
 from src.file_parser.pdf_image_extractor import PDFImageExtractor
 from src.utils.extract_tables import PDFTableParser
 from src.utils.image_describer import ImageDescriber
-
+from src.utils.logging_config import get_request_id, get_session_logger
 
 class PdfParser:
     """
@@ -29,12 +29,15 @@ class PdfParser:
         output_dir: str = 'extracted_content',
         describe_images: bool = True,
         image_describer: ImageDescriber | None = None,
+        request_id = None,
     ):
         """
         Initialize the PDF parser.
         """
-        self.logger = logging.getLogger(__name__)
-        self.file_path = file_path
+        
+        self.request_id = request_id or get_request_id()
+        self.logger = get_session_logger(self.request_id)
+        self.file_path = os.path.abspath(file_path)
         self.output_dir = output_dir
         self.describe_images = describe_images
         self.text = ''
@@ -104,10 +107,12 @@ class PdfParser:
         except MemoryError as e:
             self.logger.error('Memory error parsing large PDF: %s', e)
             return {}
+        except FileNotFoundError as e:
+            self.logger.error(f'[critical] FileNotFoundError: {self.file_path} not found')
+            return {}
         except Exception as e:
-            self.logger.error(
-                'Unexpected error parsing PDF %s: %s', self.file_path, e,
-            )
+            self.logger.error('Unexpected error parsing PDF %s: %s', self.file_path, e)
+
             return {}
         finally:
             if 'doc' in locals() and doc:

@@ -8,14 +8,15 @@ import wave
 from typing import Optional
 
 import azure.cognitiveservices.speech as speechsdk
-from src.utils.logging_config import get_request_id 
 from src.utils.key_vault import get_secret_env_first
+from src.utils.logging_config import get_request_id, get_session_logger
 
 class AzureTTSPodcastGenerator:
-    def __init__(self):
+    def __init__(self, request_id: str = None):
+        self.request_id = request_id or get_request_id()
+        self.logger = get_session_logger(self.request_id)
         api_key = get_secret_env_first("AZURE_SPEECH_API_KEY")
         region = "swedencentral"
-        self.logger = logging.getLogger(__name__)
         self.dir_prefix = 'podcast_az_'
 
         if not api_key or not region:

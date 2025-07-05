@@ -11,6 +11,7 @@ from typing import Any
 import fitz  # PyMuPDF
 
 from src.utils.text_cleaner import TextCleaner
+from src.utils.logging_config import get_request_id, get_session_logger
 
 
 class PDFContentFormatter:
@@ -23,6 +24,7 @@ class PDFContentFormatter:
         metadata: dict[str, Any],
         images: list[dict[str, Any]],
         tables: list[dict[str, Any]],
+        request_id: str = None
     ):
         """
         Initialize the PDFContentFormatter.
@@ -31,7 +33,8 @@ class PDFContentFormatter:
         self.images = images
         self.tables = tables
         self.structured_content: list[dict[str, Any]] = []
-        self.logger = logging.getLogger(__name__)
+        self.request_id = request_id or get_request_id()
+        self.logger = get_session_logger(self.request_id)
 
     def create_structured_content(
         self,
