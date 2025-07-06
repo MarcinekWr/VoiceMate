@@ -63,13 +63,15 @@ class TestPdfParser(unittest.TestCase):
 
         parser = PdfParser(self.mock_file_path, self.mock_output_dir)
 
-        self.assertEqual(parser.file_path, self.mock_file_path)
+        self.assertEqual(parser.file_path,
+                         os.path.abspath(self.mock_file_path))
         self.mocks['PDFImageExtractor'].assert_called_with(
             output_dir=self.mock_output_dir,
             image_describer=parser.image_describer,
             describe_images=True,
         )
-        self.mocks['PDFTableParser'].assert_called_with(self.mock_file_path)
+        self.mocks['PDFTableParser'].assert_called_with(
+            os.path.abspath(self.mock_file_path))
 
     def test_parse_all_successful(self):
         """Test the full parsing workflow."""
@@ -78,7 +80,8 @@ class TestPdfParser(unittest.TestCase):
 
         result = parser.parse_all()
 
-        self.mocks['fitz.open'].assert_called_with(self.mock_file_path)
+        self.mocks['fitz.open'].assert_called_with(
+            os.path.abspath(self.mock_file_path))
         self.mock_image_extractor.extract_images.assert_called_once()
         self.mock_table_parser.extract_tables.assert_called_once()
         self.mocks['PDFContentFormatter'].assert_called_with(

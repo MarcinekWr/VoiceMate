@@ -3,8 +3,6 @@ Tests for PDFContentFormatter class.
 """
 from __future__ import annotations
 
-from __future__ import annotations
-
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -89,13 +87,13 @@ class TestPDFContentFormatter(unittest.TestCase):
 
         result = self.formatter.get_content_for_llm()
 
-        self.assertIn('--- DOCUMENT METADATA ---', result)
-        self.assertIn('--- PAGE 1 ---', result)
-        self.assertIn('TEXT CONTENT', result)
+        self.assertIn('--- METADANE DOKUMENTU ---', result)
+        self.assertIn('--- STRONA 1 ---', result)
+        self.assertIn('DANE TEKSTOWE:', result)
         self.assertIn('Cleaned text.', result)
-        self.assertIn('IMAGES ON THIS PAGE', result)
+        self.assertIn('OBRAZY NA TEJ STRONIE', result)
         self.assertIn('An image.', result)
-        self.assertIn('TABLES ON THIS PAGE', result)
+        self.assertIn('TABELE NA TEJ STRONIE:', result)
         self.assertIn('{"key": "value"}', result)
 
     @patch('src.utils.text_cleaner.TextCleaner.clean_text')

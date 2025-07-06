@@ -9,6 +9,7 @@ from typing import Any
 
 import camelot
 import pandas as pd
+
 from src.utils.logging_config import get_request_id, get_session_logger
 
 
@@ -25,9 +26,7 @@ class PDFTableParser:
             pdf_path (str): The path to the PDF file.
         """
         self.pdf_path = pdf_path
-        request_id = get_request_id()
-        logger = get_session_logger(request_id)
-
+        self.logger = get_session_logger(get_request_id())
 
     def extract_tables(
         self,

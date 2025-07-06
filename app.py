@@ -15,12 +15,8 @@ from src.ui.steps.step3_and4 import render_step_3_and_4
 from src.ui.steps.step5_audio import render_step_5
 from src.ui.steps.step_all import render_auto_pipeline
 from src.utils.blob_uploader import upload_to_blob
-from src.utils.logging_config import (
-    get_request_id,
-    set_request_id,
-    get_session_logger,
-    cleanup_session_logger,
-)
+from src.utils.logging_config import (cleanup_session_logger, get_request_id,
+                                      get_session_logger, set_request_id)
 from src.workflow.session import initialize_session_state
 
 load_dotenv()
@@ -33,7 +29,7 @@ def cleanup_on_session_end():
         try:
             cleanup_session_logger(request_id)
         except Exception as e:
-            print(f"Error cleaning up logger for {request_id}: {e}")
+            print(f'Error cleaning up logger for {request_id}: {e}')
 
 
 def main():
@@ -44,20 +40,19 @@ def main():
         initial_sidebar_state='expanded',
     )
 
-    print("✅ A: przed initialize_session_state()")
+    print('✅ A: przed initialize_session_state()')
     initialize_session_state()
-    print("✅ B: po initialize_session_state()")
-
+    print('✅ B: po initialize_session_state()')
 
     # Pobierz request_id z session_state
     request_id = st.session_state.request_id
-    
+
     # Ustaw request_id w kontekście (dla thread-local storage)
     set_request_id(request_id)
-    
+
     # Pobierz logger dla tej sesji
     logger = get_session_logger(request_id)
-    
+
     # Jednorazowe logowanie inicjalizacji
     if 'logger_initialized' not in st.session_state:
         logger.info(f'🟢 Logger gotowy, request_id={request_id}')
@@ -82,7 +77,7 @@ def main():
         render_step_5()
 
     # Upload logów na końcu sesji
-    log_file_path = os.path.join(LOGS_DIR, f"{request_id}.log")
+    log_file_path = os.path.join(LOGS_DIR, f'{request_id}.log')
     if os.path.exists(log_file_path):
         try:
             upload_to_blob(
@@ -90,14 +85,18 @@ def main():
                 log_file_path,
                 blob_name=os.path.basename(log_file_path),
             )
-            logger.info('📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
+            logger.info(
+                '📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
             # Opcjonalne: wyświetl info użytkownikowi tylko raz
             if 'blob_upload_notified' not in st.session_state:
-                st.success('📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
+                st.success(
+                    '📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
                 st.session_state.blob_upload_notified = True
         except Exception as e:
-            logger.warning(f'⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}')
-            st.warning(f'⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}')
+            logger.warning(
+                f'⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}')
+            st.warning(
+                f'⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}')
 
     st.markdown('---')
     st.markdown(
@@ -106,10 +105,6 @@ def main():
         '</div>',
         unsafe_allow_html=True,
     )
-
-    # Opcjonalne: cleanup na końcu głównej funkcji
-    # (ale to może nie być idealne miejsce w Streamlit)
-    # cleanup_on_session_end()
 
 
 if __name__ == '__main__':
