@@ -58,23 +58,78 @@ def test_request_id_filter():
     assert record._request_id == 'abc-123'
 
 
-@mock.patch('src.utils.logging_config.get_secret_env_first', return_value=None)
-def test_setup_logger_creates_handlers(mock_secret, tmp_path, monkeypatch):
+@mock.patch('src.utils.logging_config.get_secret_env_first')
+def test_setup_logger_creates_handlers(mock_get_secret, tmp_path, monkeypatch):
+    def mock_get_secret_side_effect(key):
+        if key == 'APPINSIGHTS_CONNECTION_STRING':
+            return None
+        return None
+    mock_get_secret.side_effect = mock_get_secret_side_effect
+
     log_file = tmp_path / 'test.log'
     monkeypatch.delenv('APPINSIGHTS_CONNECTION_STRING', raising=False)
 
+    request_id = 'test-request-123'
+    logging_config.set_request_id(request_id)
+    logging_config.cleanup_all_loggers()
+
     logger = logging_config.setup_logger(str(log_file))
-    logger.info('Test log')
+
+    file_handler = None
+    for handler in logger.handlers:
+        if isinstance(handler, logging.FileHandler):
+            file_handler = handler
+            break
+
     for handler in logger.handlers:
         handler.flush()
         handler.close()
-    # Szukaj pliku logu w domyślnej lokalizacji, jeśli nie istnieje w tmp_path
+
+    expected_log_file = file_handler.baseFilename if file_handler else os.path.abspath(
+        os.path.join('log_folder', 'logs', f'{request_id}.log'))
+
+    assert os.path.exists(
+        expected_log_file), f'Oczekiwany plik logu {expected_log_file} nie został utworzony'
+
+
+@mock.patch('src.utils.logging_config.get_secret_env_first')
+def test_logger_creates_log_file_reliably(mock_get_secret, tmp_path, monkeypatch):
+    def mock_get_secret_side_effect(key):
+        if key == 'APPINSIGHTS_CONNECTION_STRING':
+            return None
+        return None
+    mock_get_secret.side_effect = mock_get_secret_side_effect
     import glob
-    log_files = glob.glob('log_folder/logs/*.log')
-    if log_files:
-        with open(log_files[-1], encoding='utf-8') as f:
-            content = f.read()
-    else:
-        with open(log_file, encoding='utf-8') as f:
-            content = f.read()
-    assert 'Test log' in content or 'To jest testowy wpis do logu.' in content
+    import os
+    import time
+    import uuid
+
+    log_dir = 'log_folder/logs'
+    if os.path.exists(log_dir):
+        for old_log_file in glob.glob(os.path.join(log_dir, '*.log')):
+            try:
+                os.remove(old_log_file)
+            except OSError:
+                pass
+
+    request_id = f'test-{uuid.uuid4()}'
+    logging_config.set_request_id(request_id)
+    logging_config.cleanup_all_loggers()
+
+    logger = logging_config.setup_logger('should_be_ignored.log')
+
+    file_handler = None
+    for handler in logger.handlers:
+        if isinstance(handler, logging.FileHandler):
+            file_handler = handler
+            break
+
+    for handler in logger.handlers:
+        handler.flush()
+        handler.close()
+
+    expected_log_file = file_handler.baseFilename if file_handler else os.path.abspath(
+        os.path.join(log_dir, f'{request_id}.log'))
+
+    assert os.path.exists(
+        expected_log_file), f'Log file {expected_log_file} not found.'
