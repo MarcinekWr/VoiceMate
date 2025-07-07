@@ -101,9 +101,7 @@ def render_step_1():
             if llm_content:
                 if not check_content_safety(llm_content):
                     st.session_state.processing = False
-                    st.error(
-                        '⚠️ Wykryto potencjalnie niebezpieczną treść w pliku. Przetwarzanie zostało przerwane.',
-                    )
+                    st.error('⚠️ Wystąpił błąd.')
                     return
                 st.session_state.llm_content = llm_content
                 st.session_state.step = 2

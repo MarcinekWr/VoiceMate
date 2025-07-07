@@ -5,11 +5,8 @@ import streamlit as st
 
 from src.logic.Azure_TTS import AzureTTSPodcastGenerator
 from src.logic.Elevenlabs_TTS import ElevenlabsTTSPodcastGenerator
-from src.logic.llm_podcast import (
-    create_llm,
-    generate_plan,
-    generate_podcast_text,
-)
+from src.logic.llm_podcast import (create_llm, generate_plan,
+                                   generate_podcast_text)
 from src.workflow.save import save_to_file
 
 
@@ -23,7 +20,7 @@ def generate_plan_content(llm_content: str) -> str | None:
         plan_text = generate_plan(llm, llm_content)
 
         plan_file_path = save_to_file(plan_text, 'output_plan.txt')
-        st.success(f'💾 Plan zapisany do: {plan_file_path}')
+        st.success('Plan został wygenerowany.')
 
         return plan_text
 
@@ -53,7 +50,7 @@ def generate_podcast_content(
         )
 
         podcast_file_path = save_to_file(podcast_text, 'podcast.txt')
-        st.success(f'💾 Podcast zapisany do: {podcast_file_path}')
+        st.success('Podcast został wygenerowany.')
 
         return podcast_text
 

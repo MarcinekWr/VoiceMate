@@ -85,13 +85,9 @@ def main():
                 log_file_path,
                 blob_name=os.path.basename(log_file_path),
             )
-            logger.info(
-                '📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
-            # Opcjonalne: wyświetl info użytkownikowi tylko raz
-            if 'blob_upload_notified' not in st.session_state:
-                st.success(
-                    '📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
-                st.session_state.blob_upload_notified = True
+            logger.info('Logi aplikacji zostały wysłane do chmury.')
+            # Usunięto komunikat dla użytkownika
+            st.session_state.blob_upload_notified = True
         except Exception as e:
             logger.warning(
                 f'⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}')
