@@ -3,15 +3,13 @@ from __future__ import annotations
 import logging
 import os
 import re
+
 from src.utils.logging_config import get_request_id, get_session_logger
-
-request_id = get_request_id()
-logger = get_session_logger(request_id)
-
-
 
 
 def dialog_to_json(raw_text: str, is_premium: bool = True) -> list:
+    request_id = get_request_id()
+    logger = get_session_logger(request_id)
     """Convert dialog text to JSON format"""
     speaker_map = (
         {
