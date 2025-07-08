@@ -48,8 +48,7 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
         self.assertIsNotNone(generator.speech_config)
         self.assertIsInstance(generator.logger, logging.Logger)
 
-
-    @patch('src.logic.Azure_TTS.get_secret_env_first', side_effect=ValueError("Brakuje AZURE_SPEECH_API_KEY"))
+    @patch('src.logic.Azure_TTS.get_secret_env_first', side_effect=ValueError('Brakuje AZURE_SPEECH_API_KEY'))
     def test_init_missing_api_key(self, mock_get_secret):
         """Test inicjalizacji bez klucza API (symulowana sytuacja braku)"""
         with self.assertRaises(ValueError) as context:
@@ -58,28 +57,28 @@ class TestAzureTTSPodcastGenerator(unittest.TestCase):
         self.assertIn('Brakuje AZURE_SPEECH_API_KEY', str(context.exception))
 
         @patch('src.logic.Azure_TTS.get_secret_env_first', side_effect=[
-            'test_api_key',  
-            ValueError("Brakuje AZURE_SPEECH_REGION")  
+            'test_api_key',
+            ValueError('Brakuje AZURE_SPEECH_REGION')
         ])
         def test_init_missing_region(self, mock_get_secret):
             """Test inicjalizacji bez regionu"""
             with self.assertRaises(ValueError) as context:
                 AzureTTSPodcastGenerator()
 
-            self.assertIn('Brakuje AZURE_SPEECH_REGION', str(context.exception))
-
+            self.assertIn('Brakuje AZURE_SPEECH_REGION',
+                          str(context.exception))
 
         @patch('src.logic.Azure_TTS.get_secret_env_first', side_effect=[
-            ValueError("Brakuje AZURE_SPEECH_API_KEY"),
-            ValueError("AZURE_SPEECH_REGION missing")
+            ValueError('Brakuje AZURE_SPEECH_API_KEY'),
+            ValueError('AZURE_SPEECH_REGION missing')
         ])
         def test_init_missing_both_credentials(self, mock_get_secret):
             """Test inicjalizacji bez obu wymaganych zmiennych"""
             with self.assertRaises(ValueError) as context:
                 AzureTTSPodcastGenerator()
 
-            self.assertIn('Brakuje AZURE_SPEECH_API_KEY', str(context.exception))
-
+            self.assertIn('Brakuje AZURE_SPEECH_API_KEY',
+                          str(context.exception))
 
     @patch(
         'src.utils.logging_config.get_request_id',
@@ -735,4 +734,3 @@ class TestAzureTTSPodcastGeneratorIntegration(unittest.TestCase):
             progress_callback.call_count,
             3,
         )  # 2 segmenty + łączenie
-

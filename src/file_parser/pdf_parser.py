@@ -3,7 +3,6 @@ images, and metadata with image descriptions."""
 from __future__ import annotations
 
 import json
-import logging
 import os
 from datetime import datetime
 from typing import Any
@@ -17,6 +16,7 @@ from src.utils.extract_tables import PDFTableParser
 from src.utils.image_describer import ImageDescriber
 from src.utils.logging_config import get_request_id, get_session_logger
 
+
 class PdfParser:
     """
     A class to parse PDF files and extract text, images,
@@ -29,12 +29,12 @@ class PdfParser:
         output_dir: str = 'extracted_content',
         describe_images: bool = True,
         image_describer: ImageDescriber | None = None,
-        request_id = None,
+        request_id=None,
     ):
         """
         Initialize the PDF parser.
         """
-        
+
         self.request_id = request_id or get_request_id()
         self.logger = get_session_logger(self.request_id)
         self.file_path = os.path.abspath(file_path)
@@ -46,10 +46,8 @@ class PdfParser:
         self.structured_content: list[dict[str, Any]] = []
         self.metadata: dict[str, Any] = {}
 
-        if self.describe_images:
-            self.image_describer = image_describer or ImageDescriber()
-        else:
-            self.image_describer: ImageDescriber | None = None
+        self.image_describer: ImageDescriber | None = image_describer if image_describer is not None else (
+            ImageDescriber() if describe_images else None)
 
         self.table_parser = PDFTableParser(self.file_path)
         self.image_extractor = PDFImageExtractor(
@@ -107,11 +105,13 @@ class PdfParser:
         except MemoryError as e:
             self.logger.error('Memory error parsing large PDF: %s', e)
             return {}
-        except FileNotFoundError as e:
-            self.logger.error(f'[critical] FileNotFoundError: {self.file_path} not found')
+        except FileNotFoundError:
+            self.logger.error(
+                f'[critical] FileNotFoundError: {self.file_path} not found')
             return {}
         except Exception as e:
-            self.logger.error('Unexpected error parsing PDF %s: %s', self.file_path, e)
+            self.logger.error(
+                'Unexpected error parsing PDF %s: %s', self.file_path, e)
 
             return {}
         finally:

@@ -3,13 +3,10 @@ This module contains the LLMService class for interacting with Language Models.
 """
 from __future__ import annotations
 
-import logging
-import os
-
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
-import logging
+
 from src.utils.key_vault import get_secret_env_first
 from src.utils.logging_config import get_request_id, get_session_logger
 
@@ -19,7 +16,7 @@ class LLMService:
     A service class to manage interactions with the Language Model.
     """
 
-    def __init__(self, request_id = None):
+    def __init__(self, request_id=None):
         self.request_id = request_id or get_request_id()
         self.logger = get_session_logger(self.request_id)
         self.llm = self._initialize_llm()
@@ -33,11 +30,11 @@ class LLMService:
         """
         try:
             llm = AzureChatOpenAI(
-                azure_deployment="gpt-4-vision",
-                openai_api_version="2024-02-15-preview",
-                azure_endpoint=get_secret_env_first("AZURE_OPENAI_ENDPOINT"),
-                api_key=get_secret_env_first("AZURE_OPENAI_API_KEY"),
-                model = "gpt-4-vision-preview",
+                azure_deployment='gpt-4-vision',
+                openai_api_version='2024-02-15-preview',
+                azure_endpoint=get_secret_env_first('AZURE_OPENAI_ENDPOINT'),
+                api_key=get_secret_env_first('AZURE_OPENAI_API_KEY'),
+                model='gpt-4-vision-preview',
                 max_tokens=4096,
             )
             return llm

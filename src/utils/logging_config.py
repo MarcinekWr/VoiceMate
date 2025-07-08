@@ -4,9 +4,8 @@ from __future__ import annotations
 import logging
 import os
 import re
-import uuid
-from typing import Optional, Dict
 import threading
+import uuid
 
 from azure.storage.blob import BlobServiceClient
 from opencensus.ext.azure.log_exporter import AzureLogHandler
@@ -16,7 +15,7 @@ from src.utils.key_vault import get_secret_env_first
 
 
 def get_blob_service_client() -> BlobServiceClient:
-    connection_string = get_secret_env_first("AZURE_STORAGE_CONNECTION_STRING")
+    connection_string = get_secret_env_first('AZURE_STORAGE_CONNECTION_STRING')
     if not connection_string:
         raise ValueError('Brak AZURE_STORAGE_CONNECTION_STRING')
     return BlobServiceClient.from_connection_string(connection_string)
@@ -25,13 +24,13 @@ def get_blob_service_client() -> BlobServiceClient:
 class RequestIdContext:
     # Użyj thread-local storage dla izolacji między sesjami
     _local = threading.local()
-    
+
     @classmethod
     def get_request_id(cls) -> str:
         if not hasattr(cls._local, 'request_id'):
             cls._local.request_id = 'no-request-id'
         return cls._local.request_id
-    
+
     @classmethod
     def set_request_id(cls, request_id: str):
         cls._local.request_id = request_id
@@ -43,7 +42,7 @@ class RequestIdFilter(logging.Filter):
         return True
 
 
-def set_request_id(new_id: Optional[str] = None) -> str:
+def set_request_id(new_id: str | None = None) -> str:
     """Ustawia nowe request_id (UUID) lub własne, i zwraca je."""
     request_id = new_id or str(uuid.uuid4())
     RequestIdContext.set_request_id(request_id)
@@ -56,7 +55,7 @@ def get_request_id() -> str:
 
 
 # Słownik do przechowywania loggerów per request_id
-_loggers: Dict[str, logging.Logger] = {}
+_loggers: dict[str, logging.Logger] = {}
 _loggers_lock = threading.Lock()
 _max_loggers = 50  # Maksymalna liczba aktywnych loggerów
 
@@ -70,7 +69,7 @@ def get_session_logger(request_id: str) -> logging.Logger:
             oldest_id = next(iter(_loggers))
             _cleanup_logger(oldest_id)
             del _loggers[oldest_id]
-        
+
         if request_id not in _loggers:
             _loggers[request_id] = _create_session_logger(request_id)
         return _loggers[request_id]
@@ -87,49 +86,49 @@ def _cleanup_logger(request_id: str):
 
 def _create_session_logger(request_id: str) -> logging.Logger:
     """Tworzy nowy logger dla konkretnej sesji."""
-    logger_name = f"session_{request_id}"
+    logger_name = f'session_{request_id}'
     logger = logging.getLogger(logger_name)
-    
+
     # Jeśli logger już istnieje, zwróć go
     if logger.handlers:
         return logger
-    
+
     logger.setLevel(logging.INFO)
     logger.propagate = False  # Ważne! Nie propaguj do root loggera
-    
+
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - [%(funcName)s:%(lineno)d] - [request_id=%(request_id)s] - %(message)s',
     )
-    
+
     # File handler dla tej konkretnej sesji
-    log_file_path = os.path.join(LOGS_DIR, f"{request_id}.log")
+    log_file_path = os.path.join(LOGS_DIR, f'{request_id}.log')
     file_handler = logging.FileHandler(
         log_file_path,
         mode='w',
         encoding='utf-8',
     )
     file_handler.setFormatter(formatter)
-    
+
     # Dodaj request_id do każdego rekordu
     class SessionFilter(logging.Filter):
         def __init__(self, req_id):
             super().__init__()
             self.req_id = req_id
-            
+
         def filter(self, record):
             record.request_id = self.req_id
             return True
-    
+
     session_filter = SessionFilter(request_id)
     file_handler.addFilter(session_filter)
     logger.addHandler(file_handler)
-    
+
     # Stream handler (opcjonalnie, dla debugowania)
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
     stream_handler.addFilter(session_filter)
     logger.addHandler(stream_handler)
-    
+
     # Azure handler
     def is_valid_instrumentation_key(key):
         return bool(
@@ -139,7 +138,7 @@ def _create_session_logger(request_id: str) -> logging.Logger:
             ),
         )
 
-    connection_string = get_secret_env_first("APPINSIGHTS_CONNECTION_STRING")
+    connection_string = get_secret_env_first('APPINSIGHTS_CONNECTION_STRING')
     if connection_string:
         match = re.search(
             r'InstrumentationKey=([0-9a-fA-F-]+)',
@@ -156,12 +155,12 @@ def _create_session_logger(request_id: str) -> logging.Logger:
             logger.info(
                 'AzureLogHandler podłączony – logi będą wysyłane do Application Insights',
             )
-    
+
     logger.info(
         f'Session logger initialized for request_id: {request_id}. '
         f'Log file: {log_file_path}, Level: {logging.getLevelName(logger.level)}',
     )
-    
+
     return logger
 
 

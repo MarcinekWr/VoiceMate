@@ -1,17 +1,17 @@
-import logging
 import os
 from typing import Optional
 
 from azure.storage.blob import BlobServiceClient
+
 from src.utils.key_vault import get_secret_env_first
 from src.utils.logging_config import get_request_id, get_session_logger
 
 
-def upload_to_blob(container_name: str, file_path: str, blob_name: str = None):
+def upload_to_blob(container_name: str, file_path: str, blob_name: Optional[str] = None):
     request_id = get_request_id()
     logger = get_session_logger(request_id)
 
-    connection_string = get_secret_env_first("AZURE_STORAGE_CONNECTION_STRING")
+    connection_string = get_secret_env_first('AZURE_STORAGE_CONNECTION_STRING')
     if not connection_string:
         logger.error('❌ Brak AZURE_STORAGE_CONNECTION_STRING w .env')
         return

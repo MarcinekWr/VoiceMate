@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 import os
 
 import streamlit as st
@@ -15,7 +14,7 @@ from src.ui.steps.step3_and4 import render_step_3_and_4
 from src.ui.steps.step5_audio import render_step_5
 from src.ui.steps.step_all import render_auto_pipeline
 from src.utils.blob_uploader import upload_to_blob
-from src.utils.logging_config import (cleanup_session_logger, get_request_id,
+from src.utils.logging_config import (cleanup_session_logger,
                                       get_session_logger, set_request_id)
 from src.workflow.session import initialize_session_state
 
@@ -85,9 +84,13 @@ def main():
                 log_file_path,
                 blob_name=os.path.basename(log_file_path),
             )
-            logger.info('Logi aplikacji zostały wysłane do chmury.')
-            # Usunięto komunikat dla użytkownika
-            st.session_state.blob_upload_notified = True
+            logger.info(
+                '📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
+            # Opcjonalne: wyświetl info użytkownikowi tylko raz
+            if 'blob_upload_notified' not in st.session_state:
+                st.success(
+                    '📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
+                st.session_state.blob_upload_notified = True
         except Exception as e:
             logger.warning(
                 f'⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}')

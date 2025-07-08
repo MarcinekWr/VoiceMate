@@ -4,7 +4,6 @@ Tests for ImageDescriber class.
 from __future__ import annotations
 
 import os
-
 import unittest
 from unittest.mock import MagicMock, mock_open, patch
 
@@ -71,4 +70,3 @@ class TestImageDescriber(unittest.TestCase):
         """Test the static method _image_to_base64."""
         result = ImageDescriber._image_to_base64('anypath')
         self.assertEqual(result, 'aW1hZ2VkYXRh')
-

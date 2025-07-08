@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import os
-
 import gc
-import logging
 import mimetypes
+import os
 import subprocess
 import sys
 import time
@@ -21,6 +19,7 @@ from reportlab.pdfgen import canvas
 from src.file_parser import pdf_parser
 from src.utils.logging_config import get_request_id, get_session_logger
 
+
 class FileConverter:
     SUPPORTED_FORMATS = {
         'images': ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.gif'],
@@ -30,7 +29,7 @@ class FileConverter:
         'pdf': ['.pdf'],
     }
 
-    def __init__(self, file_path: str, output_dir: str = 'assets',request_id: str = None):
+    def __init__(self, file_path: str, output_dir: str = 'assets', request_id: str | None = None):
 
         self.request_id = request_id or get_request_id()
         self.logger = get_session_logger(self.request_id)
@@ -96,9 +95,9 @@ class FileConverter:
 
     def convert_image_to_pdf(self) -> str:
         """Convert image file to PDF format."""
-        self.logger.info(f"Converting image to PDF: {self.file_path}")
+        self.logger.info(f'Converting image to PDF: {self.file_path}')
         original_name = os.path.splitext(os.path.basename(self.file_path))[0]
-        output_path = self._generate_unique_filename(original_name, ".pdf")
+        output_path = self._generate_unique_filename(original_name, '.pdf')
 
         try:
             with Image.open(self.file_path) as img:
@@ -175,7 +174,8 @@ class FileConverter:
             raise Exception(f'Connection error: {str(e)}')
 
         domain_name = self.get_domain_name(self.file_path)
-        output_path = os.path.abspath(self._generate_unique_filename(domain_name, '.pdf'))
+        output_path = os.path.abspath(
+            self._generate_unique_filename(domain_name, '.pdf'))
 
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
@@ -193,10 +193,13 @@ class FileConverter:
                     break
                 time.sleep(0.1)
             else:
-                self.logger.error(f'PDF conversion succeeded but file not found: {output_path}')
-                raise FileNotFoundError(f'PDF not found after subprocess: {output_path}')
+                self.logger.error(
+                    f'PDF conversion succeeded but file not found: {output_path}')
+                raise FileNotFoundError(
+                    f'PDF not found after subprocess: {output_path}')
 
-            self.logger.info(f'URL successfully converted to PDF: {output_path}')
+            self.logger.info(
+                f'URL successfully converted to PDF: {output_path}')
             return output_path
 
         except subprocess.CalledProcessError as e:

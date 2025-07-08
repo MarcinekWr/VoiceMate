@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import unittest
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import MagicMock, mock_open, patch
 
 import src.logic.llm_podcast as pipeline
 
@@ -24,12 +24,12 @@ class TestLLMPipeline(unittest.TestCase):
             except ValueError:
                 self.fail('Unexpected ValueError')
 
-    @patch('src.logic.llm_podcast.get_secret_env_first', side_effect=ValueError("Missing required environment variables"))
+    @patch('src.logic.llm_podcast.get_secret_env_first', side_effect=ValueError('Missing required environment variables'))
     def test_validate_env_variables_missing(self, mock_get):
         with self.assertRaises(ValueError) as ctx:
             pipeline.validate_env_variables()
-        self.assertIn('Missing required environment variables', str(ctx.exception))
-
+        self.assertIn('Missing required environment variables',
+                      str(ctx.exception))
 
     @patch('src.logic.llm_podcast.AzureChatOpenAI')
     @patch('src.logic.llm_podcast.validate_env_variables')
@@ -40,25 +40,21 @@ class TestLLMPipeline(unittest.TestCase):
         self.assertTrue(mock_azure.called)
         self.assertIsNotNone(llm)
 
-
-
-    @patch("src.logic.llm_podcast.PROMPT_PATHS", {"plan": "fake_path.txt"})
-    @patch("os.path.isfile", return_value=False)
+    @patch('src.logic.llm_podcast.PROMPT_PATHS', {'plan': 'fake_path.txt'})
+    @patch('os.path.isfile', return_value=False)
     def test_load_prompt_template_file_not_found(self, mock_isfile):
         with self.assertRaises(FileNotFoundError):
             pipeline.load_prompt_template('plan')
 
-
-    @patch("src.logic.llm_podcast.PROMPT_PATHS", {"plan": "dummy.txt"})
-    @patch("os.path.isfile", return_value=True)
-    @patch("builtins.open", new_callable=mock_open, read_data="Plan: {input_text}")
+    @patch('src.logic.llm_podcast.PROMPT_PATHS', {'plan': 'dummy.txt'})
+    @patch('os.path.isfile', return_value=True)
+    @patch('builtins.open', new_callable=mock_open, read_data='Plan: {input_text}')
     def test_load_prompt_template_success(self, mock_file, mock_isfile):
-        template = pipeline.load_prompt_template("plan")
-        result = template.format(input_text="test")
-        self.assertIn("test", result)
+        template = pipeline.load_prompt_template('plan')
+        result = template.format(input_text='test')
+        self.assertIn('test', result)
 
-
-    @patch("src.logic.llm_podcast.load_prompt_template")
+    @patch('src.logic.llm_podcast.load_prompt_template')
     def test_generate_plan_success(self, mock_prompt):
         fake_llm = MagicMock()
         fake_llm.invoke.return_value.content = 'Plan result'
@@ -113,10 +109,10 @@ class TestLLMPipeline(unittest.TestCase):
     def test_llm_podcast_service_run_success(
         self, mock_llm, mock_plan, mock_podcast, mock_save,
     ):
-        fake_input_path = "src/logic/llm_text_test_file.txt"
+        fake_input_path = 'src/logic/llm_text_test_file.txt'
         with (
-            patch("os.path.exists", return_value=True),
-            patch("builtins.open", mock_open(read_data="Input Text")),
+            patch('os.path.exists', return_value=True),
+            patch('builtins.open', mock_open(read_data='Input Text')),
         ):
 
             service = pipeline.LLMPodcastService()

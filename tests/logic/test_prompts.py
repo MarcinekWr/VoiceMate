@@ -56,4 +56,3 @@ def test_load_prompt_template_missing_file(tmp_path, monkeypatch):
             load_prompt_template('plan')
     finally:
         PROMPT_PATHS['plan'] = original_path
-

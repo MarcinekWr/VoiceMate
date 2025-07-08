@@ -153,6 +153,6 @@ def render_step_3_and_4():
                 else:
                     st.session_state.processing = False
                     st.error('❌ Nie udało się wygenerować podcastu.')
-            except Exception as e:
+            except Exception:
                 st.session_state.processing = False
                 st.error('❌ Wystąpił błąd.')

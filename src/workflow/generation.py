@@ -19,7 +19,7 @@ def generate_plan_content(llm_content: str) -> str | None:
         st.info('📝 Generuję plan podcastu...')
         plan_text = generate_plan(llm, llm_content)
 
-        plan_file_path = save_to_file(plan_text, 'output_plan.txt')
+        save_to_file(plan_text, 'output_plan.txt')
         st.success('Plan został wygenerowany.')
 
         return plan_text
@@ -49,7 +49,7 @@ def generate_podcast_content(
             plan_text,
         )
 
-        podcast_file_path = save_to_file(podcast_text, 'podcast.txt')
+        save_to_file(podcast_text, 'podcast.txt')
         st.success('Podcast został wygenerowany.')
 
         return podcast_text

@@ -140,4 +140,3 @@ class TestElevenlabsTTSPodcastGenerator(unittest.TestCase):
         )
 
         callback.assert_has_calls([call(0, 1, 'Generowanie segmentu 1/1: A')])
-

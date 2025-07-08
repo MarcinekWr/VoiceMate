@@ -10,11 +10,12 @@ These tests verify that the function properly checks the presence of required Az
 from __future__ import annotations
 
 import os
+from unittest.mock import patch
 
 import pytest
 
 from src.logic.llm_podcast import validate_env_variables
-from unittest.mock import patch
+
 
 def test_validate_env_variables_success(monkeypatch):
     monkeypatch.setenv('AZURE_OPENAI_ENDPOINT', 'https://test.endpoint')
@@ -26,7 +27,7 @@ def test_validate_env_variables_success(monkeypatch):
     validate_env_variables()
 
 
-@patch("src.logic.llm_podcast.get_secret_env_first")
+@patch('src.logic.llm_podcast.get_secret_env_first')
 def test_validate_env_variables_missing(mock_get):
     mock_get.side_effect = [None, None, None, None, None]
 

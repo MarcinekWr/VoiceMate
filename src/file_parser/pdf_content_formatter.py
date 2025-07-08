@@ -5,7 +5,6 @@ class for formatting extracted PDF content.
 """
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 import fitz  # PyMuPDF
@@ -24,7 +23,7 @@ class PDFContentFormatter:
         metadata: dict[str, Any],
         images: list[dict[str, Any]],
         tables: list[dict[str, Any]],
-        request_id: str = None
+        request_id: str | None = None
     ):
         """
         Initialize the PDFContentFormatter.

@@ -5,7 +5,6 @@ class for extracting images from PDF files.
 from __future__ import annotations
 
 import base64
-import logging
 import os
 from typing import Any
 
@@ -13,6 +12,7 @@ import fitz  # PyMuPDF
 
 from src.utils.image_describer import ImageDescriber
 from src.utils.logging_config import get_request_id, get_session_logger
+
 
 class PDFImageExtractor:
     """
@@ -24,7 +24,7 @@ class PDFImageExtractor:
         output_dir: str,
         image_describer: ImageDescriber | None = None,
         describe_images: bool = True,
-        request_id = None,
+        request_id=None,
     ):
         """
         Initialize the PDFImageExtractor.
