@@ -1,3 +1,4 @@
+import logging
 import os
 
 from azure.identity import DefaultAzureCredential
@@ -5,7 +6,6 @@ from azure.keyvault.secrets import SecretClient
 
 
 def get_secret_env_first(env_key: str) -> str:
-    import logging
     logger = logging.getLogger('fallback')
     """
     Retrieve a secret from environment variables first.
@@ -41,11 +41,3 @@ def get_secret_env_first(env_key: str) -> str:
         logger.error(
             f"❌ Failed to retrieve secret '{env_key}' from Azure Key Vault: {e}")
         raise
-
-
-if __name__ == '__main__':
-    try:
-        secret = get_secret_env_first('AZURE_OPENAI_API_KEY')
-        print('✅ Secret retrieved:', secret[:5], '...' if secret else '')
-    except Exception as e:
-        print('❌ Error:', e)

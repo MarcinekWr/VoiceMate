@@ -63,6 +63,6 @@ def cleanup_current_session():
         request_id = st.session_state.request_id
         try:
             cleanup_session_logger(request_id)
-            st.success(f'Wyczyszczono zasoby dla sesji {request_id}')
+            # st.success(f'Wyczyszczono zasoby dla sesji {request_id}')
         except Exception as e:
             st.error(f'Błąd podczas czyszczenia sesji: {e}')

@@ -189,15 +189,15 @@ class FileConverter:
                 text=True,
             )
             # Now wait for the file to physically appear
-            for _ in range(20):
-                if os.path.exists(output_path):
-                    break
+            timeout = 10
+            start_time = time.time()
+            while not os.path.exists(output_path):
+                if time.time() - start_time > timeout:
+                    self.logger.error(
+                        f'PDF conversion succeeded but file not found: {output_path}')
+                    raise FileNotFoundError(
+                        f'PDF not found after subprocess: {output_path}')
                 time.sleep(0.1)
-            else:
-                self.logger.error(
-                    f'PDF conversion succeeded but file not found: {output_path}')
-                raise FileNotFoundError(
-                    f'PDF not found after subprocess: {output_path}')
 
             self.logger.info(
                 f'URL successfully converted to PDF: {output_path}')

@@ -28,7 +28,11 @@ def cleanup_on_session_end():
         try:
             cleanup_session_logger(request_id)
         except Exception as e:
-            print(f'Error cleaning up logger for {request_id}: {e}')
+            logger = get_session_logger(
+                request_id) if 'request_id' in st.session_state else None
+            if logger:
+                logger.error(f'Error cleaning up logger for {request_id}: {e}')
+            # else: fallback (should not happen in normal flow)
 
 
 def main():
@@ -39,9 +43,7 @@ def main():
         initial_sidebar_state='expanded',
     )
 
-    print('✅ A: przed initialize_session_state()')
     initialize_session_state()
-    print('✅ B: po initialize_session_state()')
 
     # Pobierz request_id z session_state
     request_id = st.session_state.request_id
@@ -86,16 +88,15 @@ def main():
             )
             logger.info(
                 '📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
-            # Opcjonalne: wyświetl info użytkownikowi tylko raz
-            if 'blob_upload_notified' not in st.session_state:
-                st.success(
-                    '📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
-                st.session_state.blob_upload_notified = True
+            # if 'blob_upload_notified' not in st.session_state:
+            #     st.success(
+            #         '📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
+            #     st.session_state.blob_upload_notified = True
         except Exception as e:
             logger.warning(
                 f'⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}')
-            st.warning(
-                f'⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}')
+            # st.warning(
+            #     f'⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}')
 
     st.markdown('---')
     st.markdown(
