@@ -1,5 +1,47 @@
-Turn the following input into a casual podcast monologue.
-Make it fun, engaging and conversational.
+### ZADANIE
+Na podstawie przetworzonego tekstu wejściowego {input_text}, Twoim zadaniem jest stworzenie obszernej, luźnej rozmowy w języku polskim w formie dialogu dwóch znajomych: Patryka i Sylwie.
 
-Input:
-{input_text}
+### DODATKOWA INSTRUKCJA
+Oprócz materiału źródłowego otrzymujesz również spis tematów {plan_text}, który wyznacza główne zagadnienia do poruszenia w rozmowie. Przechodź przez punkty planu w naturalny sposób – każdy punkt powinien być omówiony, ale w swobodnej, przyjacielskiej atmosferze. Możesz dodawać osobiste komentarze, żarty i luźne dygresje.
+
+### KONTEKST
+Słuchacz nie zna tekstu źródłowego, dlatego wszystkie kluczowe informacje muszą zostać wyjaśnione w rozmowie. Rozmowa powinna być długa, szczegółowa i maksymalnie otwarta – wykorzystaj możliwie dużo tokenów. W razie potrzeby kontynuuj generację w kolejnych segmentach.
+
+Po omówieniu jednego tematu przejdź swobodnie do kolejnych zagadnień z planu. Jeśli jakiś wątek jest ciekawy, możesz go pogłębić żartami, osobistymi refleksjami lub przypadkowymi skojarzeniami. Pozwól sobie na naturalne odbicia od tematu.
+
+### PRZYKŁADY
+- Patryka i Sylwia rozmawiają jak znajomi przy kawie – swobodnie, z humorem, czasem się przekomarzają.
+- Jeden z nich może być bardziej zorientowany w temacie, ale obaj uczestniczą w rozmowie na równych prawach.
+- W rozmowie pojawiają się żarty, osobiste doświadczenia, analogie z życia codziennego, spontaniczne komentarze.
+- Mogą się nie zgadzać, dyskutować, wtrącać swoje "a wiesz co..." lub "czekaj, czekaj...".
+- Pozwól na naturalne przerywanie się, dokańczanie zdań za siebie, spontaniczne reakcje.
+
+### OSOBOWOŚĆ
+- Patryk: luźny, towarzyski, lubi żartować, ma swoje zdanie na różne tematy, czasem ironiczny.
+- Sylwia: bystra, ciekawska, lubi dyskutować, ma tendencję do filozofowania, czasem bardziej poważna od Patryka.
+
+### FORMAT
+Struktura odpowiedzi musi być w formacie dialogu dwóch osób z wyraźnym podziałem na role [P] to Patryk a [S] to Sylwia:
+
+[P]:
+...
+
+[S]:
+...
+
+[P]:
+...
+
+[S]:
+...
+
+(...)
+
+Utrzymuj ten format przez całą długość rozmowy.
+
+### STYL
+Styl swobodny, przyjacielski – jak rozmowa dwóch znajomych, którzy rozmawiają o interesującym temacie. Ton powinien być luźny, naturalny, z miejscem na humor, ale też merytoryczny gdy trzeba. Pozwól sobie na słownictwo potoczne, wtrącenia typu "no właśnie", "słuchaj", "wiesz co" itp.
+
+---
+
+Twój cel: Wygeneruj możliwie długą, swobodną i angażującą rozmowę dwóch znajomych na podstawie tekstu źródłowego oraz przekazanego planu. Nie kończ rozmowy przedwcześnie. Rozmawiajcie, aż wszystkie zagadnienia z planu zostaną poruszone w naturalny sposób.
