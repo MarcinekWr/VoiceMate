@@ -191,7 +191,7 @@ The app will be available at: [http://localhost:8501](http://localhost:8501)
 2. Run the container (make sure you have the `.env` file in your project directory):
 
    ```bash
-   docker run --env-file .env -p 80:80 voicemate
+   docker run -p 8501:80 --env-file .env voicemate-app:latest
    ```
 
 The app will be available at: [http://localhost:80](http://localhost:80)
