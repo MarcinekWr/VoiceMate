@@ -26,7 +26,7 @@ class PdfParser:
     def __init__(
         self,
         file_path: str,
-        output_dir: str = 'extracted_content',
+        output_dir: str = "extracted_content",
         describe_images: bool = True,
         image_describer: ImageDescriber | None = None,
         request_id=None,
@@ -47,14 +47,17 @@ class PdfParser:
         self.file_path = os.path.abspath(file_path)
         self.output_dir = output_dir
         self.describe_images = describe_images
-        self.text = ''
+        self.text = ""
         self.images: list[dict[str, Any]] = []
         self.tables: list[dict[str, Any]] = []
         self.structured_content: list[dict[str, Any]] = []
         self.metadata: dict[str, Any] = {}
 
-        self.image_describer: ImageDescriber | None = image_describer if image_describer is not None else (
-            ImageDescriber() if describe_images else None)
+        self.image_describer: ImageDescriber | None = (
+            image_describer
+            if image_describer is not None
+            else (ImageDescriber() if describe_images else None)
+        )
 
         self.table_parser = PDFTableParser(self.file_path)
         self.image_extractor = PDFImageExtractor(
@@ -64,7 +67,7 @@ class PdfParser:
         )
         self.create_output_directory()
 
-        self.logger.info('Initialized PdfParser with file: %s', file_path)
+        self.logger.info("Initialized PdfParser with file: %s", file_path)
 
     def create_output_directory(self) -> None:
         """
@@ -77,7 +80,7 @@ class PdfParser:
             os.makedirs(self.output_dir, exist_ok=True)
         except OSError as e:
             raise OSError(
-                f'Failed to create output directory {self.output_dir}: {e}',
+                f"Failed to create output directory {self.output_dir}: {e}",
             )
 
     def parse_all(self) -> dict[str, Any]:
@@ -102,34 +105,35 @@ class PdfParser:
             self.structured_content = formatter.create_structured_content(doc)
 
             self.logger.info(
-                'Successfully parsed all content from: %s', self.file_path,
+                "Successfully parsed all content from: %s",
+                self.file_path,
             )
 
             return {
-                'text': self.text,
-                'images': self.images,
-                'tables': self.tables,
-                'structured_content': self.structured_content,
-                'metadata': self.metadata,
+                "text": self.text,
+                "images": self.images,
+                "tables": self.tables,
+                "structured_content": self.structured_content,
+                "metadata": self.metadata,
             }
 
         except (FileNotFoundError, ValueError) as e:
-            self.logger.error('File error parsing PDF: %s', e)
+            self.logger.error("File error parsing PDF: %s", e)
             return {}
         except MemoryError as e:
-            self.logger.error('Memory error parsing large PDF: %s', e)
+            self.logger.error("Memory error parsing large PDF: %s", e)
             return {}
         except FileNotFoundError:
             self.logger.error(
-                f'[critical] FileNotFoundError: {self.file_path} not found')
+                f"[critical] FileNotFoundError: {self.file_path} not found"
+            )
             return {}
         except Exception as e:
-            self.logger.error(
-                'Unexpected error parsing PDF %s: %s', self.file_path, e)
+            self.logger.error("Unexpected error parsing PDF %s: %s", self.file_path, e)
 
             return {}
         finally:
-            if 'doc' in locals() and doc:
+            if "doc" in locals() and doc:
                 doc.close()
 
     def extract_metadata(self, doc: fitz.Document) -> dict[str, Any]:
@@ -146,37 +150,40 @@ class PdfParser:
 
         try:
             file_stats = os.stat(self.file_path)
-            metadata['filename'] = os.path.basename(self.file_path)
-            metadata['file_size_mb'] = round(
-                file_stats.st_size / (1024 * 1024), 2,
+            metadata["filename"] = os.path.basename(self.file_path)
+            metadata["file_size_mb"] = round(
+                file_stats.st_size / (1024 * 1024),
+                2,
             )
-            metadata['modified_time'] = datetime.fromtimestamp(
+            metadata["modified_time"] = datetime.fromtimestamp(
                 file_stats.st_mtime,
             ).isoformat()
 
         except OSError as e:
             self.logger.error(
-                'Error accessing file stats for %s: %s', self.file_path, e,
+                "Error accessing file stats for %s: %s",
+                self.file_path,
+                e,
             )
-            metadata['error'] = f'Failed to get file stats: {str(e)}'
+            metadata["error"] = f"Failed to get file stats: {str(e)}"
             return metadata
 
         try:
             pdf_metadata = doc.metadata
 
-            metadata['title'] = pdf_metadata.get('title', '')
-            metadata['author'] = pdf_metadata.get('author', '')
-            metadata['creation_date'] = pdf_metadata.get('creationDate', '')
-            metadata['page_count'] = len(doc)
+            metadata["title"] = pdf_metadata.get("title", "")
+            metadata["author"] = pdf_metadata.get("author", "")
+            metadata["creation_date"] = pdf_metadata.get("creationDate", "")
+            metadata["page_count"] = len(doc)
 
-            self.logger.info('Successfully extracted metadata')
+            self.logger.info("Successfully extracted metadata")
 
         except RuntimeError as e:
-            self.logger.error('PDF file data error extracting metadata: %s', e)
-            metadata['error'] = f'Invalid PDF file: {str(e)}'
+            self.logger.error("PDF file data error extracting metadata: %s", e)
+            metadata["error"] = f"Invalid PDF file: {str(e)}"
         except Exception as e:
-            self.logger.error('Unexpected error extracting metadata: %s', e)
-            metadata['error'] = f'Unexpected error: {str(e)}'
+            self.logger.error("Unexpected error extracting metadata: %s", e)
+            metadata["error"] = f"Unexpected error: {str(e)}"
 
         return metadata
 
@@ -189,14 +196,14 @@ class PdfParser:
         """
         try:
             text = extract_text(self.file_path)
-            self.logger.info('Text extraction completed')
+            self.logger.info("Text extraction completed")
             return text
         except FileNotFoundError as e:
-            self.logger.error('File not found error extracting text: %s', e)
-            return ''
+            self.logger.error("File not found error extracting text: %s", e)
+            return ""
         except Exception as e:
-            self.logger.error('Unexpected error extracting text: %s', e)
-            return ''
+            self.logger.error("Unexpected error extracting text: %s", e)
+            return ""
 
     def get_content_for_llm(self) -> str:
         """
@@ -223,19 +230,19 @@ class PdfParser:
         report_path = os.path.join(self.output_dir, 'extraction_report.txt')
 
         try:
-            with open(report_path, 'w', encoding='utf-8') as file:
-                file.write('PDF CONTENT EXTRACTION REPORT\n')
-                file.write('=' * 50 + '\n\n')
-                file.write(f'Source File: {self.file_path}\n')
-                file.write(f'Total Pages: {len(self.structured_content)}\n')
-                file.write(f'Images Extracted: {len(self.images)}\n')
-                file.write(f'Text Length: {len(self.text)} characters\n')
+            with open(report_path, "w", encoding="utf-8") as file:
+                file.write("PDF CONTENT EXTRACTION REPORT\n")
+                file.write("=" * 50 + "\n\n")
+                file.write(f"Source File: {self.file_path}\n")
+                file.write(f"Total Pages: {len(self.structured_content)}\n")
+                file.write(f"Images Extracted: {len(self.images)}\n")
+                file.write(f"Text Length: {len(self.text)} characters\n")
 
-                file.write('\n')
+                file.write("\n")
 
                 if self.metadata:
-                    file.write('METADATA\n')
-                    file.write('-' * 20 + '\n')
+                    file.write("METADATA\n")
+                    file.write("-" * 20 + "\n")
                     file.write(
                         f"Filename: {self.metadata.get('filename', 'N/A')}\n",
                     )
@@ -249,38 +256,38 @@ class PdfParser:
                         f"Modified: {self.metadata.get('modified_time', 'N/A')}\n",
                     )
 
-                    if self.metadata.get('title'):
+                    if self.metadata.get("title"):
                         file.write(f"Title: {self.metadata['title']}\n")
-                    if self.metadata.get('author'):
+                    if self.metadata.get("author"):
                         file.write(f"Author: {self.metadata['author']}\n")
-                    if self.metadata.get('creation_date'):
+                    if self.metadata.get("creation_date"):
                         file.write(
                             f"Created: {self.metadata['creation_date']}\n",
                         )
-                    file.write('\n')
+                    file.write("\n")
 
-                file.write('PAGE SUMMARY\n')
-                file.write('-' * 20 + '\n')
+                file.write("PAGE SUMMARY\n")
+                file.write("-" * 20 + "\n")
                 for page in self.structured_content:
                     file.write(f"Page {page['page']}:\n")
                     file.write(f"  - Text: {len(page['text'])} characters\n")
                     file.write(f"  - Images: {len(page['images'])}\n")
 
-                    if page['images']:
-                        for image in page['images']:
+                    if page["images"]:
+                        for image in page["images"]:
                             file.write(
                                 f"    * {image['filename']} "
                                 f"({image['width']}x{image['height']})\n",
                             )
-                            if image.get('description'):
+                            if image.get("description"):
                                 file.write(
                                     f"      Description: {image['description'][:100]}...\n",
                                 )
-                    file.write('\n')
+                    file.write("\n")
 
         except OSError as e:
-            self.logger.error('Error saving summary report: %s', e)
-            raise OSError(f'Failed to save summary report: {e}')
+            self.logger.error("Error saving summary report: %s", e)
+            raise OSError(f"Failed to save summary report: {e}")
 
         return report_path
 
@@ -296,7 +303,7 @@ class PdfParser:
         try:
             extended_metadata = self.metadata.copy()
 
-            with open(metadata_path, 'w', encoding='utf-8') as file:
+            with open(metadata_path, "w", encoding="utf-8") as file:
                 json.dump(
                     extended_metadata,
                     file,
@@ -305,11 +312,11 @@ class PdfParser:
                     default=str,
                 )
         except OSError as e:
-            self.logger.error('Error saving metadata JSON: %s', e)
-            raise OSError(f'Failed to save metadata JSON: {e}')
+            self.logger.error("Error saving metadata JSON: %s", e)
+            raise OSError(f"Failed to save metadata JSON: {e}")
         except (TypeError, ValueError) as e:
-            self.logger.error('JSON serialization error: %s', e)
-            raise ValueError(f'Failed to serialize metadata to JSON: {e}')
+            self.logger.error("JSON serialization error: %s", e)
+            raise ValueError(f"Failed to serialize metadata to JSON: {e}")
 
         return metadata_path
 
@@ -325,12 +332,12 @@ class PdfParser:
         """
         report_path = os.path.join(self.output_dir, 'llm_content.txt')
         try:
-            with open(report_path, 'w', encoding='utf-8') as file:
+            with open(report_path, "w", encoding="utf-8") as file:
                 file.write(content)
-            self.logger.info(f'LLM-ready content saved to {report_path}')
+            self.logger.info(f"LLM-ready content saved to {report_path}")
         except OSError as e:
-            self.logger.error(f'Error saving LLM content report: {e}')
-            raise OSError(f'Failed to save LLM content report: {e}')
+            self.logger.error(f"Error saving LLM content report: {e}")
+            raise OSError(f"Failed to save LLM content report: {e}")
         return report_path
 
     def initiate(self) -> str:

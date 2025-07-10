@@ -50,13 +50,13 @@ RUN mkdir -p /root/.streamlit
 
 RUN bash -c 'echo -e "\
 [general]\n\
-email = \"272462@student.pwr.edu.pl\"\n\
+email = \"admin@admin.com\"\n\
 " > /root/.streamlit/credentials.toml'
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements-docker.txt .
+RUN pip install --no-cache-dir -r requirements-docker.txt
 
 COPY . .
 
@@ -64,6 +64,7 @@ ENV STREAMLIT_BROWSER_GATHERUSAGESTATS=false
 ENV QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox"
 ENV XDG_RUNTIME_DIR="/tmp/runtime-root"
 RUN mkdir -p /tmp/runtime-root && chmod 700 /tmp/runtime-root
+ENV PYTHONPATH=.
 
 EXPOSE 80
 

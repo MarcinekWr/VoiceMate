@@ -31,7 +31,7 @@ class TextCleaner:
             str: Cleaned text content.
         """
         if not self.text:
-            return ''
+            return ""
         self.remove_pdf_artifacts()
         self.normalize_whitespace()
         self.remove_emojis_and_special_chars()
@@ -47,26 +47,26 @@ class TextCleaner:
         self.text = re.sub(r'\f', '', self.text)
         self.text = re.sub(r'Page\s*\d+', '', self.text, flags=re.IGNORECASE)
         self.text = re.sub(
-            r'^\s*[\u2022•\-–—]+\s*$',
-            '',
+            r"^\s*[\u2022•\-–—]+\s*$",
+            "",
             self.text,
             flags=re.MULTILINE,
         )
         self.text = re.sub(
-            r'CONFIDENTIAL|DRAFT|WATERMARK',
-            '',
+            r"CONFIDENTIAL|DRAFT|WATERMARK",
+            "",
             self.text,
             flags=re.IGNORECASE,
         )
         self.text = re.sub(
-            r'\d+\s+of\s+\d+',
-            '',
+            r"\d+\s+of\s+\d+",
+            "",
             self.text,
             flags=re.IGNORECASE,
         )
         self.text = re.sub(
-            r'^\s*[A-Za-z\s]+\|\s*\d+\s*$',
-            '',
+            r"^\s*[A-Za-z\s]+\|\s*\d+\s*$",
+            "",
             self.text,
             flags=re.MULTILINE,
         )
@@ -99,13 +99,13 @@ class TextCleaner:
         Normalize punctuation marks and quotes in the text.
         """
         replacements = {
-            '–': '-',
-            '—': '-',
-            '…': '...',
-            '‹': '<',
-            '›': '>',
-            '«': '<<',
-            '»': '>>',
+            "–": "-",
+            "—": "-",
+            "…": "...",
+            "‹": "<",
+            "›": ">",
+            "«": "<<",
+            "»": ">>",
         }
         for old, new in replacements.items():
             self.text = self.text.replace(old, new)
@@ -116,18 +116,18 @@ class TextCleaner:
         """
         self.text = ' '.join(self.text.split())
         self.remove_repeated_chars()
-        self.text = re.sub(r'[^\w\s.,!?-]', '', self.text)
+        self.text = re.sub(r"[^\w\s.,!?-]", "", self.text)
 
     def remove_repeated_chars(self):
         """
         Remove repeated special characters like ., /, & etc. (more than 2 consecutive).
         """
         special_chars = r"[.\/&*+=#@$%^(){}\[\]|\\:;<>?~`\"]"
-        pattern = f'({special_chars}){{3,}}'
-        self.text = re.sub(pattern, r'\1\1', self.text)
+        pattern = f"({special_chars}){{3,}}"
+        self.text = re.sub(pattern, r"\1\1", self.text)
 
     URL_PATTERN = re.compile(
-        r'(https?://\S+|www\.\S+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:/\S*)?)',
+        r"(https?://\S+|www\.\S+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:/\S*)?)",
     )
 
     def remove_page_numbers(self):
@@ -135,8 +135,8 @@ class TextCleaner:
         Remove page numbers from the text.
         """
         self.text = re.sub(
-            r'\bPage \d+\b|\bStrona \d+\b|\bSeite \d+\b|\bPágina \d+\b|\bPagina \d+\b|\bP\.? ?\d+\b',
-            '',
+            r"\bPage \d+\b|\bStrona \d+\b|\bSeite \d+\b|\bPágina \d+\b|\bPagina \d+\b|\bP\.? ?\d+\b",
+            "",
             self.text,
         )
 
@@ -145,7 +145,7 @@ class TextCleaner:
         Remove email addresses from the text.
         """
         self.text = re.sub(
-            r'([\w\.-]+)@([\w\.-]+)\.(\w+)',
-            '[email]',
+            r"([\w\.-]+)@([\w\.-]+)\.(\w+)",
+            "[email]",
             self.text,
         )

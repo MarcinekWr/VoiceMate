@@ -8,106 +8,135 @@ from langchain_openai import AzureChatOpenAI
 from src.utils.key_vault import get_secret_env_first
 from src.utils.logging_config import get_request_id, get_session_logger
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 PROMPT_PATHS = {
-    'scientific': os.path.join(BASE_DIR, 'prompts', 'scientific_style.txt'),
-    'casual': os.path.join(BASE_DIR, 'prompts', 'casual_style.txt'),
-    'plan': os.path.join(BASE_DIR, 'prompts', 'plan_prompt.txt'),
+    "scientific": os.path.join(BASE_DIR, "prompts", "scientific_style.txt"),
+    "casual": os.path.join(BASE_DIR, "prompts", "casual_style.txt"),
+    "plan": os.path.join(BASE_DIR, "prompts", "plan_prompt.txt"),
 }
 
 
 def validate_env_variables() -> None:
-    """Validate that all required environment variables are set."""
+    """
+    Validates that all required environment variables for Azure OpenAI are set.
+
+    Raises:
+        ValueError: If one or more required environment variables are missing.
+    """
     required_vars = [
-        'AZURE_OPENAI_ENDPOINT',
-        'AZURE_OPENAI_API_KEY',
-        'API_VERSION',
-        'AZURE_OPENAI_DEPLOYMENT',
-        'AZURE_OPENAI_MODEL',
+        "AZURE_OPENAI_ENDPOINT",
+        "AZURE_OPENAI_API_KEY",
+        "API_VERSION",
+        "AZURE_OPENAI_DEPLOYMENT",
+        "AZURE_OPENAI_MODEL",
     ]
 
-    missing_vars = [
-        var for var in required_vars if not get_secret_env_first(var)]
+    missing_vars = [var for var in required_vars if not get_secret_env_first(var)]
     if missing_vars:
         raise ValueError(
-            f'Missing required environment variables: {missing_vars}',
+            f"Missing required environment variables: {missing_vars}",
         )
 
 
 def create_llm(ui_callback=None) -> AzureChatOpenAI:
-    """Create and configure the Azure OpenAI client."""
+    """
+    Creates and returns a configured Azure OpenAI chat model client.
+
+    Args:
+        ui_callback (Callable, optional): Callback for UI status updates.
+
+    Returns:
+        AzureChatOpenAI: An instance of AzureChatOpenAI client.
+
+    Raises:
+        Exception: If any environment variables are missing or client initialization fails.
+    """
     request_id = get_request_id()
     logger = get_session_logger(request_id)
     try:
-        logger.info('Validating environment variables')
+        logger.info("Validating environment variables")
         if ui_callback:
-            ui_callback('Sprawdzam zmienne środowiskowe...')
+            ui_callback("Sprawdzam zmienne środowiskowe...")
 
         validate_env_variables()
 
-        logger.info('Creating Azure OpenAI client')
+        logger.info("Creating Azure OpenAI client")
         if ui_callback:
-            ui_callback('Tworzę połączenie z Azure OpenAI...')
+            ui_callback("Tworzę połączenie z Azure OpenAI...")
 
         llm = AzureChatOpenAI(
-            azure_endpoint=get_secret_env_first('AZURE_OPENAI_ENDPOINT'),
-            api_key=get_secret_env_first('AZURE_OPENAI_API_KEY'),
-            api_version=get_secret_env_first('API_VERSION'),
-            deployment_name=get_secret_env_first('AZURE_OPENAI_DEPLOYMENT'),
-            model_name=get_secret_env_first('AZURE_OPENAI_MODEL'),
+            azure_endpoint=get_secret_env_first("AZURE_OPENAI_ENDPOINT"),
+            api_key=get_secret_env_first("AZURE_OPENAI_API_KEY"),
+            api_version=get_secret_env_first("API_VERSION"),
+            deployment_name=get_secret_env_first("AZURE_OPENAI_DEPLOYMENT"),
+            model_name=get_secret_env_first("AZURE_OPENAI_MODEL"),
             temperature=0.7,
             max_tokens=16384,
         )
 
-        logger.info('Azure OpenAI client created successfully')
+        logger.info("Azure OpenAI client created successfully")
         if ui_callback:
-            ui_callback('Połączenie z AI nawiązane pomyślnie!', 'success')
+            ui_callback("Połączenie z AI nawiązane pomyślnie!", "success")
 
         return llm
     except Exception as e:
-        logger.error(f'Error creating LLM: {e}')
+        logger.error(f"Error creating LLM: {e}")
         if ui_callback:
-            ui_callback(f'Błąd tworzenia połączenia: {e}', 'error')
+            ui_callback(f"Błąd tworzenia połączenia: {e}", "error")
         raise
 
 
 def load_prompt_template(style: str, ui_callback=None) -> PromptTemplate:
-    """Load a prompt template from a file."""
+    """
+    Loads a prompt template from a local file based on the selected style.
+
+    Args:
+        style (str): One of 'scientific', 'casual', or 'plan'.
+        ui_callback (Callable, optional): Optional UI progress callback.
+
+    Returns:
+        PromptTemplate: Loaded LangChain prompt template.
+
+    Raises:
+        ValueError: If the style is invalid.
+        FileNotFoundError: If the template file does not exist.
+    """
     request_id = get_request_id()
     logger = get_session_logger(request_id)
     try:
         if style not in PROMPT_PATHS:
-            error_msg = f'Unknown style: {style}. Available styles: {list(PROMPT_PATHS.keys())}'
+            error_msg = (
+                f"Unknown style: {style}. Available styles: {list(PROMPT_PATHS.keys())}"
+            )
             logger.error(error_msg)
             if ui_callback:
-                ui_callback(error_msg, 'error')
+                ui_callback(error_msg, "error")
             raise ValueError(error_msg)
 
         prompt_path = PROMPT_PATHS[style]
 
         if not os.path.isfile(prompt_path):
-            error_msg = f'Prompt file not found: {prompt_path}'
+            error_msg = f"Prompt file not found: {prompt_path}"
             logger.error(error_msg)
             if ui_callback:
-                ui_callback(
-                    f'Nie znaleziono pliku szablonu: {prompt_path}', 'error')
+                ui_callback(f"Nie znaleziono pliku szablonu: {prompt_path}", "error")
             raise FileNotFoundError(error_msg)
 
-        with open(prompt_path, encoding='utf-8') as f:
+        with open(prompt_path, encoding="utf-8") as f:
             prompt_text = f.read()
 
         template = PromptTemplate.from_template(prompt_text)
 
-        logger.info('Prompt template loaded successfully')
+        logger.info("Prompt template loaded successfully")
         if ui_callback:
-            ui_callback('Szablon załadowany pomyślnie!')
+            ui_callback("Szablon załadowany pomyślnie!")
 
         return template
 
     except Exception as e:
-        logger.error(f'Error loading prompt template: {e}')
+        logger.error(f"Error loading prompt template: {e}")
         if ui_callback:
-            ui_callback(f'Błąd ładowania szablonu: {e}', 'error')
+            ui_callback(f"Błąd ładowania szablonu: {e}", "error")
         raise
 
 
@@ -116,34 +145,48 @@ def generate_plan(
     input_text: str,
     ui_callback=None,
 ) -> str:
-    """Generate a plan for the podcast based on input text."""
+    """
+    Generates a podcast plan using the AI model based on the input content.
+
+    Args:
+        llm (AzureChatOpenAI): Azure OpenAI LLM instance.
+        input_text (str): Source material to extract a plan from.
+        ui_callback (Callable, optional): Optional UI progress callback.
+
+    Returns:
+        str: The generated plan as a string.
+
+    Raises:
+        ValueError: If the input text is empty.
+        Exception: If generation fails.
+    """
     request_id = get_request_id()
     logger = get_session_logger(request_id)
     try:
         if not input_text or not input_text.strip():
-            raise ValueError('Input text is empty or only whitespace.')
+            raise ValueError("Input text is empty or only whitespace.")
 
-        logger.info('Starting plan generation')
+        logger.info("Starting plan generation")
         if ui_callback:
-            ui_callback('Rozpoczynam generowanie planu...')
+            ui_callback("Rozpoczynam generowanie planu...")
 
-        prompt_template = load_prompt_template('plan')
-        logger.info('Prompt template loaded')
+        prompt_template = load_prompt_template("plan")
+        logger.info("Prompt template loaded")
         if ui_callback:
-            ui_callback('Szablon załadowany, wysyłam do AI...')
+            ui_callback("Szablon załadowany, wysyłam do AI...")
 
         user_prompt = prompt_template.format(input_text=input_text)
-        response = llm.invoke([{'role': 'user', 'content': user_prompt}])
+        response = llm.invoke([{"role": "user", "content": user_prompt}])
 
-        logger.info('Plan generated successfully')
+        logger.info("Plan generated successfully")
         if ui_callback:
-            ui_callback('Plan wygenerowany!', 'success')
+            ui_callback("Plan wygenerowany!", "success")
 
         return response.content
     except Exception as e:
-        logger.error(f'Error loading prompt template: {e}')
+        logger.error(f"Error loading prompt template: {e}")
         if ui_callback:
-            ui_callback(f'Błąd ładowania szablonu: {e}', 'error')
+            ui_callback(f"Błąd ładowania szablonu: {e}", "error")
         raise
 
 
@@ -154,20 +197,36 @@ def generate_podcast_text(
     plan_text: str,
     ui_callback=None,
 ) -> str:
-    """Generate podcast text in specified style."""
+    """
+    Generates the full podcast text using the selected style and AI model.
+
+    Args:
+        llm (AzureChatOpenAI): Azure OpenAI LLM instance.
+        style (str): Podcast style, either 'scientific' or 'casual'.
+        input_text (str): Source content provided by the user.
+        plan_text (str): Plan previously generated for structuring the podcast.
+        ui_callback (Callable, optional): Optional UI progress callback.
+
+    Returns:
+        str: The generated podcast text.
+
+    Raises:
+        ValueError: If the input or plan text is empty.
+        Exception: If generation fails.
+    """
     request_id = get_request_id()
     logger = get_session_logger(request_id)
     try:
         if not input_text or not input_text.strip():
-            raise ValueError('Input text is empty or only whitespace.')
+            raise ValueError("Input text is empty or only whitespace.")
         if not plan_text or not plan_text.strip():
-            raise ValueError('Plan text is empty or only whitespace.')
+            raise ValueError("Plan text is empty or only whitespace.")
 
-        logger.info(f'Starting podcast generation in {style} style')
+        logger.info(f"Starting podcast generation in {style} style")
         if ui_callback:
-            ui_callback('Rozpoczynam generowanie podcastu...')
+            ui_callback("Rozpoczynam generowanie podcastu...")
 
-        logger.info('Loading prompt template')
+        logger.info("Loading prompt template")
         if ui_callback:
             ui_callback(f"Ładuję szablon stylu '{style}'...")
 
@@ -177,54 +236,63 @@ def generate_podcast_text(
             plan_text=plan_text,
         )
 
-        logger.info('Preparing system prompt')
+        logger.info("Preparing system prompt")
         if ui_callback:
-            ui_callback('Przygotowuję prompt systemowy...')
+            ui_callback("Przygotowuję prompt systemowy...")
 
         system_prompt = (
-            'Jesteś Agentem Podcastu Naukowego. Tworzysz klarowne, edukacyjne podcasty w stylu wykładowym.'
-            if style == 'scientific'
-            else 'Jesteś Agentem Podcastu Hobbistycznego. Opowiadasz lekko, ciekawie i nieformalnie jak przy kawie.'
+            "Jesteś Agentem Podcastu Naukowego. Tworzysz klarowne, edukacyjne podcasty w stylu wykładowym."
+            if style == "scientific"
+            else "Jesteś Agentem Podcastu Hobbistycznego. Opowiadasz lekko, ciekawie i nieformalnie jak przy kawie."
         )
 
-        logger.info('Sending request to AI model')
+        logger.info("Sending request to AI model")
         if ui_callback:
-            ui_callback('Wysyłam zapytanie do modelu AI...')
+            ui_callback("Wysyłam zapytanie do modelu AI...")
 
         response = llm.invoke(
             [
-                {'role': 'system', 'content': system_prompt},
-                {'role': 'user', 'content': user_prompt},
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
             ],
         )
 
         logger.info(
-            f'Podcast text generated successfully ({len(response.content)} characters)',
+            f"Podcast text generated successfully ({len(response.content)} characters)",
         )
         if ui_callback:
             ui_callback(
-                f'Podcast wygenerowany pomyślnie! ({len(response.content)} znaków)',
-                'success',
+                f"Podcast wygenerowany pomyślnie! ({len(response.content)} znaków)",
+                "success",
             )
 
         return response.content
     except Exception as e:
-        logger.error(f'Error generating podcast text: {e}')
+        logger.error(f"Error generating podcast text: {e}")
         if ui_callback:
-            ui_callback(f'Błąd generowania podcastu: {e}', 'error')
+            ui_callback(f"Błąd generowania podcastu: {e}", "error")
         raise
 
 
 def save_to_file(content: str, filename: str) -> None:
-    """Save content to file with error handling."""
+    """
+    Saves a string of content to a file.
+
+    Args:
+        content (str): Text content to write.
+        filename (str): File path where content should be saved.
+
+    Raises:
+        Exception: If the file write operation fails.
+    """
     request_id = get_request_id()
     logger = get_session_logger(request_id)
     try:
-        with open(filename, 'w', encoding='utf-8') as f:
+        with open(filename, "w", encoding="utf-8") as f:
             f.write(content)
-        logger.info(f'Content saved to {filename}')
+        logger.info(f"Content saved to {filename}")
     except Exception as e:
-        logger.error(f'Error saving to {filename}: {e}')
+        logger.error(f"Error saving to {filename}: {e}")
         raise
 
 
@@ -236,24 +304,24 @@ class LLMPodcastService:
         """Main logic for generating the podcast."""
         request_id = get_request_id()
         logger = get_session_logger(request_id)
-        input_file = os.path.join('src', 'logic', 'llm_text_test_file.txt')
+        input_file = os.path.join("src", "logic", "llm_text_test_file.txt")
         if not os.path.exists(input_file):
-            raise FileNotFoundError(f'Input file not found: {input_file}')
+            raise FileNotFoundError(f"Input file not found: {input_file}")
 
-        with open(input_file, encoding='utf-8') as f:
+        with open(input_file, encoding="utf-8") as f:
             input_text = f.read()
 
-        logger.info(f'Loaded input text ({len(input_text)} characters)')
+        logger.info(f"Loaded input text ({len(input_text)} characters)")
 
         plan_text = generate_plan(self.llm, input_text)
-        save_to_file(plan_text, 'output_plan.txt')
+        save_to_file(plan_text, "output_plan.txt")
 
         output = generate_podcast_text(
             self.llm,
-            'scientific',
+            "scientific",
             input_text,
             plan_text,
         )
-        save_to_file(output, 'podcast.txt')
+        save_to_file(output, "podcast.txt")
 
-        logger.info('Podcast generation completed successfully!')
+        logger.info("Podcast generation completed successfully!")

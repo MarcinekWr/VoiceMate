@@ -5,24 +5,48 @@ description = "Browser-based AI tool for creating, scientific and hobby audio po
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "langchain-core~=0.3.65",
-    "langchain-openai~=0.3.23",
-    "python-dotenv>=1.1.0",
-    "streamlit~=1.45",
+    "langchain-core ~= 0.3.68",
+    "langchain-openai ~= 0.3.27",
+    "python-dotenv >= 1.1.1, <2.0.0",
+    "streamlit ~= 1.45",
+    "azure-storage-blob ~= 12.25",
+    "azure-ai-contentsafety ~= 1.0",
+    "azure-keyvault-secrets ~= 4.7",
+    "azure-keyvault ~= 4.2",
+    "azure-cognitiveservices-speech ~= 1.44",
+    "camelot-py ~= 1.0",
+    "elevenlabs ~= 2.6",
+    "emoji ~= 2.14",
+    "PyMuPDF ~= 1.26",
+    "Markdown ~= 3.8",
+    "opencensus ~= 0.11",
+    "opencensus-ext-azure ~= 1.1",
+    "pandas ~= 2.3",
+    "pdfkit ~= 1.0",
+    "pdfminer.six >= 20250506", 
+    "Pillow ~= 11.3",
+    "playwright ~= 1.53",
+    "python-pptx ~= 1.0",
+    "requests ~= 2.32",
+    "PyQt5 ~= 5.15",
+    "pyqtwebengine ~= 5.15"
 ]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.11.13",
+    "pytest==8.4.1",
+    "ruff>=0.11.13"
 ]
 
 [tool.poetry]
 name = "voicemate"
 version = "0.1.0"
-packages = [{ include = "common", from = "src" },
-            { include = "file_parser", from = "src" },
-            {include="logic", from = "src"},
-            {include="prompts", from = "src"},]
+packages = [
+    { include = "common", from = "src" },
+    { include = "file_parser", from = "src" },
+    { include = "logic", from = "src" },
+    { include = "prompts", from = "src" }
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

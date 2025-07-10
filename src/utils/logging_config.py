@@ -1,4 +1,5 @@
 """Defines the logging configuration for the application with per-session isolation."""
+
 from __future__ import annotations
 
 import logging
@@ -15,42 +16,79 @@ from src.utils.key_vault import get_secret_env_first
 
 
 def get_blob_service_client() -> BlobServiceClient:
-    connection_string = get_secret_env_first('AZURE_STORAGE_CONNECTION_STRING')
+    """
+    Creates a BlobServiceClient using the Azure Storage connection string from environment or Key Vault.
+
+    Returns:
+        BlobServiceClient: Azure BlobServiceClient instance.
+
+    Raises:
+        ValueError: If the connection string is not set.
+    """
+    connection_string = get_secret_env_first("AZURE_STORAGE_CONNECTION_STRING")
     if not connection_string:
-        raise ValueError('Brak AZURE_STORAGE_CONNECTION_STRING')
+        raise ValueError("Brak AZURE_STORAGE_CONNECTION_STRING")
     return BlobServiceClient.from_connection_string(connection_string)
 
 
 class RequestIdContext:
-    # Użyj thread-local storage dla izolacji między sesjami
+    """Manages per-thread request ID using thread-local storage."""
+
     _local = threading.local()
 
     @classmethod
     def get_request_id(cls) -> str:
-        if not hasattr(cls._local, 'request_id'):
-            cls._local.request_id = 'no-request-id'
+        """
+        Returns the current thread-local request ID.
+
+        Returns:
+            str: Current request ID, or 'no-request-id' if not set.
+        """
+        if not hasattr(cls._local, "request_id"):
+            cls._local.request_id = "no-request-id"
         return cls._local.request_id
 
     @classmethod
     def set_request_id(cls, request_id: str):
+        """
+        Sets the request ID for the current thread.
+
+        Args:
+            request_id (str): Unique identifier for the request/session.
+        """
         cls._local.request_id = request_id
 
 
 class RequestIdFilter(logging.Filter):
+    """Injects request ID into log records for formatting."""
+
     def filter(self, record):
         record._request_id = RequestIdContext.get_request_id()
         return True
 
 
 def set_request_id(new_id: str | None = None) -> str:
-    """Ustawia nowe request_id (UUID) lub własne, i zwraca je."""
+    """
+    Sets a new UUID as the request ID or uses the provided one.
+
+    Args:
+        new_id (str, optional): Custom request ID. If None, a new UUID is generated.
+
+    Returns:
+        str: The assigned request ID.
+    """
     request_id = new_id or str(uuid.uuid4())
     RequestIdContext.set_request_id(request_id)
     return request_id
 
 
 def get_request_id() -> str:
-    """Zwraca aktualne request_id (lub 'no-request-id')."""
+    """
+    Returns the current request ID.
+
+    Returns:
+        str: The current request ID or 'no-request-id' if not set.
+    """
     return RequestIdContext.get_request_id()
 
 
@@ -61,7 +99,17 @@ _max_loggers = 50  # Maksymalna liczba aktywnych loggerów
 
 
 def get_session_logger(request_id: str) -> logging.Logger:
-    """Zwraca logger specyficzny dla danej sesji/request_id."""
+    """
+    Returns a logger specific to the given request/session.
+
+    Creates a new logger if one does not already exist.
+
+    Args:
+        request_id (str): Unique session ID.
+
+    Returns:
+        logging.Logger: The logger instance.
+    """
     with _loggers_lock:
         # Sprawdź czy nie ma za dużo loggerów
         if len(_loggers) >= _max_loggers and request_id not in _loggers:
@@ -76,7 +124,12 @@ def get_session_logger(request_id: str) -> logging.Logger:
 
 
 def _cleanup_logger(request_id: str):
-    """Wewnętrzna funkcja do czyszczenia loggera."""
+    """
+    Internal function to clean up logger handlers for a given request ID.
+
+    Args:
+        request_id (str): Request ID whose logger should be cleaned up.
+    """
     if request_id in _loggers:
         logger = _loggers[request_id]
         for handler in logger.handlers[:]:
@@ -85,8 +138,21 @@ def _cleanup_logger(request_id: str):
 
 
 def _create_session_logger(request_id: str) -> logging.Logger:
-    """Tworzy nowy logger dla konkretnej sesji."""
-    logger_name = f'session_{request_id}'
+    """
+    Creates and configures a new logger for the given request ID.
+
+    Includes:
+    - File handler (per session)
+    - Stream handler (optional)
+    - Azure Application Insights handler (if configured)
+
+    Args:
+        request_id (str): Unique request/session identifier.
+
+    Returns:
+        logging.Logger: Configured logger instance.
+    """
+    logger_name = f"session_{request_id}"
     logger = logging.getLogger(logger_name)
 
     # Jeśli logger już istnieje, zwróć go
@@ -97,15 +163,15 @@ def _create_session_logger(request_id: str) -> logging.Logger:
     logger.propagate = False  # Ważne! Nie propaguj do root loggera
 
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - [%(funcName)s:%(lineno)d] - [request_id=%(request_id)s] - %(message)s',
+        "%(asctime)s - %(name)s - %(levelname)s - [%(funcName)s:%(lineno)d] - [request_id=%(request_id)s] - %(message)s",
     )
 
     # File handler dla tej konkretnej sesji
-    log_file_path = os.path.join(LOGS_DIR, f'{request_id}.log')
+    log_file_path = os.path.join(LOGS_DIR, f"{request_id}.log")
     file_handler = logging.FileHandler(
         log_file_path,
-        mode='w',
-        encoding='utf-8',
+        mode="w",
+        encoding="utf-8",
     )
     file_handler.setFormatter(formatter)
 
@@ -116,6 +182,15 @@ def _create_session_logger(request_id: str) -> logging.Logger:
             self.req_id = req_id
 
         def filter(self, record):
+            """
+            Adds request ID to the log record.
+
+            Args:
+                record (LogRecord): The log record being processed.
+
+            Returns:
+                bool: Always returns True.
+            """
             record.request_id = self.req_id
             return True
 
@@ -133,15 +208,15 @@ def _create_session_logger(request_id: str) -> logging.Logger:
     def is_valid_instrumentation_key(key):
         return bool(
             re.match(
-                r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
-                key or '',
+                r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                key or "",
             ),
         )
 
-    connection_string = get_secret_env_first('APPINSIGHTS_CONNECTION_STRING')
+    connection_string = get_secret_env_first("APPINSIGHTS_CONNECTION_STRING")
     if connection_string:
         match = re.search(
-            r'InstrumentationKey=([0-9a-fA-F-]+)',
+            r"InstrumentationKey=([0-9a-fA-F-]+)",
             connection_string,
         )
         key = match.group(1) if match else None
@@ -153,25 +228,38 @@ def _create_session_logger(request_id: str) -> logging.Logger:
             azure_handler.addFilter(session_filter)
             logger.addHandler(azure_handler)
             logger.info(
-                'AzureLogHandler podłączony – logi będą wysyłane do Application Insights',
+                "AzureLogHandler podłączony – logi będą wysyłane do Application Insights",
             )
 
     logger.info(
-        f'Session logger initialized for request_id: {request_id}. '
-        f'Log file: {log_file_path}, Level: {logging.getLevelName(logger.level)}',
+        f"Session logger initialized for request_id: {request_id}. "
+        f"Log file: {log_file_path}, Level: {logging.getLevelName(logger.level)}",
     )
 
     return logger
 
 
 def setup_logger(log_file_path: str) -> logging.Logger:
-    """Zachowana dla kompatybilności wstecznej, ale zalecane jest użycie get_session_logger."""
+    """
+    Legacy-compatible function for setting up a logger using the current request ID.
+
+    Args:
+        log_file_path (str): Path to the log file (unused in modern flow).
+
+    Returns:
+        logging.Logger: Logger for the current session.
+    """
     request_id = get_request_id()
     return get_session_logger(request_id)
 
 
 def cleanup_session_logger(request_id: str):
-    """Czyści logger dla danej sesji (opcjonalne, do wywołania na końcu sesji)."""
+    """
+    Removes and deletes all handlers for a session-specific logger.
+
+    Args:
+        request_id (str): The request ID of the logger to clean up.
+    """
     with _loggers_lock:
         if request_id in _loggers:
             _cleanup_logger(request_id)
@@ -179,7 +267,12 @@ def cleanup_session_logger(request_id: str):
 
 
 def cleanup_all_loggers():
-    """Czyści wszystkie loggery - użyj ostrożnie!"""
+    """
+    Clears and removes all session loggers.
+
+    This should be used with caution, as it forcefully closes and removes
+    all active loggers from memory. Useful for application shutdown or reset scenarios.
+    """
     with _loggers_lock:
         for request_id in list(_loggers.keys()):
             _cleanup_logger(request_id)

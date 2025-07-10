@@ -98,6 +98,9 @@ plan_prompt_test.txt
 tests/
 test/
 __tests__/
+tests_e2e/
+test_data/
+
 
 # Ignoruj katalogi z konfiguracjami CI/CD
 .github/
@@ -119,3 +122,7 @@ __tests__/
 *.local
 *.env.*
 
+README.md
+.github/
+
+requirements.txt/

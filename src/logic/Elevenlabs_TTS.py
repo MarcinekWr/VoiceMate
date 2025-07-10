@@ -10,36 +10,64 @@ from src.utils.logging_config import get_request_id, get_session_logger
 
 
 class ElevenlabsTTSPodcastGenerator:
+    """
+    Podcast generator using the ElevenLabs Text-to-Speech API.
+
+    This class converts a sequence of dialog segments into speech audio using ElevenLabs,
+    then saves the combined result as a podcast audio file in MP3 format.
+
+    :param request_id: Optional unique request/session identifier for logging purposes.
+                       If not provided, a new one will be generated.
+    """
+
     def __init__(self, request_id: str | None = None):
         self.request_id = request_id or get_request_id()
         self.logger = get_session_logger(self.request_id)
         self.client = self._load_client()
-        self.dir_prefix = 'podcast_el_'
+        self.dir_prefix = "podcast_el_"
 
     def _load_client(self) -> ElevenLabs:
-        api_key = get_secret_env_first('ELEVENLABS_API_KEY')
+        """
+        Load and initialize the ElevenLabs client using the API key from the environment.
+
+        :return: Initialized ElevenLabs client instance.
+        :raises ValueError: If the API key is missing.
+        """
+        api_key = get_secret_env_first("ELEVENLABS_API_KEY")
         if not api_key:
-            self.logger.error('Missing ELEVENLABS_API_KEY in file .env')
-            raise ValueError('Missing ELEVENLABS_API_KEY')
+            self.logger.error("Missing ELEVENLABS_API_KEY in file .env")
+            raise ValueError("Missing ELEVENLABS_API_KEY")
         return ElevenLabs(api_key=api_key)
 
     def generate_audio_chunk(
-        self, text: str, voice_id: str, model_id: str = 'eleven_multilingual_v2',
+        self,
+        text: str,
+        voice_id: str,
+        model_id: str = "eleven_multilingual_v2",
     ) -> bytes:
+        """
+        Generate a single audio chunk from the given text using ElevenLabs TTS.
+
+        :param text: The text to synthesize into speech.
+        :param voice_id: The ElevenLabs voice identifier to use.
+        :param model_id: The speech model to use (default: 'eleven_multilingual_v2').
+        :return: Audio content as raw MP3 bytes.
+        :raises Exception: If the TTS request fails.
+        """
         try:
             audio = self.client.text_to_speech.convert(
                 text=text,
                 voice_id=voice_id,
                 model_id=model_id,
-                output_format='mp3_44100_128',
+                output_format="mp3_44100_128",
                 voice_settings={
-                    'stability': 0.3,
-                    'similarity_boost': 0.0,
-                    'style': 0.6,
-                    'use_speaker_boost': True,
+                    "stability": 0.3,
+                    "similarity_boost": 0.0,
+                    "style": 0.6,
+                    "use_speaker_boost": True,
                 },
             )
-            return b''.join(audio)
+            return b"".join(audio)
         except Exception as e:
             self.logger.exception(
                 f"Error while generating audio for voice_id '{voice_id}': {e}",
@@ -47,41 +75,58 @@ class ElevenlabsTTSPodcastGenerator:
             raise
 
     def generate_podcast_elevenlabs(
-        self, dialog_data: list, output_path: str | None = None, progress_callback=None,
+        self,
+        dialog_data: list,
+        output_path: str | None = None,
+        progress_callback=None,
     ) -> str | None:
+        """
+        Generate a podcast audio file from a list of dialog segments using ElevenLabs TTS.
+
+        :param dialog_data: List of dictionaries containing:
+                            - 'text': Text to synthesize
+                            - 'voice_id': ElevenLabs voice ID
+                            - 'speaker': Speaker name (used in logs/UI)
+                            - 'order': Segment order index
+        :param output_path: Optional path to save the resulting audio file. A temporary file will be used if not provided.
+        :param progress_callback: Optional function called during processing with:
+                                  (current_index, total_segments, message)
+        :return: Path to the generated podcast file, or None if generation failed.
+        """
         if not dialog_data:
-            self.logger.error('No dialog data provided.')
+            self.logger.error("No dialog data provided.")
             return None
 
-        self.logger.info(f'Loaded {len(dialog_data)} utterances.')
+        self.logger.info(f"Loaded {len(dialog_data)} utterances.")
         audio_chunks = []
 
         if output_path is None:
             temp_dir = tempfile.mkdtemp(prefix=self.dir_prefix)
             output_path = os.path.join(
-                temp_dir, f'{self.dir_prefix}{self.request_id}.wav',
+                temp_dir,
+                f"{self.dir_prefix}{self.request_id}.wav",
             )
 
         total_segments = len(dialog_data)
 
         for i, part in enumerate(dialog_data):
             try:
-                order = part.get('order')
-                speaker = part.get('speaker')
-                voice_id = part.get('voice_id')
-                text = part.get('text')
+                order = part.get("order")
+                speaker = part.get("speaker")
+                voice_id = part.get("voice_id")
+                text = part.get("text")
 
                 if order is None or not speaker or not voice_id or not text:
-                    self.logger.warning(f'Skipped incomplete segment: {part}')
+                    self.logger.warning(f"Skipped incomplete segment: {part}")
                     continue
 
-                self.logger.info(f'{order:02d}: {speaker} ({voice_id})')
+                self.logger.info(f"{order:02d}: {speaker} ({voice_id})")
 
                 if progress_callback:
                     progress_callback(
                         i,
                         total_segments,
-                        f'Generowanie segmentu {i+1}/{total_segments}: {speaker}',
+                        f"Generowanie segmentu {i+1}/{total_segments}: {speaker}",
                     )
 
                 chunk = self.generate_audio_chunk(
@@ -91,21 +136,21 @@ class ElevenlabsTTSPodcastGenerator:
                 audio_chunks.append(chunk)
 
             except Exception:
-                self.logger.error(f'Failed to process segment {part}')
+                self.logger.error(f"Failed to process segment {part}")
                 continue
 
         if not audio_chunks:
-            self.logger.error('No segments generated – podcast was not saved.')
+            self.logger.error("No segments generated – podcast was not saved.")
             return None
 
         try:
-            with open(output_path, 'wb') as f:
+            with open(output_path, "wb") as f:
                 for chunk in audio_chunks:
                     f.write(chunk)
-            self.logger.info(f'Podcast saved as {output_path}')
+            self.logger.info(f"Podcast saved as {output_path}")
             return output_path
         except Exception as e:
             self.logger.exception(
-                f'Error saving podcast to file {output_path}: {e}',
+                f"Error saving podcast to file {output_path}: {e}",
             )
             return None

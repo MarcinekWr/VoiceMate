@@ -23,7 +23,7 @@ class TestVoiceMateStepByStep:
             spinner = page.get_by_text(spinner_text, exact=False)
             try:
                 if spinner.is_visible():
-                    spinner.wait_for(state='hidden', timeout=timeout)
+                    spinner.wait_for(state="hidden", timeout=timeout)
             except Exception:
                 pass
 
@@ -32,13 +32,13 @@ class TestVoiceMateStepByStep:
         voicemate_page.wait_for_app_ready()
         expect(
             voicemate_page.page.get_by_text(
-                '🚀 Rozpocznij krok po kroku',
+                "🚀 Rozpocznij krok po kroku",
                 exact=True,
             ),
         ).to_be_visible()
         expect(
             voicemate_page.page.get_by_text(
-                '⚡ Szybki podcast',
+                "⚡ Szybki podcast",
                 exact=True,
             ),
         ).to_be_visible()
@@ -51,20 +51,20 @@ class TestVoiceMateStepByStep:
         """Test the full step-by-step flow with a sample PDF file."""
         voicemate_page.wait_for_app_ready()
         voicemate_page.page.get_by_text(
-            '🚀 Rozpocznij krok po kroku',
+            "🚀 Rozpocznij krok po kroku",
             exact=True,
         ).click()
         expect(
             voicemate_page.page.get_by_role(
-                'heading',
-                name='📁 Wczytaj plik',
+                "heading",
+                name="📁 Wczytaj plik",
             ),
         ).to_be_visible(timeout=10000)
         voicemate_page.page.locator(
             "input[type='file']",
         ).set_input_files(str(sample_pdf_file))
         process_btn = voicemate_page.page.get_by_text(
-            '🚀 Przetwórz',
+            "🚀 Przetwórz",
             exact=True,
         )
         expect(process_btn).to_be_enabled()
@@ -72,18 +72,18 @@ class TestVoiceMateStepByStep:
         self.wait_for_spinner_to_disappear(
             voicemate_page.page,
             [
-                '🔄 Przetwarzanie w toku...',
-                '🔄 Przetwarzanie pliku i wydobywanie treści...',
+                "🔄 Przetwarzanie w toku...",
+                "🔄 Przetwarzanie pliku i wydobywanie treści...",
             ],
         )
         expect(
             voicemate_page.page.get_by_role(
-                'heading',
-                name='📝 Krok 2: Generuj plan podcastu',
+                "heading",
+                name="📝 Krok 2: Generuj plan podcastu",
             ),
         ).to_be_visible(timeout=30000)
         plan_btn = voicemate_page.page.get_by_text(
-            '📝 Generuj plan',
+            "📝 Generuj plan",
             exact=True,
         )
         expect(plan_btn).to_be_enabled()
@@ -91,18 +91,18 @@ class TestVoiceMateStepByStep:
         self.wait_for_spinner_to_disappear(
             voicemate_page.page,
             [
-                '🔄 Generowanie planu...',
-                '🧠 Analizuję treść i tworzę plan podcastu...',
+                "🔄 Generowanie planu...",
+                "🧠 Analizuję treść i tworzę plan podcastu...",
             ],
         )
         expect(
             voicemate_page.page.get_by_role(
-                'heading',
-                name='🎙️ Krok 3: Generuj podcast i wybierz silnik audio',
+                "heading",
+                name="🎙️ Krok 3: Generuj podcast i wybierz silnik audio",
             ),
         ).to_be_visible(timeout=120000)
         podcast_btn = voicemate_page.page.get_by_text(
-            '🎙️ Generuj podcast',
+            "🎙️ Generuj podcast",
             exact=True,
         )
         expect(podcast_btn).to_be_enabled()
@@ -110,18 +110,18 @@ class TestVoiceMateStepByStep:
         self.wait_for_spinner_to_disappear(
             voicemate_page.page,
             [
-                '🔄 Generowanie tekstu podcastu...',
-                '🎙️ Tworzę tekst podcastu',
+                "🔄 Generowanie tekstu podcastu...",
+                "🎙️ Tworzę tekst podcastu",
             ],
         )
         expect(
             voicemate_page.page.get_by_role(
-                'heading',
-                name='🎵 Krok 4: Generuj audio',
+                "heading",
+                name="🎵 Krok 4: Generuj audio",
             ),
         ).to_be_visible(timeout=120000)
         audio_btn = voicemate_page.page.get_by_text(
-            '🎵 Generuj audio',
+            "🎵 Generuj audio",
             exact=True,
         )
         expect(audio_btn).to_be_enabled()
@@ -129,46 +129,46 @@ class TestVoiceMateStepByStep:
         self.wait_for_spinner_to_disappear(
             voicemate_page.page,
             [
-                '🔄 Generowanie audio...',
-                '🎵 Generuję audio za pomocą',
+                "🔄 Generowanie audio...",
+                "🎵 Generuję audio za pomocą",
             ],
         )
         expect(
             voicemate_page.page.get_by_text(
-                '🎧 Wygenerowane audio',
+                "🎧 Wygenerowane audio",
                 exact=False,
             ),
         ).to_be_visible(timeout=120000)
-        audio_count = voicemate_page.page.locator('audio').count()
-        print('Liczba elementów <audio> w DOM:', audio_count)
-        voicemate_page.page.wait_for_selector('audio', timeout=10000)
+        audio_count = voicemate_page.page.locator("audio").count()
+        print("Liczba elementów <audio> w DOM:", audio_count)
+        voicemate_page.page.wait_for_selector("audio", timeout=10000)
         expect(
             voicemate_page.page.get_by_role(
-                'button',
-                name='📥 Pobierz plan',
+                "button",
+                name="📥 Pobierz plan",
             ),
         ).to_be_visible()
         expect(
             voicemate_page.page.get_by_role(
-                'button',
-                name='📥 Pobierz podcast',
+                "button",
+                name="📥 Pobierz podcast",
             ),
         ).to_be_visible()
         expect(
             voicemate_page.page.get_by_role(
-                'button',
-                name='📥 Pobierz JSON',
+                "button",
+                name="📥 Pobierz JSON",
             ),
         ).to_be_visible()
         expect(
             voicemate_page.page.get_by_role(
-                'button',
-                name='📥 Pobierz audio',
+                "button",
+                name="📥 Pobierz audio",
             ),
         ).to_be_visible()
         expect(
             voicemate_page.page.get_by_text(
-                'zakończony pomyślnie',
+                "zakończony pomyślnie",
                 exact=False,
             ),
         ).to_be_visible()
@@ -182,20 +182,20 @@ class TestVoiceMateStepByStep:
         This test simulates the process of uploading a PDF file"""
         voicemate_page.wait_for_app_ready()
         voicemate_page.page.get_by_text(
-            '🚀 Rozpocznij krok po kroku',
+            "🚀 Rozpocznij krok po kroku",
             exact=True,
         ).click()
         expect(
             voicemate_page.page.get_by_role(
-                'heading',
-                name='📁 Wczytaj plik',
+                "heading",
+                name="📁 Wczytaj plik",
             ),
         ).to_be_visible(timeout=10000)
         voicemate_page.page.locator(
             "input[type='file']",
         ).set_input_files(str(sample_pdf_file))
         process_btn = voicemate_page.page.get_by_text(
-            '🚀 Przetwórz',
+            "🚀 Przetwórz",
             exact=True,
         )
         expect(process_btn).to_be_enabled()
@@ -203,14 +203,14 @@ class TestVoiceMateStepByStep:
         self.wait_for_spinner_to_disappear(
             voicemate_page.page,
             [
-                '🔄 Przetwarzanie w toku...',
-                '🔄 Przetwarzanie pliku i wydobywanie treści...',
+                "🔄 Przetwarzanie w toku...",
+                "🔄 Przetwarzanie pliku i wydobywanie treści...",
             ],
         )
         expect(
             voicemate_page.page.get_by_role(
-                'heading',
-                name='📝 Krok 2: Generuj plan podcastu',
+                "heading",
+                name="📝 Krok 2: Generuj plan podcastu",
             ),
         ).to_be_visible(timeout=30000)
 
@@ -223,16 +223,16 @@ class TestVoiceMateStepByStep:
         This test simulates the process of uploading a URL."""
         voicemate_page.wait_for_app_ready()
         voicemate_page.page.get_by_text(
-            '🚀 Rozpocznij krok po kroku',
+            "🚀 Rozpocznij krok po kroku",
             exact=True,
         ).click()
         url_input = voicemate_page.page.locator(
             "input[placeholder='https://example.com/article']",
         )
         url_input.fill(sample_url)
-        url_input.press('Enter')
+        url_input.press("Enter")
         process_btn = voicemate_page.page.get_by_text(
-            '🚀 Przetwórz',
+            "🚀 Przetwórz",
             exact=True,
         )
         expect(process_btn).to_be_enabled()
@@ -240,14 +240,14 @@ class TestVoiceMateStepByStep:
         self.wait_for_spinner_to_disappear(
             voicemate_page.page,
             [
-                '🔄 Przetwarzanie w toku...',
-                '🔄 Przetwarzanie pliku i wydobywanie treści...',
+                "🔄 Przetwarzanie w toku...",
+                "🔄 Przetwarzanie pliku i wydobywanie treści...",
             ],
         )
         expect(
             voicemate_page.page.get_by_role(
-                'heading',
-                name='📝 Krok 2: Generuj plan podcastu',
+                "heading",
+                name="📝 Krok 2: Generuj plan podcastu",
             ),
         ).to_be_visible(timeout=30000)
 
@@ -255,12 +255,12 @@ class TestVoiceMateStepByStep:
         """Test the step-by-step mode selection and UI elements."""
         voicemate_page.wait_for_app_ready()
         voicemate_page.page.get_by_text(
-            '🚀 Rozpocznij krok po kroku',
+            "🚀 Rozpocznij krok po kroku",
             exact=True,
         ).click()
         expect(
             voicemate_page.page.get_by_role(
-                'heading',
-                name='📁 Wczytaj plik',
+                "heading",
+                name="📁 Wczytaj plik",
             ),
         ).to_be_visible(timeout=10000)
