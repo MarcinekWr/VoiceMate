@@ -68,8 +68,6 @@ def render_step_3_and_4():
                     is_premium = True
                 else:
                     is_premium = False
-            else:
-                is_premium = False
 
             st.session_state.is_premium = is_premium
     # Opis wybranego stylu
