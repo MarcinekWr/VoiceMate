@@ -4,15 +4,32 @@ import re
 
 import emoji
 
+"""
+TextCleaner class for cleaning and normalizing text content, especially from PDF sources.
+"""
+
 
 class TextCleaner:
-    """Cleans and normalizes text content. self.text will be changed in place by methods."""
+    """
+    Cleans and normalizes text content. self.text will be changed in place by methods.
+    """
 
     def __init__(self, text: str):
+        """
+        Initialize the TextCleaner.
+
+        Args:
+            text (str): The text to be cleaned.
+        """
         self.text = text or ''
 
     def clean_text(self) -> str:
-        """Clean text content using all cleaning steps."""
+        """
+        Clean text content using all cleaning steps.
+
+        Returns:
+            str: Cleaned text content.
+        """
         if not self.text:
             return ''
         self.remove_pdf_artifacts()
@@ -24,7 +41,9 @@ class TextCleaner:
         return self.text.strip()
 
     def remove_pdf_artifacts(self):
-        """Remove common PDF artifacts like headers, footers, and page numbers."""
+        """
+        Remove common PDF artifacts like headers, footers, and page numbers.
+        """
         self.text = re.sub(r'\f', '', self.text)
         self.text = re.sub(r'Page\s*\d+', '', self.text, flags=re.IGNORECASE)
         self.text = re.sub(
@@ -53,24 +72,32 @@ class TextCleaner:
         )
 
     def normalize_whitespace(self):
-        """Normalize whitespace and line breaks."""
+        """
+        Normalize whitespace and line breaks in the text.
+        """
         self.text = re.sub(r'(?<!\n)\n(?!\n)', ' ', self.text)
         self.text = re.sub(r'\n{2,}', '\n\n', self.text)
         self.text = re.sub(r'\s+', ' ', self.text)
 
     def remove_emojis_and_special_chars(self):
-        """Remove emojis and normalize special characters."""
+        """
+        Remove emojis and normalize special characters in the text.
+        """
         self.text = emoji.replace_emoji(self.text, replace='')
 
     def remove_references_and_notes(self):
-        """Remove references, footnotes, and other citation markers."""
+        """
+        Remove references, footnotes, and other citation markers from the text.
+        """
         self.text = re.sub(r'\[\d+\]', '', self.text)
         self.text = re.sub(r'\(\d+\)', '', self.text)
         self.text = re.sub(r'\([A-Za-z]+ et al\., \d{4}\)', '', self.text)
         self.text = re.sub(r'\*\s?.*?(\n|$)', '', self.text)
 
     def normalize_punctuation(self):
-        """Normalize punctuation marks and quotes."""
+        """
+        Normalize punctuation marks and quotes in the text.
+        """
         replacements = {
             '–': '-',
             '—': '-',
@@ -84,14 +111,17 @@ class TextCleaner:
             self.text = self.text.replace(old, new)
 
     def final_cleanup(self):
-        """Perform final cleanup operations."""
+        """
+        Perform final cleanup operations on the text.
+        """
         self.text = ' '.join(self.text.split())
         self.remove_repeated_chars()
         self.text = re.sub(r'[^\w\s.,!?-]', '', self.text)
 
     def remove_repeated_chars(self):
-        """Remove repeated special
-        characters like ., /, & etc. (more than 2 consecutive)."""
+        """
+        Remove repeated special characters like ., /, & etc. (more than 2 consecutive).
+        """
         special_chars = r"[.\/&*+=#@$%^(){}\[\]|\\:;<>?~`\"]"
         pattern = f'({special_chars}){{3,}}'
         self.text = re.sub(pattern, r'\1\1', self.text)
@@ -101,7 +131,9 @@ class TextCleaner:
     )
 
     def remove_page_numbers(self):
-        """Remove page numbers from the text."""
+        """
+        Remove page numbers from the text.
+        """
         self.text = re.sub(
             r'\bPage \d+\b|\bStrona \d+\b|\bSeite \d+\b|\bPágina \d+\b|\bPagina \d+\b|\bP\.? ?\d+\b',
             '',
@@ -109,7 +141,9 @@ class TextCleaner:
         )
 
     def remove_emails(self):
-        """Remove email addresses from the text."""
+        """
+        Remove email addresses from the text.
+        """
         self.text = re.sub(
             r'([\w\.-]+)@([\w\.-]+)\.(\w+)',
             '[email]',

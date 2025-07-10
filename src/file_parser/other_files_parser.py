@@ -1,3 +1,6 @@
+"""
+This module provides the FileConverter class for converting various file types (images, HTML, Markdown, PPTX, URLs) to PDF and initiating PDF parsing workflows.
+"""
 from __future__ import annotations
 
 import gc
@@ -22,6 +25,10 @@ from src.utils.logging_config import get_request_id, get_session_logger
 
 
 class FileConverter:
+    """
+    Handles conversion of supported file types (images, HTML, Markdown, PPTX, URLs) to PDF format and initiates PDF parsing.
+    """
+
     SUPPORTED_FORMATS = {
         'images': ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.gif'],
         'web': ['.html', '.htm'],
@@ -31,7 +38,14 @@ class FileConverter:
     }
 
     def __init__(self, file_path: str, output_dir: str = 'assets', request_id: str | None = None):
+        """
+        Initialize the FileConverter.
 
+        Args:
+            file_path (str): Path to the input file or URL.
+            output_dir (str, optional): Directory to store output files. Defaults to 'assets'.
+            request_id (str, optional): Unique request identifier for logging. If None, a new one is generated.
+        """
         self.request_id = request_id or get_request_id()
         self.logger = get_session_logger(self.request_id)
         self.file_path = file_path
@@ -40,7 +54,12 @@ class FileConverter:
         self.create_output_dir()
 
     def create_output_dir(self) -> None:
-        """Create the output directory if it doesn't exist."""
+        """
+        Create the output directory if it doesn't exist.
+
+        Raises:
+            OSError: If the directory cannot be created.
+        """
         try:
             os.makedirs(self.output_dir, exist_ok=True)
         except OSError as e:
@@ -50,7 +69,15 @@ class FileConverter:
             raise
 
     def detect_file_type(self) -> str:
-        """Detect the type of file based on its extension or MIME type."""
+        """
+        Detect the type of file based on its extension or MIME type.
+
+        Returns:
+            str: Detected file type (e.g., 'images', 'web', 'presentations', 'markdown', 'pdf', or 'unknown').
+
+        Raises:
+            FileNotFoundError: If the file does not exist.
+        """
         if not os.path.exists(self.file_path):
             self.logger.error(f'File does not exist: {self.file_path}')
             raise FileNotFoundError(f'File does not exist: {self.file_path}')
@@ -81,7 +108,16 @@ class FileConverter:
         base_name: str,
         extension: str,
     ) -> str:
-        """Generate a unique filename in the output directory."""
+        """
+        Generate a unique filename in the output directory.
+
+        Args:
+            base_name (str): Base name for the file.
+            extension (str): File extension (e.g., '.pdf').
+
+        Returns:
+            str: Full path to the unique output file.
+        """
         output_path = os.path.join(self.output_dir, f'{base_name}{extension}')
 
         if os.path.exists(output_path):
@@ -95,7 +131,15 @@ class FileConverter:
         return output_path
 
     def convert_image_to_pdf(self) -> str:
-        """Convert image file to PDF format."""
+        """
+        Convert an image file to PDF format.
+
+        Returns:
+            str: Path to the generated PDF file.
+
+        Raises:
+            RuntimeError: If image conversion fails.
+        """
         self.logger.info(f'Converting image to PDF: {self.file_path}')
         original_name = os.path.splitext(os.path.basename(self.file_path))[0]
         output_path = self._generate_unique_filename(original_name, '.pdf')
@@ -115,7 +159,15 @@ class FileConverter:
             raise RuntimeError(f'Image conversion error: {str(e)}')
 
     def is_valid_url(self, url: str) -> bool:
-        """Validate if the provided string is a valid URL."""
+        """
+        Validate if the provided string is a valid URL.
+
+        Args:
+            url (str): URL string to validate.
+
+        Returns:
+            bool: True if valid, False otherwise.
+        """
         try:
             result = urlparse(url)
             is_valid = all([result.scheme, result.netloc])
@@ -126,7 +178,15 @@ class FileConverter:
             return False
 
     def get_domain_name(self, url: str) -> str:
-        """Extract domain name from URL."""
+        """
+        Extract the domain name from a URL and format it for use in filenames.
+
+        Args:
+            url (str): The URL to extract the domain from.
+
+        Returns:
+            str: Cleaned domain name suitable for filenames.
+        """
         try:
             domain = urlparse(url).netloc
             clean_domain = (
@@ -146,6 +206,16 @@ class FileConverter:
             return 'website'
 
     def convert_url_to_pdf(self) -> str:
+        """
+        Convert a URL to a PDF file using an external script.
+
+        Returns:
+            str: Path to the generated PDF file.
+
+        Raises:
+            ValueError: If the URL is invalid.
+            Exception: If the URL is inaccessible or conversion fails.
+        """
         self.logger.info(f'Converting URL to PDF: {self.file_path}')
 
         if not self.is_valid_url(self.file_path):
@@ -208,7 +278,15 @@ class FileConverter:
             raise Exception(f'URL to PDF conversion error: {e.stderr}')
 
     def convert_html_to_pdf(self) -> str:
-        """Convert HTML file to PDF format."""
+        """
+        Convert an HTML file to PDF format.
+
+        Returns:
+            str: Path to the generated PDF file.
+
+        Raises:
+            RuntimeError: If HTML conversion fails.
+        """
         self.logger.info(f'Converting HTML to PDF: {self.file_path}')
         original_name = os.path.splitext(os.path.basename(self.file_path))[0]
         output_path = self._generate_unique_filename(original_name, '.pdf')
@@ -228,7 +306,15 @@ class FileConverter:
             raise RuntimeError(f'HTML conversion error: {str(e)}')
 
     def convert_markdown_to_pdf(self) -> str:
-        """Convert Markdown file to PDF format."""
+        """
+        Convert a Markdown file to PDF format.
+
+        Returns:
+            str: Path to the generated PDF file.
+
+        Raises:
+            RuntimeError: If Markdown conversion fails.
+        """
         self.logger.info(f'Converting Markdown to PDF: {self.file_path}')
         original_name = os.path.splitext(os.path.basename(self.file_path))[0]
         output_path = self._generate_unique_filename(original_name, '.pdf')
@@ -246,7 +332,15 @@ class FileConverter:
             raise RuntimeError(f'Markdown conversion error: {str(e)}')
 
     def convert_pptx_to_pdf(self) -> str:
-        """Convert PPTX file to PDF format."""
+        """
+        Convert a PPTX file to PDF format.
+
+        Returns:
+            str: Path to the generated PDF file.
+
+        Raises:
+            RuntimeError: If PPTX conversion fails.
+        """
         self.logger.info(f'Converting PPTX to PDF: {self.file_path}')
         original_name = os.path.splitext(os.path.basename(self.file_path))[0]
         output_path = self._generate_unique_filename(original_name, '.pdf')
@@ -285,6 +379,15 @@ class FileConverter:
             raise RuntimeError(f'PPTX conversion error: {str(e)}')
 
     def convert_to_pdf(self) -> str:
+        """
+        Convert the input file (or URL) to PDF format, if needed.
+
+        Returns:
+            str: Path to the resulting PDF file.
+
+        Raises:
+            ValueError: If the file type is unsupported.
+        """
         self.logger.info('Starting file conversion to PDF...')
 
         if self.is_valid_url(self.file_path):
@@ -309,7 +412,9 @@ class FileConverter:
             raise ValueError(f'Unsupported file type: {file_type}')
 
     def cleanup(self):
-        """Explicit cleanup of all resources"""
+        """
+        Explicitly clean up all temporary files and resources used during conversion.
+        """
         if self.temp_files:
             self.logger.debug(
                 f'Cleaning up {len(self.temp_files)} temporary files...',
@@ -330,12 +435,20 @@ class FileConverter:
         self.logger.debug('Cleanup completed')
 
     def __del__(self):
+        """
+        Destructor to ensure cleanup of resources.
+        """
         self.cleanup()
 
     def initiate_parser(self) -> str:
         """
-        Initiates the parser workflow by converting the file to PDF
-        and then using PdfParser to extract content.
+        Initiate the parser workflow by converting the file to PDF and extracting its content using PdfParser.
+
+        Returns:
+            str: Content extracted from the PDF, formatted for LLMs.
+
+        Raises:
+            RuntimeError: If parsing or conversion fails.
         """
         self.logger.info('Initiating parser workflow...')
 

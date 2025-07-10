@@ -1,5 +1,6 @@
-"""PDF Parser class to parse PDF files and extract text,
-images, and metadata with image descriptions."""
+"""
+PDF Parser class to parse PDF files and extract text, images, tables, and metadata, with optional image descriptions.
+"""
 from __future__ import annotations
 
 import json
@@ -19,8 +20,7 @@ from src.utils.logging_config import get_request_id, get_session_logger
 
 class PdfParser:
     """
-    A class to parse PDF files and extract text, images,
-    and metadata with image descriptions.
+    Parses PDF files to extract text, images, tables, and metadata, with optional image descriptions.
     """
 
     def __init__(
@@ -32,7 +32,14 @@ class PdfParser:
         request_id=None,
     ):
         """
-        Initialize the PDF parser.
+        Initialize the PdfParser.
+
+        Args:
+            file_path (str): Path to the PDF file.
+            output_dir (str, optional): Directory to store extracted content. Defaults to 'extracted_content'.
+            describe_images (bool, optional): Whether to generate image descriptions. Defaults to True.
+            image_describer (ImageDescriber, optional): Custom image describer instance. Defaults to None.
+            request_id (str, optional): Unique request identifier for logging. If None, a new one is generated.
         """
 
         self.request_id = request_id or get_request_id()
@@ -60,7 +67,12 @@ class PdfParser:
         self.logger.info('Initialized PdfParser with file: %s', file_path)
 
     def create_output_directory(self) -> None:
-        """Create the output directory if it doesn't exist."""
+        """
+        Create the output directory if it doesn't exist.
+
+        Raises:
+            OSError: If the directory cannot be created.
+        """
         try:
             os.makedirs(self.output_dir, exist_ok=True)
         except OSError as e:
@@ -70,8 +82,10 @@ class PdfParser:
 
     def parse_all(self) -> dict[str, Any]:
         """
-        Parse all content from the PDF
-        including text, images, tables, and metadata.
+        Parse all content from the PDF, including text, images, tables, and metadata.
+
+        Returns:
+            dict[str, Any]: Dictionary with keys 'text', 'images', 'tables', 'structured_content', and 'metadata'.
         """
         try:
             doc = fitz.open(self.file_path)
@@ -119,7 +133,15 @@ class PdfParser:
                 doc.close()
 
     def extract_metadata(self, doc: fitz.Document) -> dict[str, Any]:
-        """Extract basic metadata from PDF file."""
+        """
+        Extract basic metadata from the PDF file.
+
+        Args:
+            doc (fitz.Document): The opened PDF document.
+
+        Returns:
+            dict[str, Any]: Extracted metadata.
+        """
         metadata: dict[str, Any] = {}
 
         try:
@@ -159,7 +181,12 @@ class PdfParser:
         return metadata
 
     def extract_text(self) -> str:
-        """Extract text content using pdfminer."""
+        """
+        Extract text content from the PDF using pdfminer.
+
+        Returns:
+            str: Extracted text content.
+        """
         try:
             text = extract_text(self.file_path)
             self.logger.info('Text extraction completed')
@@ -174,6 +201,9 @@ class PdfParser:
     def get_content_for_llm(self) -> str:
         """
         Get formatted content suitable for LLM processing.
+
+        Returns:
+            str: Formatted content for LLMs.
         """
         formatter = PDFContentFormatter(
             metadata=self.metadata,
@@ -184,7 +214,12 @@ class PdfParser:
         return formatter.get_content_for_llm()
 
     def save_summary_report(self) -> str:
-        """Save a simplified summary report of extracted content."""
+        """
+        Save a simplified summary report of extracted content.
+
+        Returns:
+            str: Path to the saved summary report.
+        """
         report_path = os.path.join(self.output_dir, 'extraction_report.txt')
 
         try:
@@ -250,7 +285,12 @@ class PdfParser:
         return report_path
 
     def save_metadata_json(self) -> str:
-        """Save metadata as JSON file for programmatic access."""
+        """
+        Save extracted metadata as a JSON file.
+
+        Returns:
+            str: Path to the saved JSON file.
+        """
         metadata_path = os.path.join(self.output_dir, 'metadata.json')
 
         try:
@@ -274,7 +314,15 @@ class PdfParser:
         return metadata_path
 
     def save_llm_content(self, content: str) -> str:
-        """Saves the LLM-ready content to a text file."""
+        """
+        Save LLM-formatted content to a file.
+
+        Args:
+            content (str): Content to save.
+
+        Returns:
+            str: Path to the saved file.
+        """
         report_path = os.path.join(self.output_dir, 'llm_content.txt')
         try:
             with open(report_path, 'w', encoding='utf-8') as file:
@@ -286,8 +334,12 @@ class PdfParser:
         return report_path
 
     def initiate(self) -> str:
-        """Initiate the parsing process
-        and return content formatted for LLM processing."""
+        """
+        Run the full PDF parsing workflow and return LLM-formatted content.
+
+        Returns:
+            str: LLM-formatted content extracted from the PDF.
+        """
         self.parse_all()
         self.save_summary_report()
         self.save_metadata_json()

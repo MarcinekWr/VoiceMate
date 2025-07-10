@@ -1,7 +1,5 @@
 """
-This module
-contains the PDFContentFormatter
-class for formatting extracted PDF content.
+This module provides the PDFContentFormatter class for formatting extracted PDF content for various outputs, including LLM-friendly formats.
 """
 from __future__ import annotations
 
@@ -15,7 +13,7 @@ from src.utils.text_cleaner import TextCleaner
 
 class PDFContentFormatter:
     """
-    Formats extracted PDF data for various outputs.
+    Formats extracted PDF data (metadata, images, tables) for structured output and LLM processing.
     """
 
     def __init__(
@@ -27,6 +25,12 @@ class PDFContentFormatter:
     ):
         """
         Initialize the PDFContentFormatter.
+
+        Args:
+            metadata (dict[str, Any]): Extracted PDF metadata.
+            images (list[dict[str, Any]]): List of extracted images.
+            tables (list[dict[str, Any]]): List of extracted tables.
+            request_id (str, optional): Unique request identifier for logging. If None, a new one is generated.
         """
         self.metadata = metadata
         self.images = images
@@ -39,7 +43,15 @@ class PDFContentFormatter:
         self,
         doc: fitz.Document,
     ) -> list[dict[str, Any]]:
-        """Create a structured representation of all content by page."""
+        """
+        Create a structured representation of all content by page.
+
+        Args:
+            doc (fitz.Document): The opened PDF document.
+
+        Returns:
+            list[dict[str, Any]]: List of dictionaries, one per page, with text and images.
+        """
         try:
             if not isinstance(self.structured_content, list):
                 self.structured_content = []
@@ -76,6 +88,9 @@ class PDFContentFormatter:
     def get_content_for_llm(self) -> str:
         """
         Get formatted content suitable for LLM processing.
+
+        Returns:
+            str: Formatted content for LLMs.
         """
         if not self.structured_content:
             self.logger.warning(

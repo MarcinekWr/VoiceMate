@@ -1,6 +1,5 @@
 """
-This module contains the PDFImageExtractor
-class for extracting images from PDF files.
+This module contains the PDFImageExtractor class for extracting and describing images from PDF files.
 """
 from __future__ import annotations
 
@@ -16,7 +15,7 @@ from src.utils.logging_config import get_request_id, get_session_logger
 
 class PDFImageExtractor:
     """
-    Extracts and processes images from a PDF document.
+    Extracts and describes images from a PDF document, saving them and providing metadata and optional descriptions.
     """
 
     def __init__(
@@ -28,6 +27,12 @@ class PDFImageExtractor:
     ):
         """
         Initialize the PDFImageExtractor.
+
+        Args:
+            output_dir (str): Directory to store extracted images.
+            image_describer (ImageDescriber, optional): Custom image describer instance. Defaults to None.
+            describe_images (bool, optional): Whether to generate image descriptions. Defaults to True.
+            request_id (str, optional): Unique request identifier for logging. If None, a new one is generated.
         """
         self.output_dir = output_dir
         self.image_describer = image_describer
@@ -39,8 +44,15 @@ class PDFImageExtractor:
         self,
         doc: fitz.Document,
     ) -> list[dict[str, Any]]:
-        """Extract images
-        using PyMuPDF and describe them using ImageDescriber."""
+        """
+        Extract images from a PDF document and describe them using ImageDescriber.
+
+        Args:
+            doc (fitz.Document): The opened PDF document.
+
+        Returns:
+            list[dict[str, Any]]: List of dictionaries with image metadata and descriptions.
+        """
         images_data: list[dict[str, Any]] = []
 
         try:
@@ -131,7 +143,14 @@ class PDFImageExtractor:
 
     def _get_image_description(self, img_path: str, image_data: bytes) -> str:
         """
-        Get description for an image using the ImageDescriber.
+        Get a description for an image using the ImageDescriber.
+
+        Args:
+            img_path (str): Path to the image file.
+            image_data (bytes): Image data in bytes.
+
+        Returns:
+            str: Description of the image.
         """
         if not self.describe_images or not self.image_describer:
             return 'No description available'
