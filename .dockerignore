@@ -92,22 +92,30 @@ output_plan.txt
 scientific_style_test.txt
 plan_prompt_test.txt
 
+# Dodatkowe wpisy:
+
+# Ignoruj katalog z testami
 tests/
+test/
 __tests__/
 
+# Ignoruj katalogi z konfiguracjami CI/CD
 .github/
 .gitlab/
 .git/
 
+# Ignoruj pliki tymczasowe i backupy edytorów
 *~
 *.swp
 *.swo
 *.bak
 *.tmp
 
+# Ignoruj logi i raporty
 *.log
 *.out
 
+# Ignoruj pliki lokalnych konfiguracji
 *.local
 *.env.*
 

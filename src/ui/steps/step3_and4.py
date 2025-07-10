@@ -4,6 +4,7 @@ import json
 
 import streamlit as st
 
+from src.utils.key_vault import get_secret_env_first
 from src.workflow.generation import generate_podcast_content
 from src.workflow.save import dialog_to_json, save_to_file
 
@@ -12,6 +13,7 @@ def render_step_3_and_4():
     """Krok 3: Generowanie tekstu podcastu i wybór silnika TTS"""
     st.header('🎙️ Krok 3: Generuj podcast i wybierz silnik audio')
 
+    PREMIUM_PASSWORD = get_secret_env_first('ELEVENLABS_PASSWORD')
     # Podgląd planu
     with st.expander('📋 Podgląd wygenerowanego planu', expanded=True):
         st.text_area(
@@ -50,8 +52,24 @@ def render_step_3_and_4():
                 index=0,
                 help='Wybierz silnik do generowania audio',
             )
-            st.session_state.is_premium = 'Premium' in tts_option
+            is_premium = False
+            if tts_option == '🎯 ElevenLabs (Premium)':
+                password_input = st.text_input(
+                    'Wpisz hasło dostępu do ElevenLabs Premium:',
+                    type='password'
+                )
+                if password_input and password_input != PREMIUM_PASSWORD:
+                    st.error(
+                        '❌ Niepoprawne hasło! Opcja ElevenLabs Premium jest zablokowana.')
+                    is_premium = False
+                elif password_input == PREMIUM_PASSWORD:
+                    st.success(
+                        '✅ Hasło poprawne! Opcja ElevenLabs Premium odblokowana.')
+                    is_premium = True
+                else:
+                    is_premium = False
 
+            st.session_state.is_premium = is_premium
     # Opis wybranego stylu
     style_descriptions = {
         'scientific': '🔬 *Styl naukowy* – precyzyjny, oparty na faktach',
@@ -133,6 +151,6 @@ def render_step_3_and_4():
                 else:
                     st.session_state.processing = False
                     st.error('❌ Nie udało się wygenerować podcastu.')
-            except Exception as e:
+            except Exception:
                 st.session_state.processing = False
-                st.error(f'❌ Wystąpił błąd: {str(e)}')
+                st.error('❌ Wystąpił błąd.')

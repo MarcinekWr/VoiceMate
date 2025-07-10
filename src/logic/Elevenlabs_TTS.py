@@ -1,22 +1,23 @@
 from __future__ import annotations
 
-import logging
 import os
 import tempfile
 
 from elevenlabs.client import ElevenLabs
 
-from src.utils.logging_config import get_request_id
+from src.utils.key_vault import get_secret_env_first
+from src.utils.logging_config import get_request_id, get_session_logger
 
 
 class ElevenlabsTTSPodcastGenerator:
-    def __init__(self):
-        self.logger = logging.getLogger(__name__)
+    def __init__(self, request_id: str | None = None):
+        self.request_id = request_id or get_request_id()
+        self.logger = get_session_logger(self.request_id)
         self.client = self._load_client()
         self.dir_prefix = 'podcast_el_'
 
     def _load_client(self) -> ElevenLabs:
-        api_key = os.getenv('ELEVENLABS_API_KEY')
+        api_key = get_secret_env_first('ELEVENLABS_API_KEY')
         if not api_key:
             self.logger.error('Missing ELEVENLABS_API_KEY in file .env')
             raise ValueError('Missing ELEVENLABS_API_KEY')
@@ -46,8 +47,8 @@ class ElevenlabsTTSPodcastGenerator:
             raise
 
     def generate_podcast_elevenlabs(
-        self, dialog_data: list, output_path: str = None, progress_callback=None,
-    ) -> str:
+        self, dialog_data: list, output_path: str | None = None, progress_callback=None,
+    ) -> str | None:
         if not dialog_data:
             self.logger.error('No dialog data provided.')
             return None
@@ -57,9 +58,8 @@ class ElevenlabsTTSPodcastGenerator:
 
         if output_path is None:
             temp_dir = tempfile.mkdtemp(prefix=self.dir_prefix)
-            request_id = get_request_id()
             output_path = os.path.join(
-                temp_dir, f'{self.dir_prefix}{request_id}.wav',
+                temp_dir, f'{self.dir_prefix}{self.request_id}.wav',
             )
 
         total_segments = len(dialog_data)

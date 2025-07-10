@@ -1,20 +1,18 @@
 from __future__ import annotations
 
-from langchain_openai import AzureChatOpenAI
-import logging
 import os
 
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import AzureChatOpenAI
 
-logger = logging.getLogger(__name__)
+from src.utils.key_vault import get_secret_env_first
+from src.utils.logging_config import get_request_id, get_session_logger
 
-
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 PROMPT_PATHS = {
-    "scientific": os.path.join(BASE_DIR, "prompts", "scientific_style.txt"),
-    "casual": os.path.join(BASE_DIR, "prompts", "casual_style.txt"),
-    "plan": os.path.join(BASE_DIR, "prompts", "plan_prompt.txt"),
+    'scientific': os.path.join(BASE_DIR, 'prompts', 'scientific_style.txt'),
+    'casual': os.path.join(BASE_DIR, 'prompts', 'casual_style.txt'),
+    'plan': os.path.join(BASE_DIR, 'prompts', 'plan_prompt.txt'),
 }
 
 
@@ -28,7 +26,8 @@ def validate_env_variables() -> None:
         'AZURE_OPENAI_MODEL',
     ]
 
-    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    missing_vars = [
+        var for var in required_vars if not get_secret_env_first(var)]
     if missing_vars:
         raise ValueError(
             f'Missing required environment variables: {missing_vars}',
@@ -37,6 +36,8 @@ def validate_env_variables() -> None:
 
 def create_llm(ui_callback=None) -> AzureChatOpenAI:
     """Create and configure the Azure OpenAI client."""
+    request_id = get_request_id()
+    logger = get_session_logger(request_id)
     try:
         logger.info('Validating environment variables')
         if ui_callback:
@@ -49,11 +50,11 @@ def create_llm(ui_callback=None) -> AzureChatOpenAI:
             ui_callback('Tworzę połączenie z Azure OpenAI...')
 
         llm = AzureChatOpenAI(
-            azure_endpoint=os.getenv('AZURE_OPENAI_ENDPOINT'),
-            api_key=os.getenv('AZURE_OPENAI_API_KEY'),
-            api_version=os.getenv('API_VERSION'),
-            deployment_name=os.getenv('AZURE_OPENAI_DEPLOYMENT'),
-            model_name=os.getenv('AZURE_OPENAI_MODEL'),
+            azure_endpoint=get_secret_env_first('AZURE_OPENAI_ENDPOINT'),
+            api_key=get_secret_env_first('AZURE_OPENAI_API_KEY'),
+            api_version=get_secret_env_first('API_VERSION'),
+            deployment_name=get_secret_env_first('AZURE_OPENAI_DEPLOYMENT'),
+            model_name=get_secret_env_first('AZURE_OPENAI_MODEL'),
             temperature=0.7,
             max_tokens=16384,
         )
@@ -71,6 +72,9 @@ def create_llm(ui_callback=None) -> AzureChatOpenAI:
 
 
 def load_prompt_template(style: str, ui_callback=None) -> PromptTemplate:
+    """Load a prompt template from a file."""
+    request_id = get_request_id()
+    logger = get_session_logger(request_id)
     try:
         if style not in PROMPT_PATHS:
             error_msg = f'Unknown style: {style}. Available styles: {list(PROMPT_PATHS.keys())}'
@@ -82,30 +86,29 @@ def load_prompt_template(style: str, ui_callback=None) -> PromptTemplate:
         prompt_path = PROMPT_PATHS[style]
 
         if not os.path.isfile(prompt_path):
-            error_msg = f"Prompt file not found: {prompt_path}"
+            error_msg = f'Prompt file not found: {prompt_path}'
             logger.error(error_msg)
             if ui_callback:
-                ui_callback(f"Nie znaleziono pliku szablonu: {prompt_path}", "error")
+                ui_callback(
+                    f'Nie znaleziono pliku szablonu: {prompt_path}', 'error')
             raise FileNotFoundError(error_msg)
 
-        with open(prompt_path, encoding="utf-8") as f:
+        with open(prompt_path, encoding='utf-8') as f:
             prompt_text = f.read()
 
         template = PromptTemplate.from_template(prompt_text)
 
-        logger.info("Prompt template loaded successfully")
+        logger.info('Prompt template loaded successfully')
         if ui_callback:
-            ui_callback("Szablon załadowany pomyślnie!")
+            ui_callback('Szablon załadowany pomyślnie!')
 
         return template
 
     except Exception as e:
-        logger.error(f"Error loading prompt template: {e}") 
+        logger.error(f'Error loading prompt template: {e}')
         if ui_callback:
-            ui_callback(f"Błąd ładowania szablonu: {e}", "error")
+            ui_callback(f'Błąd ładowania szablonu: {e}', 'error')
         raise
-
-
 
 
 def generate_plan(
@@ -114,6 +117,8 @@ def generate_plan(
     ui_callback=None,
 ) -> str:
     """Generate a plan for the podcast based on input text."""
+    request_id = get_request_id()
+    logger = get_session_logger(request_id)
     try:
         if not input_text or not input_text.strip():
             raise ValueError('Input text is empty or only whitespace.')
@@ -136,11 +141,10 @@ def generate_plan(
 
         return response.content
     except Exception as e:
-        logger.error(f"Error loading prompt template: {e}")
+        logger.error(f'Error loading prompt template: {e}')
         if ui_callback:
-            ui_callback(f"Błąd ładowania szablonu: {e}", "error")
+            ui_callback(f'Błąd ładowania szablonu: {e}', 'error')
         raise
-
 
 
 def generate_podcast_text(
@@ -151,6 +155,8 @@ def generate_podcast_text(
     ui_callback=None,
 ) -> str:
     """Generate podcast text in specified style."""
+    request_id = get_request_id()
+    logger = get_session_logger(request_id)
     try:
         if not input_text or not input_text.strip():
             raise ValueError('Input text is empty or only whitespace.')
@@ -211,6 +217,8 @@ def generate_podcast_text(
 
 def save_to_file(content: str, filename: str) -> None:
     """Save content to file with error handling."""
+    request_id = get_request_id()
+    logger = get_session_logger(request_id)
     try:
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(content)
@@ -226,14 +234,16 @@ class LLMPodcastService:
 
     def run(self):
         """Main logic for generating the podcast."""
-        input_file = os.path.join("src", "logic", "llm_text_test_file.txt")
+        request_id = get_request_id()
+        logger = get_session_logger(request_id)
+        input_file = os.path.join('src', 'logic', 'llm_text_test_file.txt')
         if not os.path.exists(input_file):
-            raise FileNotFoundError(f"Input file not found: {input_file}")
+            raise FileNotFoundError(f'Input file not found: {input_file}')
 
-        with open(input_file, encoding="utf-8") as f:
+        with open(input_file, encoding='utf-8') as f:
             input_text = f.read()
 
-        logger.info(f"Loaded input text ({len(input_text)} characters)")
+        logger.info(f'Loaded input text ({len(input_text)} characters)')
 
         plan_text = generate_plan(self.llm, input_text)
         save_to_file(plan_text, 'output_plan.txt')

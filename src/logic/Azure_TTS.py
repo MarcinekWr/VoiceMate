@@ -1,22 +1,22 @@
 from __future__ import annotations
 
-import logging
 import os
 import tempfile
 import time
 import wave
-from typing import Optional
 
 import azure.cognitiveservices.speech as speechsdk
 
-from src.utils.logging_config import get_request_id
+from src.utils.key_vault import get_secret_env_first
+from src.utils.logging_config import get_request_id, get_session_logger
 
 
 class AzureTTSPodcastGenerator:
-    def __init__(self):
-        api_key = os.getenv('AZURE_SPEECH_API_KEY')
-        region = os.getenv('AZURE_SPEECH_REGION')
-        self.logger = logging.getLogger(__name__)
+    def __init__(self, request_id: str | None = None):
+        self.request_id = request_id or get_request_id()
+        self.logger = get_session_logger(self.request_id)
+        api_key = get_secret_env_first('AZURE_SPEECH_API_KEY')
+        region = 'swedencentral'
         self.dir_prefix = 'podcast_az_'
 
         if not api_key or not region:
@@ -29,8 +29,8 @@ class AzureTTSPodcastGenerator:
         )
 
     def generate_podcast_azure(
-        self, dialog_data: list, output_path: str = None, progress_callback=None,
-    ) -> str:
+        self, dialog_data: list, output_path: str | None = None, progress_callback=None,
+    ) -> str | None:
         if not dialog_data:
             self.logger.error('No dialog data provided.')
             return None
@@ -100,7 +100,7 @@ class AzureTTSPodcastGenerator:
 
         return self._combine_segments(temp_files, output_path)
 
-    def _combine_segments(self, temp_files: list, output_path: str) -> str:
+    def _combine_segments(self, temp_files: list, output_path: str) -> str | None:
         self.logger.info('Merging WAV files...')
 
         first_file = next((f for f in temp_files if os.path.exists(f)), None)

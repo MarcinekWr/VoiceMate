@@ -5,11 +5,11 @@ class for formatting extracted PDF content.
 """
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 import fitz  # PyMuPDF
 
+from src.utils.logging_config import get_request_id, get_session_logger
 from src.utils.text_cleaner import TextCleaner
 
 
@@ -23,6 +23,7 @@ class PDFContentFormatter:
         metadata: dict[str, Any],
         images: list[dict[str, Any]],
         tables: list[dict[str, Any]],
+        request_id: str | None = None
     ):
         """
         Initialize the PDFContentFormatter.
@@ -31,7 +32,8 @@ class PDFContentFormatter:
         self.images = images
         self.tables = tables
         self.structured_content: list[dict[str, Any]] = []
-        self.logger = logging.getLogger(__name__)
+        self.request_id = request_id or get_request_id()
+        self.logger = get_session_logger(self.request_id)
 
     def create_structured_content(
         self,
@@ -84,49 +86,49 @@ class PDFContentFormatter:
         llm_content = []
 
         if self.metadata:
-            llm_content.append('--- DOCUMENT METADATA ---')
+            llm_content.append('--- METADANE DOKUMENTU ---')
             llm_content.append(
-                f"Filename: {self.metadata.get('filename', 'N/A')}",
+                f"Nazwa pliku: {self.metadata.get('filename', 'N/A')}",
             )
             llm_content.append(
-                f"File Size: {self.metadata.get('file_size_mb', 'N/A')} MB",
+                f"Wielkość pliku: {self.metadata.get('file_size_mb', 'N/A')} MB",
             )
             llm_content.append(
-                f"Pages: {self.metadata.get('page_count', 'N/A')}",
+                f"Strony: {self.metadata.get('page_count', 'N/A')}",
             )
             llm_content.append('')
 
         for page in self.structured_content:
-            page_text = f"\n--- PAGE {page['page']} ---\n"
+            page_text = f"\n--- STRONA {page['page']} ---\n"
 
             if page['text'].strip():
                 try:
                     cleaned_text = TextCleaner(page['text']).clean_text()
-                    page_text += f'\nTEXT CONTENT:\n{cleaned_text}\n'
+                    page_text += f'\nDANE TEKSTOWE:\n{cleaned_text}\n'
                 except (OSError, ValueError) as e:
                     self.logger.warning(
                         'Error cleaning text for page %s: %s', page['page'], e,
                     )
-                    page_text += f"\nTEXT CONTENT:\n{page['text']}\n"
+                    page_text += f"\nDANE TEKSTOWE:\n{page['text']}\n"
 
             if page['images']:
-                page_text += '\nIMAGES ON THIS PAGE:\n'
+                page_text += '\nOBRAZY NA TEJ STRONIE:\n'
                 for image in page['images']:
                     page_text += (
                         f"- Image {image['filename']} "
                         f"({image['width']}x{image['height']}, {image['size_kb']}KB)\n"
                     )
                     if image.get('description'):
-                        page_text += f"  Description: {image['description']}\n"
+                        page_text += f"  OPIS: {image['description']}\n"
 
             if self.tables:
                 page_tables = [
                     table for table in self.tables if table['page'] == page['page']
                 ]
                 if page_tables:
-                    page_text += '\nTABLES ON THIS PAGE:\n'
+                    page_text += '\nTABELE NA TEJ STRONIE:\n'
                     for table in page_tables:
-                        page_text += f"  JSON Data: {table['json']}\n"
+                        page_text += f"  JSON Dane: {table['json']}\n"
 
             llm_content.append(page_text)
 

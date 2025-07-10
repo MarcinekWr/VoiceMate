@@ -11,9 +11,9 @@ from src.workflow.generation import generate_audio_from_json
 
 def render_step_5():
     """Render Step 5: Audio Generation"""
-    if "audio_generated_in_step5" not in st.session_state:
+    if 'audio_generated_in_step5' not in st.session_state:
         st.session_state.audio_generated_in_step5 = False
-    st.header("🎵 Krok 4: Generuj audio")
+    st.header('🎵 Krok 4: Generuj audio')
 
     # Show JSON preview
     with st.expander('📋 Podgląd JSON', expanded=False):

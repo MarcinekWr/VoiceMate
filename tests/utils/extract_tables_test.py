@@ -53,13 +53,14 @@ class TestPDFTableParser(unittest.TestCase):
         """Test handling of a read error from camelot."""
         # Arrange
         parser = PDFTableParser('dummy.pdf')
+        parser.logger = MagicMock()
 
         # Act
         tables = parser.extract_tables()
 
         # Assert
         self.assertEqual(len(tables), 0)
-        self.mock_logger.error.assert_called_once()
+        parser.logger.error.assert_called_once()
 
     def test_clean_table_dataframe(self):
         """Test the dataframe cleaning functionality."""
@@ -113,4 +114,3 @@ class TestPDFTableParser(unittest.TestCase):
         # Assert
         self.assertIn('TABLE 1', formatted_string)
         self.assertIn('Accuracy: 95.5%', formatted_string)
-

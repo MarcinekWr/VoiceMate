@@ -7,11 +7,10 @@ import streamlit as st
 
 from src.utils.blob_uploader import upload_to_blob
 from src.utils.content_safety import check_content_safety
-from src.workflow.generation import (
-    generate_audio_from_json,
-    generate_plan_content,
-    generate_podcast_content,
-)
+from src.utils.key_vault import get_secret_env_first
+from src.workflow.generation import (generate_audio_from_json,
+                                     generate_plan_content,
+                                     generate_podcast_content)
 from src.workflow.process_file import process_uploaded_file, process_url_input
 from src.workflow.save import dialog_to_json, save_to_file
 
@@ -30,9 +29,8 @@ def render_auto_pipeline():
 
     if 'step' not in st.session_state:
         st.session_state.step = 6
-
-    st.markdown(
-        """
+    PREMIUM_PASSWORD = get_secret_env_first('ELEVENLABS_PASSWORD')
+    st.markdown("""
         <style>
         .centered-header {
             max-width: 900px;
@@ -41,8 +39,8 @@ def render_auto_pipeline():
         }
         </style>
     """,
-        unsafe_allow_html=True,
-    )
+                unsafe_allow_html=True,
+                )
 
     st.markdown("<div class='centered-header'>", unsafe_allow_html=True)
     st.header(
@@ -126,10 +124,25 @@ def render_auto_pipeline():
             'Wybierz silnik:',
             options=[
                 '🆓 Azure (Darmowy)',
-                '🎯 ElevenLabs (Premium)',
+                '🎯 ElevenLabs (Premium)'
             ],
         )
-        is_premium = 'Premium' in tts_option
+        is_premium = False
+        if tts_option == '🎯 ElevenLabs (Premium)':
+            password_input = st.text_input(
+                'Wpisz hasło dostępu do ElevenLabs Premium:',
+                type='password'
+            )
+            if password_input and password_input != PREMIUM_PASSWORD:
+                st.error(
+                    'Niepoprawne hasło! Opcja ElevenLabs Premium jest zablokowana.')
+                is_premium = False
+            elif password_input == PREMIUM_PASSWORD:
+                is_premium = True
+                st.success(
+                    'Hasło poprawne! Opcja ElevenLabs Premium odblokowana.')
+            else:
+                is_premium = False
 
         if st.button('⬅️ Wróć na stronę główną', type='secondary'):
             st.session_state.clear_state_on_enter = True

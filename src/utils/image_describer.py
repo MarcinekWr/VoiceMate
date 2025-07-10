@@ -1,22 +1,14 @@
 """Image description class using Azure OpenAI for describing images."""
 from __future__ import annotations
-import os
+
 import base64
-from typing import Optional
-from src.common.constants import IMAGE_DESCRIBER_PROMPT_PATH
-
-
-from langchain_core.messages import HumanMessage
-from langchain_core.prompts import PromptTemplate
-from src.services.llm_service import LLMService
-from PIL import Image
-import logging
-from pathlib import Path
+import os
 
 from langchain_core.prompts import PromptTemplate
 
 from src.common.constants import IMAGE_DESCRIBER_PROMPT_PATH
 from src.services.llm_service import LLMService
+from src.utils.logging_config import get_request_id, get_session_logger
 
 
 class ImageDescriber:
@@ -30,11 +22,14 @@ class ImageDescriber:
         self,
         prompt_path: str = IMAGE_DESCRIBER_PROMPT_PATH,
         llm_service: LLMService | None = None,
+        request_id: str | None = None,
+
     ):
         """
         Initialize the ImageDescriber.
         """
-        self.logger = logging.getLogger(__name__)
+        self.request_id = request_id or get_request_id()
+        self.logger = get_session_logger(self.request_id)
         self.prompt_path = prompt_path
         self.llm_service = llm_service or LLMService()
         self.prompt_template: PromptTemplate | None = None
@@ -49,7 +44,8 @@ class ImageDescriber:
             if os.path.isfile(self.prompt_path):
                 with open(self.prompt_path, encoding='utf-8') as f:
                     template = f.read()
-                self.logger.info(f'Loaded custom prompt from {self.prompt_path}')
+                self.logger.info(
+                    f'Loaded custom prompt from {self.prompt_path}')
                 return PromptTemplate.from_template(template)
         except (OSError, UnicodeDecodeError) as e:
             self.logger.error(

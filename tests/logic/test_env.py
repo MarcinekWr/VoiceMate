@@ -10,6 +10,7 @@ These tests verify that the function properly checks the presence of required Az
 from __future__ import annotations
 
 import os
+from unittest.mock import patch
 
 import pytest
 
@@ -26,9 +27,11 @@ def test_validate_env_variables_success(monkeypatch):
     validate_env_variables()
 
 
-def test_validate_env_variables_missing(monkeypatch):
-    monkeypatch.delenv('AZURE_OPENAI_API_KEY', raising=False)
+@patch('src.logic.llm_podcast.get_secret_env_first')
+def test_validate_env_variables_missing(mock_get):
+    mock_get.side_effect = [None, None, None, None, None]
 
     with pytest.raises(ValueError) as exc:
         validate_env_variables()
-    assert 'AZURE_OPENAI_API_KEY' in str(exc.value)
+
+    assert 'Missing required environment variables' in str(exc.value)

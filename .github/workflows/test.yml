@@ -7,11 +7,27 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=https;AccountName=fake;AccountKey=fake;EndpointSuffix=core.windows.net"
+      AZURE_OPENAI_API_KEY: "fake-openai-key"
+      AZURE_OPENAI_ENDPOINT: "https://fake-openai-endpoint.openai.azure.com"
+      AZURE_OPENAI_DEPLOYMENT: "fake-deployment"
+      AZURE_OPENAI_MODEL: "gpt-4"
+      API_VERSION: "2024-06-01"
+
+      AZURE_SPEECH_API_KEY: "fake-speech-key"
+      AZURE_SPEECH_REGION: "eastus"
+
+      ELEVENLABS_API_KEY: "sk-fake-elevenlabs"
+
       APPINSIGHTS_CONNECTION_STRING: "InstrumentationKey=fake-uuid;IngestionEndpoint=https://fake.endpoint.com"
-      APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=fake-uuid;IngestionEndpoint=https://fake.endpoint.com"
-      CONTENT_SAFETY_ENDPOINT: "https://fake.endpoint.com"
-      CONTENT_SAFETY_KEY: "fake-key"
+
+      AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=https;AccountName=fake;AccountKey=fake;EndpointSuffix=core.windows.net"
+
+      CONTENT_SAFETY_ENDPOINT: "https://fake-safety-endpoint"
+      CONTENT_SAFETY_KEY: "fake-safety-key"
+
+      AZURE_KEYVAULT_URL: "https://fake-vault.vault.azure.net"
+
+      ELEVENLABS_PASSWORD: "Fakepassword123"
 
     steps:
     - name: Checkout code
@@ -30,7 +46,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pytest pytest-cov
-        # Dodaj brakujące zależności
         pip install opencensus-ext-azure
         pip install -e .
 
@@ -38,4 +53,4 @@ jobs:
     - name: Run tests with coverage
       run: |
         export PYTHONPATH="${PYTHONPATH}:./src"
-        pytest --cov=src --cov-fail-under=1
+        pytest --cov=src --cov-fail-under=70

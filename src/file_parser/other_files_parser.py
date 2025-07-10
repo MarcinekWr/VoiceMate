@@ -18,6 +18,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
 from src.file_parser import pdf_parser
+from src.utils.logging_config import get_request_id, get_session_logger
 
 
 class FileConverter:
@@ -29,16 +30,14 @@ class FileConverter:
         'pdf': ['.pdf'],
     }
 
-    def __init__(self, file_path: str, output_dir: str = 'assets'):
-        """Initialize the FileConverter
-        with a file path and output directory."""
+    def __init__(self, file_path: str, output_dir: str = 'assets', request_id: str | None = None):
+
+        self.request_id = request_id or get_request_id()
+        self.logger = get_session_logger(self.request_id)
         self.file_path = file_path
         self.output_dir = output_dir
         self.temp_files: list[str] = []
-        self.logger = logging.getLogger(__name__)
-
         self.create_output_dir()
-        self.logger.info(f'FileConverter initialized for: {file_path}')
 
     def create_output_dir(self) -> None:
         """Create the output directory if it doesn't exist."""
@@ -97,9 +96,9 @@ class FileConverter:
 
     def convert_image_to_pdf(self) -> str:
         """Convert image file to PDF format."""
-        self.logger.info(f"Converting image to PDF: {self.file_path}")
+        self.logger.info(f'Converting image to PDF: {self.file_path}')
         original_name = os.path.splitext(os.path.basename(self.file_path))[0]
-        output_path = self._generate_unique_filename(original_name, ".pdf")
+        output_path = self._generate_unique_filename(original_name, '.pdf')
 
         try:
             with Image.open(self.file_path) as img:
@@ -176,25 +175,34 @@ class FileConverter:
             raise Exception(f'Connection error: {str(e)}')
 
         domain_name = self.get_domain_name(self.file_path)
-        output_path = self._generate_unique_filename(domain_name, '.pdf')
+        output_path = os.path.abspath(
+            self._generate_unique_filename(domain_name, '.pdf'))
+
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
         script_path = os.path.join(os.path.dirname(__file__), 'url2pdf.py')
         try:
             subprocess.run(
-                [
-                    sys.executable,
-                    script_path,
-                    self.file_path,
-                    output_path,
-                ],
+                [sys.executable, script_path, self.file_path, output_path],
                 check=True,
                 capture_output=True,
                 text=True,
             )
+            # Now wait for the file to physically appear
+            timeout = 10
+            start_time = time.time()
+            while not os.path.exists(output_path):
+                if time.time() - start_time > timeout:
+                    self.logger.error(
+                        f'PDF conversion succeeded but file not found: {output_path}')
+                    raise FileNotFoundError(
+                        f'PDF not found after subprocess: {output_path}')
+                time.sleep(0.1)
+
             self.logger.info(
-                f'URL successfully converted to PDF: {output_path}',
-            )
+                f'URL successfully converted to PDF: {output_path}')
             return output_path
+
         except subprocess.CalledProcessError as e:
             self.logger.error(f'URL to PDF conversion failed: {e.stderr}')
             raise Exception(f'URL to PDF conversion error: {e.stderr}')
@@ -340,6 +348,7 @@ class FileConverter:
                 file_path=pdf_path,
                 output_dir='extracted_content',
                 describe_images=True,
+                request_id=self.request_id,
             )
 
             self.logger.info('Extracting content from PDF...')

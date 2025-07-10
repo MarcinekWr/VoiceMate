@@ -4,12 +4,7 @@ import os
 import shutil
 import sys
 import tempfile
-import shutil
-from unittest.mock import Mock, patch, MagicMock, mock_open
-import pytest
-from PIL import Image
-import requests
-from pptx import Presentation
+from unittest.mock import MagicMock, Mock, mock_open, patch
 
 import pytest
 import requests
@@ -534,6 +529,7 @@ class TestFileConverter:
                 file_path='converted.pdf',
                 output_dir='extracted_content',
                 describe_images=True,
+                request_id='no-request-id',
             )
             mock_parser_instance.initiate.assert_called_once()
 
