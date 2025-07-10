@@ -11,12 +11,14 @@ from PyQt5.QtWidgets import QApplication
 from src.utils.logging_config import get_request_id, get_session_logger
 
 
-def convert_url_to_pdf(url: str, output_path: str, request_id: str | None = None) -> None:
+def convert_url_to_pdf(
+    url: str, output_path: str, request_id: str | None = None
+) -> None:
     """Convert a URL to a PDF file."""
     request_id = request_id or get_request_id()
     logger = get_session_logger(request_id)
-    logger.info(f'📥 Rozpoczynam konwersję URL na PDF: {url}')
-    logger.info(f'📤 Ścieżka wyjściowa: {output_path}')
+    logger.info(f"📥 Rozpoczynam konwersję URL na PDF: {url}")
+    logger.info(f"📤 Ścieżka wyjściowa: {output_path}")
 
     app = QApplication(sys.argv)
     web_view = QtWebEngineWidgets.QWebEngineView()
@@ -29,27 +31,28 @@ def convert_url_to_pdf(url: str, output_path: str, request_id: str | None = None
     loop = QEventLoop()
     timer = QTimer()
     timer.setSingleShot(True)
-    timer.timeout.connect(lambda: (
-        logger.error('❌ Timeout: generowanie PDF-a trwało zbyt długo'),
-        loop.quit(),
-        sys.exit(1)
-    ))
+    timer.timeout.connect(
+        lambda: (
+            logger.error("❌ Timeout: generowanie PDF-a trwało zbyt długo"),
+            loop.quit(),
+            sys.exit(1),
+        )
+    )
 
     def handle_load_finished(ok: bool) -> None:
         """Handle the load finished event."""
         if not ok:
-            logger.error(f'❌ Nie udało się załadować strony: {url}')
+            logger.error(f"❌ Nie udało się załadować strony: {url}")
             loop.quit()
             sys.exit(1)
-        logger.info(
-            f'🌍 Strona załadowana pomyślnie, drukowanie do: {output_path}')
+        logger.info(f"🌍 Strona załadowana pomyślnie, drukowanie do: {output_path}")
         web_view.page().printToPdf(output_path, layout)
 
     def handle_pdf_finished(path: str, success: bool) -> None:
         if success:
-            logger.info(f'✅ PDF zapisany pomyślnie do: {path}')
+            logger.info(f"✅ PDF zapisany pomyślnie do: {path}")
         else:
-            logger.error(f'❌ Nie udało się zapisać PDF-a do: {path}')
+            logger.error(f"❌ Nie udało się zapisać PDF-a do: {path}")
             sys.exit(1)
         loop.quit()
 
@@ -66,9 +69,9 @@ def convert_url_to_pdf(url: str, output_path: str, request_id: str | None = None
     app.quit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print('❌ Usage: python url2pdf.py <URL> <output_path>')
+        print("❌ Usage: python url2pdf.py <URL> <output_path>")
         sys.exit(1)
 
     url = sys.argv[1]

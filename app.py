@@ -14,8 +14,11 @@ from src.ui.steps.step3_and4 import render_step_3_and_4
 from src.ui.steps.step5_audio import render_step_5
 from src.ui.steps.step_all import render_auto_pipeline
 from src.utils.blob_uploader import upload_to_blob
-from src.utils.logging_config import (cleanup_session_logger,
-                                      get_session_logger, set_request_id)
+from src.utils.logging_config import (
+    cleanup_session_logger,
+    get_session_logger,
+    set_request_id,
+)
 from src.workflow.session import initialize_session_state
 
 load_dotenv()
@@ -23,24 +26,26 @@ load_dotenv()
 
 def cleanup_on_session_end():
     """Funkcja do czyszczenia zasobów na końcu sesji"""
-    if 'request_id' in st.session_state:
+    if "request_id" in st.session_state:
         request_id = st.session_state.request_id
         try:
             cleanup_session_logger(request_id)
         except Exception as e:
-            logger = get_session_logger(
-                request_id) if 'request_id' in st.session_state else None
+            logger = (
+                get_session_logger(request_id)
+                if "request_id" in st.session_state
+                else None
+            )
             if logger:
-                logger.error(f'Error cleaning up logger for {request_id}: {e}')
-            # else: fallback (should not happen in normal flow)
+                logger.error(f"Error cleaning up logger for {request_id}: {e}")
 
 
 def main():
     st.set_page_config(
-        page_title='VoiceMate',
-        page_icon='🎙️',
-        layout='wide',
-        initial_sidebar_state='expanded',
+        page_title="VoiceMate",
+        page_icon="🎙️",
+        layout="wide",
+        initial_sidebar_state="expanded",
     )
 
     initialize_session_state()
@@ -55,8 +60,8 @@ def main():
     logger = get_session_logger(request_id)
 
     # Jednorazowe logowanie inicjalizacji
-    if 'logger_initialized' not in st.session_state:
-        logger.info(f'🟢 Logger gotowy, request_id={request_id}')
+    if "logger_initialized" not in st.session_state:
+        logger.info(f"🟢 Logger ready, request_id={request_id}")
         st.session_state.logger_initialized = True
 
     if st.session_state.step >= 1 and st.session_state.step <= 5:
@@ -78,34 +83,26 @@ def main():
         render_step_5()
 
     # Upload logów na końcu sesji
-    log_file_path = os.path.join(LOGS_DIR, f'{request_id}.log')
+    log_file_path = os.path.join(LOGS_DIR, f"{request_id}.log")
     if os.path.exists(log_file_path):
         try:
             upload_to_blob(
-                'logs',
+                "logs",
                 log_file_path,
                 blob_name=os.path.basename(log_file_path),
             )
-            logger.info(
-                '📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
-            # if 'blob_upload_notified' not in st.session_state:
-            #     st.success(
-            #         '📤 Logi aplikacji zostały zapisane w Azure Blob Storage.')
-            #     st.session_state.blob_upload_notified = True
+            logger.info("📤 Logi aplikacji zostały zapisane w Azure Blob Storage.")
         except Exception as e:
-            logger.warning(
-                f'⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}')
-            # st.warning(
-            #     f'⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}')
+            logger.warning(f"⚠️ Nie udało się wysłać logów do Azure Blob Storage: {e}")
 
-    st.markdown('---')
+    st.markdown("---")
     st.markdown(
         "<div style='text-align: center; color: #666; font-size: 0.8em;'>"
-        '🚀 Powered by AI | 🛠️ Built with Streamlit | 🎵 TTS: Azure & ElevenLabs'
-        '</div>',
+        "🚀 Powered by AI | 🛠️ Built with Streamlit | 🎵 TTS: Azure & ElevenLabs"
+        "</div>",
         unsafe_allow_html=True,
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

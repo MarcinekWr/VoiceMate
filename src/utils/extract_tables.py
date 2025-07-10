@@ -1,6 +1,7 @@
 """
 PDF Table Parser class to extract tables from PDF files.
 """
+
 from __future__ import annotations
 
 import json
@@ -30,7 +31,7 @@ class PDFTableParser:
 
     def extract_tables(
         self,
-        pages: str = 'all',
+        pages: str = "all",
     ) -> list[dict[str, Any]]:
         """
         Extract tables from PDF and return them as structured data.
@@ -39,15 +40,15 @@ class PDFTableParser:
             tables = camelot.read_pdf(
                 self.pdf_path,
                 pages=pages,
-                flavor='lattice',
-                strip_text='\n',
+                flavor="lattice",
+                strip_text="\n",
             )
 
             extracted_tables = []
 
             for i, table in enumerate(tables):
                 parsing_report = table.parsing_report
-                accuracy = parsing_report.get('accuracy', 0)
+                accuracy = parsing_report.get("accuracy", 0)
 
                 df = self._clean_table_dataframe(table.df)
 
@@ -58,14 +59,14 @@ class PDFTableParser:
 
                 if content_ratio > 0.1 or accuracy > 40:
                     table_data = {
-                        'table_id': i,
-                        'page': table.parsing_report.get('page', 'unknown'),
-                        'accuracy': round(accuracy, 2),
-                        'content_ratio': round(content_ratio, 2),
-                        'shape': df.shape,
-                        'data': df.to_dict('records'),
-                        'json': df.to_json(
-                            orient='records',
+                        "table_id": i,
+                        "page": table.parsing_report.get("page", "unknown"),
+                        "accuracy": round(accuracy, 2),
+                        "content_ratio": round(content_ratio, 2),
+                        "shape": df.shape,
+                        "data": df.to_dict("records"),
+                        "json": df.to_json(
+                            orient="records",
                             force_ascii=False,
                         ),
                     }
@@ -75,7 +76,7 @@ class PDFTableParser:
 
         except Exception as e:
             self.logger.error(
-                f'Error extracting tables from PDF {self.pdf_path} on pages {pages}: {e}',
+                f"Error extracting tables from PDF {self.pdf_path} on pages {pages}: {e}",
             )
             return []
 
@@ -87,22 +88,22 @@ class PDFTableParser:
         cleaned_df = df.copy()
 
         # Replace empty strings with NA for consistent handling
-        cleaned_df.replace('', pd.NA, inplace=True)
+        cleaned_df.replace("", pd.NA, inplace=True)
 
-        cleaned_df.dropna(how='all', axis=0, inplace=True)
-        cleaned_df.dropna(how='all', axis=1, inplace=True)
+        cleaned_df.dropna(how="all", axis=0, inplace=True)
+        cleaned_df.dropna(how="all", axis=1, inplace=True)
 
         cleaned_df = cleaned_df[
             ~cleaned_df.astype(str)
             .apply(
                 lambda x: x.str.strip(),
             )
-            .eq('')
+            .eq("")
             .all(axis=1)
         ]
 
         for col in cleaned_df.columns:
-            if cleaned_df[col].dtype == 'object':
+            if cleaned_df[col].dtype == "object":
                 cleaned_df[col] = cleaned_df[col].astype(str).str.strip()
 
         cleaned_df.reset_index(drop=True, inplace=True)
@@ -120,7 +121,7 @@ class PDFTableParser:
         non_empty_cells = (
             df.astype(str)
             .apply(
-                lambda x: x.str.strip() != '',
+                lambda x: x.str.strip() != "",
             )
             .sum()
             .sum()
@@ -135,10 +136,10 @@ class PDFTableParser:
         Format extracted tables into a string suitable for LLM processing.
         """
         if not tables:
-            return 'No tables found in the document.'
+            return "No tables found in the document."
 
         formatted_output = []
-        formatted_output.append('--- EXTRACTED TABLES ---')
+        formatted_output.append("--- EXTRACTED TABLES ---")
 
         for table in tables:
             formatted_output.append(f"\n=== TABLE {table['table_id']} ===")
@@ -151,9 +152,9 @@ class PDFTableParser:
                 f"Content Ratio: {table['content_ratio']}",
             )
 
-            formatted_output.append('\nTable Data (JSON):')
+            formatted_output.append("\nTable Data (JSON):")
             try:
-                json_data = json.loads(table['json'])
+                json_data = json.loads(table["json"])
                 formatted_output.append(
                     json.dumps(
                         json_data,
@@ -162,8 +163,8 @@ class PDFTableParser:
                     ),
                 )
             except Exception:
-                formatted_output.append(table['json'])
+                formatted_output.append(table["json"])
 
-            formatted_output.append('-' * 50)
+            formatted_output.append("-" * 50)
 
-        return '\n'.join(formatted_output)
+        return "\n".join(formatted_output)
