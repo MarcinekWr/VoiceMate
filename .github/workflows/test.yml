@@ -53,5 +53,4 @@ jobs:
     - name: Run tests with coverage
       run: |
         export PYTHONPATH="${PYTHONPATH}:./src"
-        pytest --cov=src --cov-fail-under=70 --cov-report=term --cov-report=xml --cov-omit="tests/ui/*"
-
+        pytest --cov=src --cov-fail-under=70
