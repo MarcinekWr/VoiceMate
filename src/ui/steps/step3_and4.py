@@ -90,15 +90,18 @@ def render_step_3_and_4():
 
     st.markdown("---")
 
-    # Przycisk generowania
+    if tts_option == "🎯 ElevenLabs (Premium)" and not is_premium:
+        st.warning("🔒 Aby korzystać z ElevenLabs, wpisz poprawne hasło. W przeciwnym razie użyj Azure.")
+
     col1, col2 = st.columns([1, 3])
     with col1:
         generate_podcast_button = st.button(
             "🎙️ Generuj podcast",
             type="primary",
-            disabled=st.session_state.processing,
+            disabled=st.session_state.processing or (tts_option == "🎯 ElevenLabs (Premium)" and not is_premium),
             use_container_width=True,
         )
+
     with col2:
         if st.session_state.processing:
             st.info(

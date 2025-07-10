@@ -155,6 +155,8 @@ def render_auto_pipeline():
         url_input.strip().startswith(("http://", "https://"))
     )
 
+    if tts_option == "🎯 ElevenLabs (Premium)" and not is_premium:
+        st.warning("🔒 Aby korzystać z ElevenLabs, wpisz poprawne hasło. W przeciwnym razie użyj Azure.")
     if st.button(
         "🚀 Start – Wygeneruj podcast",
         type="primary",
