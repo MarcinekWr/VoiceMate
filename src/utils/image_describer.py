@@ -1,5 +1,6 @@
-"""Image description class using Azure OpenAI for describing images."""
-
+"""
+Image description class using Azure OpenAI for describing images.
+"""
 from __future__ import annotations
 
 import base64
@@ -27,6 +28,11 @@ class ImageDescriber:
     ):
         """
         Initialize the ImageDescriber.
+
+        Args:
+            prompt_path (str, optional): Path to the prompt template file. Defaults to IMAGE_DESCRIBER_PROMPT_PATH.
+            llm_service (LLMService, optional): Custom LLM service instance. Defaults to None.
+            request_id (str, optional): Unique request identifier for logging. If None, a new one is generated.
         """
         self.request_id = request_id or get_request_id()
         self.logger = get_session_logger(self.request_id)
@@ -39,7 +45,12 @@ class ImageDescriber:
             self.prompt_template = self._load_prompt_template()
 
     def _load_prompt_template(self) -> PromptTemplate:
-        """Load the prompt template from file or use default."""
+        """
+        Load the prompt template from file or use the default template.
+
+        Returns:
+            PromptTemplate: Loaded or default prompt template.
+        """
         try:
             if os.path.isfile(self.prompt_path):
                 with open(self.prompt_path, encoding="utf-8") as f:
@@ -54,7 +65,12 @@ class ImageDescriber:
         return self._use_default_prompt()
 
     def _use_default_prompt(self) -> PromptTemplate:
-        """Set up the default prompt template."""
+        """
+        Set up and return the default prompt template.
+
+        Returns:
+            PromptTemplate: Default prompt template.
+        """
         default_prompt = (
             "Opisz ten obraz szczegółowo. Skup się na tekście, wykresach, diagramach i wszelkich istotnych elementach wizualnych. "
             "Jeśli obraz wygląda na slajd, zrzut ekranu lub dokument, przedstaw uporządkowane podsumowanie jego treści. "
@@ -66,6 +82,13 @@ class ImageDescriber:
     def describe_image(self, image_path: str, topic: str = "general") -> str:
         """
         Describe an image from a file path.
+
+        Args:
+            image_path (str): Path to the image file.
+            topic (str, optional): Topic to focus the description on. Defaults to 'general'.
+
+        Returns:
+            str: Description of the image or error message.
         """
         if not self.is_available:
             return "Image description not available"
@@ -91,6 +114,13 @@ class ImageDescriber:
     ) -> str:
         """
         Describe an image from bytes.
+
+        Args:
+            image_bytes (bytes): Image data in bytes.
+            topic (str, optional): Topic to focus the description on. Defaults to 'general'.
+
+        Returns:
+            str: Description of the image or error message.
         """
         if not self.is_available:
             return "Image description not available"
@@ -110,6 +140,12 @@ class ImageDescriber:
     def _image_to_base64(image_path: str) -> str:
         """
         Convert an image file to a base64 encoded string.
+
+        Args:
+            image_path (str): Path to the image file.
+
+        Returns:
+            str: Base64 encoded string of the image.
         """
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode("utf-8")

@@ -1,3 +1,6 @@
+"""
+This script provides a function to convert a URL to a PDF file using PyQt5's QtWebEngine, suitable for headless conversion in automation workflows.
+"""
 from __future__ import annotations
 
 import gc
@@ -11,10 +14,18 @@ from PyQt5.QtWidgets import QApplication
 from src.utils.logging_config import get_request_id, get_session_logger
 
 
-def convert_url_to_pdf(
-    url: str, output_path: str, request_id: str | None = None
-) -> None:
-    """Convert a URL to a PDF file."""
+def convert_url_to_pdf(url: str, output_path: str, request_id: str | None = None) -> None:
+    """
+    Convert a URL to a PDF file using PyQt5's QtWebEngine.
+
+    Args:
+        url (str): The URL to convert to PDF.
+        output_path (str): Path where the PDF will be saved.
+        request_id (str, optional): Unique request identifier for logging. If None, a new one is generated.
+
+    Raises:
+        SystemExit: If the page fails to load or PDF generation fails.
+    """
     request_id = request_id or get_request_id()
     logger = get_session_logger(request_id)
     logger.info(f"📥 Rozpoczynam konwersję URL na PDF: {url}")
@@ -40,7 +51,15 @@ def convert_url_to_pdf(
     )
 
     def handle_load_finished(ok: bool) -> None:
-        """Handle the load finished event."""
+        """
+        Handle the load finished event for the web page.
+
+        Args:
+            ok (bool): True if the page loaded successfully, False otherwise.
+
+        Raises:
+            SystemExit: If the page fails to load.
+        """
         if not ok:
             logger.error(f"❌ Nie udało się załadować strony: {url}")
             loop.quit()
@@ -49,6 +68,16 @@ def convert_url_to_pdf(
         web_view.page().printToPdf(output_path, layout)
 
     def handle_pdf_finished(path: str, success: bool) -> None:
+        """
+        Handle the PDF printing finished event.
+
+        Args:
+            path (str): Path where the PDF was saved.
+            success (bool): True if PDF was saved successfully, False otherwise.
+
+        Raises:
+            SystemExit: If PDF saving fails.
+        """
         if success:
             logger.info(f"✅ PDF zapisany pomyślnie do: {path}")
         else:
@@ -71,7 +100,7 @@ def convert_url_to_pdf(
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("❌ Usage: python url2pdf.py <URL> <output_path>")
+        print('\u274c Usage: python url2pdf.py <URL> <output_path>')
         sys.exit(1)
 
     url = sys.argv[1]

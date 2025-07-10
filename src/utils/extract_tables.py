@@ -35,6 +35,15 @@ class PDFTableParser:
     ) -> list[dict[str, Any]]:
         """
         Extract tables from PDF and return them as structured data.
+
+        Args:
+            pages (str, optional): Pages to extract tables from. Defaults to 'all'.
+
+        Returns:
+            list[dict[str, Any]]: List of extracted tables with metadata and data.
+
+        Raises:
+            Exception: If table extraction fails (logged, returns empty list).
         """
         try:
             tables = camelot.read_pdf(
@@ -84,6 +93,12 @@ class PDFTableParser:
     def _clean_table_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         """
         Clean a DataFrame by removing empty rows/columns and whitespace.
+
+        Args:
+            df (pd.DataFrame): DataFrame to clean.
+
+        Returns:
+            pd.DataFrame: Cleaned DataFrame.
         """
         cleaned_df = df.copy()
 
@@ -114,6 +129,12 @@ class PDFTableParser:
     def _calculate_content_ratio(df: pd.DataFrame) -> float:
         """
         Calculate the ratio of non-empty cells in a DataFrame.
+
+        Args:
+            df (pd.DataFrame): DataFrame to analyze.
+
+        Returns:
+            float: Ratio of non-empty cells to total cells.
         """
         if df.empty:
             return 0.0
@@ -134,6 +155,12 @@ class PDFTableParser:
     def format_tables_for_llm(tables: list[dict[str, Any]]) -> str:
         """
         Format extracted tables into a string suitable for LLM processing.
+
+        Args:
+            tables (list[dict[str, Any]]): List of extracted tables.
+
+        Returns:
+            str: Formatted string for LLM consumption.
         """
         if not tables:
             return "No tables found in the document."
