@@ -2,6 +2,22 @@
 
 VoiceMate is a modular application for converting documents into audio using advanced text-to-speech (TTS) services. It leverages Streamlit for the UI, supports PDF parsing and image extraction, and integrates with Azure and ElevenLabs for high-quality audio output. The codebase is organized for extensibility, with clear session management, logging, and cloud integration.
 
+## Demo – How VoiceMate Works
+
+The following demo presents the full podcast generation process in VoiceMate – from file upload to listening and downloading the final audio.
+
+### Steps shown in the demo:
+1. **Main Page** – Welcome screen introducing the tool.
+2. **Quick Podcast Mode** – A fast-track option for generating a full podcast with one click.
+3. **Content Selection** – Uploading a document (PDF, HTML, URL), selecting the podcast style (e.g., *scientific*), and choosing a TTS engine (Azure or ElevenLabs).
+4. **Parsing Document** – The system analyzes and extracts content from the uploaded file.
+5. **Outline Generation** – VoiceMate creates a structured podcast outline based on the input.
+6. **Narration Generation** – The narration is composed using LLM and converted to audio using the selected voice engine.
+7. **Final View** – The user can listen to the generated podcast, download the audio file, or export the script.
+
+
+![VoiceMate Demo](doc/demo-gif.gif)
+
 ## Techniques Used
 
 - **Session State Management**: Uses [Streamlit session state](https://docs.streamlit.io/library/api-reference/session-state) to persist user context and progress.
